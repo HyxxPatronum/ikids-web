@@ -2,6 +2,7 @@ node_modules/
 dist/
 .next/
 .wrangler/
+.vinext/
 .env*
 !.env.example
 public/index.html
@@ -14,4 +15,3 @@ public/shared.js
 public/day001-flower.png
 public/day001-flower.json
 public/science-reader-100-how-a-cactus-saves-water.json
-
