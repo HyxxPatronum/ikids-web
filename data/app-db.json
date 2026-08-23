@@ -1,0 +1,159 @@
+{
+  "users": {},
+  "sessions": {},
+  "progress": {
+    "demo": {
+      "cards": {
+        "day001-flower": {
+          "cardId": "day001-flower",
+          "answers": {
+            "context": {
+              "0": "A",
+              "1": "A"
+            },
+            "comprehension": {
+              "0": "A",
+              "1": "B",
+              "2": "A",
+              "context0": "water"
+            }
+          },
+          "steps": [],
+          "active": -1,
+          "updatedAt": "2026-08-23T14:07:29.151Z",
+          "lastModule": "result",
+          "matched": [
+            "bud",
+            "roots",
+            "soil",
+            "sunlight",
+            "petals"
+          ],
+          "rebuild": [
+            0,
+            3,
+            1,
+            2,
+            4
+          ],
+          "moduleStatus": {
+            "reading": {
+              "completed": true,
+              "score": 100,
+              "completedAt": "2026-08-23T14:03:50.576Z"
+            },
+            "listening": {
+              "completed": true,
+              "score": 100,
+              "completedAt": "2026-08-23T14:04:55.673Z"
+            },
+            "words": {
+              "completed": true,
+              "score": 100,
+              "completedAt": "2026-08-23T14:05:32.360Z"
+            },
+            "comprehension": {
+              "completed": true,
+              "score": 100,
+              "completedAt": "2026-08-23T14:06:37.845Z"
+            },
+            "rebuild": {
+              "completed": true,
+              "score": 40,
+              "completedAt": "2026-08-23T14:07:26.557Z"
+            },
+            "result": {
+              "completed": true,
+              "score": 100,
+              "completedAt": "2026-08-23T14:07:29.099Z"
+            }
+          },
+          "completedPercent": 100
+        },
+        "science-reader-100-how-a-cactus-saves-water": {
+          "cardId": "science-reader-100-how-a-cactus-saves-water",
+          "lastModule": "words",
+          "answers": {
+            "context": {},
+            "comprehension": {}
+          },
+          "matched": [],
+          "rebuild": [
+            0,
+            2,
+            4,
+            1,
+            3
+          ],
+          "moduleStatus": {},
+          "completedPercent": 0,
+          "updatedAt": "2026-08-23T14:32:48.321Z"
+        }
+      }
+    }
+  },
+  "recordings": [
+    {
+      "id": "cdc4b074-10ad-4328-8f42-77cb7e378d9f",
+      "userId": "demo",
+      "cardId": "day001-flower",
+      "targetSentence": "The petals slowly unfold and open.",
+      "mime": "audio/webm;codecs=opus",
+      "size": 73712,
+      "status": "uploaded",
+      "createdAt": "2026-08-23T14:04:37.174Z"
+    },
+    {
+      "id": "667c332f-1ae6-475f-a3af-1aa30e16d857",
+      "userId": "demo",
+      "cardId": "day001-flower",
+      "targetSentence": "The petals slowly unfold and open.",
+      "mime": "audio/webm;codecs=opus",
+      "size": 45698,
+      "status": "uploaded",
+      "createdAt": "2026-08-23T14:04:55.669Z"
+    }
+  ],
+  "cards": {
+    "day001-flower": {
+      "id": "day001-flower",
+      "slug": "science-reading-1-flower",
+      "seriesId": "science-reading",
+      "courseId": "science-reading",
+      "topic": "Living Things",
+      "theme": "Flowers",
+      "day": 1,
+      "level": "L1",
+      "title": "FLOWER",
+      "image": "day001-flower.png",
+      "status": "published",
+      "contentFile": "day001-flower.json",
+      "updatedAt": "2026-08-23T14:33:07.996Z"
+    },
+    "science-reader-100-how-a-cactus-saves-water": {
+      "id": "science-reader-100-how-a-cactus-saves-water",
+      "slug": "science-reader-100-how-a-cactus-saves-water",
+      "seriesId": "science-reading",
+      "courseId": "science-reading",
+      "topic": "Living Things",
+      "theme": "Desert Plants",
+      "day": 100,
+      "level": "L1",
+      "title": "How a Cactus Saves Water",
+      "image": "day001-flower.png",
+      "status": "published",
+      "contentFile": "science-reader-100-how-a-cactus-saves-water.json",
+      "updatedAt": "2026-08-23T14:33:07.996Z"
+    }
+  },
+  "series": [
+    {
+      "id": "science-reading",
+      "name": "Science Reading",
+      "subtitle": "Nature, life science, and science stories",
+      "description": "Learn science English through reading, listening, and practice",
+      "sort": 10,
+      "status": "published"
+    }
+  ]
+}

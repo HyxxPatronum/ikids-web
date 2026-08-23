@@ -1,0 +1,166 @@
+<!doctype html>
+<html lang="zh-CN">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width,initial-scale=1">
+  <meta name="description" content="通过英语科普阅读，练习词汇、听力、理解与科学表达。">
+  <meta property="og:title" content="Fluent Science Reading">
+  <meta property="og:description" content="Read · Think · Explain — 儿童英语科普阅读学习平台。">
+  <meta property="og:image" content="/og.png">
+  <meta name="twitter:card" content="summary_large_image">
+  <meta name="twitter:title" content="Fluent Science Reading">
+  <meta name="twitter:description" content="Read · Think · Explain — 儿童英语科普阅读学习平台。">
+  <meta name="twitter:image" content="/og.png">
+  <title>我的课程 · Fluent Science Reading</title>
+  <link rel="stylesheet" href="/styles.css">
+  <style>
+    .hero-strip { display: grid; grid-template-columns: 1fr auto; gap: 24px; align-items: end; padding: 28px; margin-bottom: 18px; overflow: hidden; background: linear-gradient(135deg,#fff 0,#fff7ef 100%); }
+    .hero-strip p { max-width: 650px; margin: 10px 0 0; }
+    .hero-stat { min-width: 160px; padding: 16px; border-radius: 16px; background: var(--ink); color: #fff; }
+    .hero-stat strong { display: block; font-size: 32px; }
+    .catalog { display: grid; grid-template-columns: 250px 1fr; gap: 18px; align-items: start; }
+    .series-panel { position: sticky; top: 16px; padding: 18px; }
+    .series-list { display: grid; gap: 8px; margin-top: 15px; }
+    .series-item { width: 100%; border: 1px solid var(--line); border-radius: 14px; padding: 12px; background: #fff; color: var(--ink); text-align: left; cursor: pointer; }
+    .series-item.active { border-color: var(--brand); background: #fff2ed; }
+    .series-item strong, .series-item small { display: block; }
+    .series-item small { color: var(--muted); margin-top: 4px; }
+    .course-main { padding: 22px; min-width: 0; }
+    .course-head { display: flex; justify-content: space-between; gap: 20px; align-items: flex-start; padding-bottom: 18px; border-bottom: 1px dashed var(--line); }
+    .course-head h2 { margin: 0; font-size: 28px; }
+    .filters { display: flex; gap: 7px; flex-wrap: wrap; margin: 18px 0; }
+    .filter { border: 1px solid var(--line); border-radius: 999px; padding: 8px 12px; background: #fff; color: var(--muted); font-weight: 800; cursor: pointer; }
+    .filter.active { border-color: #9fbde8; color: var(--blue); background: var(--blue-soft); }
+    .cards { display: grid; grid-template-columns: repeat(2,minmax(0,1fr)); gap: 13px; }
+    .lesson-card { display: grid; grid-template-columns: 110px 1fr; gap: 13px; padding: 11px; border: 1px solid var(--line); border-radius: 17px; background: #fff; }
+    .lesson-card:hover { border-color: #abc0d8; box-shadow: 0 10px 26px rgba(25,54,88,.07); }
+    .lesson-card img { width: 110px; height: 148px; object-fit: cover; object-position: top; border-radius: 12px; background: #edf1f5; }
+    .lesson-card h3 { margin: 5px 0; font-size: 19px; line-height: 1.2; }
+    .lesson-meta { display: flex; gap: 6px; flex-wrap: wrap; color: var(--muted); font-size: 11px; font-weight: 800; }
+    .lesson-progress { margin: 14px 0 10px; }
+    .lesson-progress div:first-child { display: flex; justify-content: space-between; margin-bottom: 6px; color: var(--muted); font-size: 12px; }
+    .card-actions { display: flex; justify-content: space-between; align-items: center; gap: 8px; }
+    @media(max-width:900px){.catalog{grid-template-columns:1fr}.series-panel{position:static}.series-list{grid-template-columns:repeat(2,1fr)}.cards{grid-template-columns:1fr}}
+    @media(max-width:600px){.hero-strip{grid-template-columns:1fr;padding:20px}.hero-stat{min-width:0}.course-main{padding:15px}.series-list{grid-template-columns:1fr}.course-head{display:block}.course-head .badge{margin-top:10px}.lesson-card{grid-template-columns:88px 1fr}.lesson-card img{width:88px;height:124px}.card-actions{align-items:flex-end}}
+  </style>
+</head>
+<body>
+  <div class="shell">
+    <div id="nav"></div>
+    <section class="panel hero-strip">
+      <div>
+        <p class="eyebrow">My learning path</p>
+        <h1 class="page-title">今天，读懂一个科学故事</h1>
+        <p class="muted">从图文阅读出发，用核心词、3Q 理解和结构重建把知识说清楚。</p>
+      </div>
+      <div class="hero-stat" aria-live="polite"><span>总体学习进度</span><strong id="overall">0%</strong><small id="summary">正在读取学习记录…</small></div>
+    </section>
+
+    <div class="catalog">
+      <aside class="panel series-panel">
+        <p class="eyebrow">Course series</p>
+        <h2 class="section-title">课程系列</h2>
+        <p class="muted">选择一个主题路径开始学习。</p>
+        <div id="seriesList" class="series-list"><div class="skeleton"></div></div>
+      </aside>
+      <main class="panel course-main">
+        <div class="course-head">
+          <div><p class="eyebrow">Current series</p><h2 id="seriesName">加载课程中…</h2><p id="seriesDescription" class="muted"></p></div>
+          <span class="badge" id="seriesCount">—</span>
+        </div>
+        <div class="filters" role="group" aria-label="按学习状态筛选">
+          <button class="filter active" data-filter="all" type="button">全部</button>
+          <button class="filter" data-filter="new" type="button">未开始</button>
+          <button class="filter" data-filter="learning" type="button">学习中</button>
+          <button class="filter" data-filter="done" type="button">已完成</button>
+        </div>
+        <div id="cards" class="cards" aria-live="polite"><div class="skeleton"></div><div class="skeleton"></div></div>
+      </main>
+    </div>
+  </div>
+  <script type="module">
+    import { $, $$, api, currentUserId, escapeHtml, nav, formatDate } from '/shared.js';
+    $('#nav').innerHTML = nav('courses');
+
+    const state = { series: [], cards: [], progress: { cards: {} }, active: null, filter: 'all' };
+    const cardProgress = card => state.progress.cards?.[card.id] || {};
+    const percent = card => Number(cardProgress(card).completedPercent ?? cardProgress(card).completed_percent ?? 0);
+    const status = card => percent(card) >= 100 ? 'done' : percent(card) > 0 ? 'learning' : 'new';
+
+    function renderSummary() {
+      const records = Object.values(state.progress.cards || {});
+      const average = records.length ? Math.round(records.reduce((sum, item) => sum + Number(item.completedPercent || item.completed_percent || 0), 0) / records.length) : 0;
+      $('#overall').textContent = `${average}%`;
+      $('#summary').textContent = records.length ? `${records.filter(item => Number(item.completedPercent || item.completed_percent || 0) >= 100).length} 课完成 · ${records.length} 课已开始` : '选择一张卡片开始第一课';
+    }
+
+    function renderSeries() {
+      $('#seriesList').innerHTML = state.series.length ? state.series.map(series => `<button type="button" class="series-item ${state.active?.id === series.id ? 'active' : ''}" data-series="${escapeHtml(series.id)}"><strong>${escapeHtml(series.name)}</strong><small>${series.cardCount} lessons</small></button>`).join('') : '<div class="state-box"><strong>暂无课程系列</strong>发布第一张卡片后会显示在这里。</div>';
+      $$('.series-item').forEach(button => button.addEventListener('click', () => selectSeries(state.series.find(item => item.id === button.dataset.series))));
+    }
+
+    function renderCards() {
+      const visible = state.cards.filter(card => state.filter === 'all' || status(card) === state.filter);
+      if (!visible.length) {
+        $('#cards').innerHTML = '<div class="state-box"><strong>这个筛选下还没有课程</strong>换一个状态看看，或从未开始的课程出发。</div>';
+        return;
+      }
+      $('#cards').innerHTML = visible.map(card => {
+        const value = percent(card);
+        const label = value >= 100 ? '再次学习' : value > 0 ? '继续学习' : '开始学习';
+        return `<article class="lesson-card">
+          <img src="/${escapeHtml(card.image || 'day001-flower.png')}" alt="${escapeHtml(card.title)} 阅读卡片" loading="lazy">
+          <div>
+            <div class="lesson-meta"><span>DAY ${String(card.day).padStart(3,'0')}</span><span>·</span><span>${escapeHtml(card.level || 'L1')}</span><span>·</span><span>${escapeHtml(card.theme || '')}</span></div>
+            <h3>${escapeHtml(card.title || 'Untitled lesson')}</h3>
+            <div class="lesson-progress"><div><span>${value ? `上次学习 ${formatDate(cardProgress(card).updatedAt)}` : '尚未开始'}</span><strong>${value}%</strong></div><div class="progress"><span style="width:${Math.min(100,value)}%"></span></div></div>
+            <div class="card-actions"><span class="badge ${value >= 100 ? 'success' : value > 0 ? 'warning' : ''}"><span class="status-dot"></span>${value >= 100 ? '已完成' : value > 0 ? '学习中' : '新课程'}</span><a class="btn primary" href="/lesson/${encodeURIComponent(card.slug || card.id)}">${label}</a></div>
+          </div>
+        </article>`;
+      }).join('');
+    }
+
+    async function selectSeries(series) {
+      if (!series) return;
+      state.active = series;
+      renderSeries();
+      $('#seriesName').textContent = series.name;
+      $('#seriesDescription').textContent = series.subtitle || series.description || '';
+      $('#seriesCount').textContent = `${series.cardCount} lessons`;
+      $('#cards').innerHTML = '<div class="skeleton"></div><div class="skeleton"></div>';
+      try {
+        const data = await api(`/api/cards?seriesId=${encodeURIComponent(series.id)}`);
+        state.cards = data.cards || [];
+        renderCards();
+      } catch (error) {
+        $('#cards').innerHTML = `<div class="state-box"><strong>课程加载失败</strong>${escapeHtml(error.message)}<br><button class="btn" id="retryCards" type="button">重新加载</button></div>`;
+        $('#retryCards').onclick = () => selectSeries(series);
+      }
+    }
+
+    $$('.filter').forEach(button => button.addEventListener('click', () => {
+      $$('.filter').forEach(item => item.classList.toggle('active', item === button));
+      state.filter = button.dataset.filter;
+      renderCards();
+    }));
+
+    async function load() {
+      try {
+        const [seriesData, progressData] = await Promise.all([
+          api(`/api/series?ts=${Date.now()}`),
+          api(`/api/progress/${encodeURIComponent(currentUserId())}`).catch(() => ({ cards: {} }))
+        ]);
+        state.series = seriesData.series || [];
+        state.progress = progressData || { cards: {} };
+        renderSummary();
+        if (!state.series.length) { renderSeries(); $('#cards').innerHTML = '<div class="state-box"><strong>还没有已发布课程</strong>内容发布后会自动出现。</div>'; return; }
+        await selectSeries(state.series[0]);
+      } catch (error) {
+        $('#seriesList').innerHTML = `<div class="state-box"><strong>目录加载失败</strong>${escapeHtml(error.message)}</div>`;
+        $('#cards').innerHTML = '<div class="state-box"><button class="btn" type="button" onclick="location.reload()">重新加载</button></div>';
+      }
+    }
+    load();
+  </script>
+</body>
+</html>

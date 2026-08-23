@@ -1,0 +1,17 @@
+node_modules/
+dist/
+.next/
+.wrangler/
+.env*
+!.env.example
+public/index.html
+public/syllabus.html
+public/words.html
+public/account.html
+public/admin.html
+public/styles.css
+public/shared.js
+public/day001-flower.png
+public/day001-flower.json
+public/science-reader-100-how-a-cactus-saves-water.json
+
