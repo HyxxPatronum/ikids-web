@@ -1,5 +1,6 @@
 import level2Data from '../../data/vocabulary-level2.json' with { type: 'json' };
 import level3Data from '../../data/vocabulary-level3.json' with { type: 'json' };
+import type { ApprovalFields } from '../vocabulary/approval.ts';
 
 const level2Words = level2Data as string[];
 const level3Words = level3Data as string[];
@@ -13,7 +14,7 @@ export type CatalogCard = {
   image?: string;
   image_file?: string;
   status?: string;
-  word_bank?: Array<{ english?: string; chinese?: string; meaning?: string; image?: string; approved?: boolean; approvalStatus?: string; status?: string }>;
+  word_bank?: Array<{ english?: string; chinese?: string; meaning?: string; image?: string } & ApprovalFields>;
 };
 
 export type CatalogIndexEntry = {

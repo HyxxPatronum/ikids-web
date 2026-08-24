@@ -1,6 +1,6 @@
 import assert from 'node:assert/strict';
 import test from 'node:test';
-import { createMemoryPublicationStore, createPublicationIndex } from '../lib/catalog/publication-index.ts';
+import { createMemoryPublicationStore, createPublicationIndex, phraseCandidates, reviewPhraseCandidate } from '../lib/catalog/publication-index.ts';
 import type { PublicationCard } from '../lib/catalog/publication-index.ts';
 
 test('draft terms remain preview-only and publishing indexes only approved terms', async () => {
@@ -61,6 +61,20 @@ test('republishing replaces a course atomically and visibility changes are idemp
   assert.equal((await index.lookup('microscope')).length, 0);
 });
 
+test('course-context lookup chooses the matching published Course Sense deterministically', async () => {
+  const index = createPublicationIndex(createMemoryPublicationStore());
+  await index.synchronize({
+    cardId: 'course-a', status: 'published',
+    word_bank: [{ english: 'organism', chinese: 'course A meaning', approved: true }],
+  });
+  await index.synchronize({
+    cardId: 'course-b', status: 'published',
+    word_bank: [{ english: 'organism', chinese: 'course B meaning', approved: true }],
+  });
+
+  assert.equal((await index.lookup('organism', { courseId: 'course-b' }))[0]?.meaning, 'course B meaning');
+});
+
 test('science surface forms share one normalized Lexeme identity', async () => {
   const index = createPublicationIndex(createMemoryPublicationStore());
   await index.synchronize({
@@ -79,4 +93,51 @@ test('fixed-catalog membership is decided from the resolved Lexeme', async () =>
   const entry = (await index.lookup('flower'))[0];
   assert.equal(entry?.lexeme, 'flower');
   assert.equal(entry?.membership, 'level2');
+});
+
+test('content editors can accept a phrase candidate before publication', () => {
+  const card: PublicationCard = {
+    cardId: 'course-phrases',
+    status: 'draft',
+    word_bank: [
+      { english: 'living things', chinese: '生物', approvalStatus: 'candidate' },
+      { english: 'water cycle', chinese: '水循环', approvalStatus: 'rejected' },
+    ],
+  };
+
+  assert.deepEqual(phraseCandidates(card).map(term => term.english), ['living things']);
+  const reviewed = reviewPhraseCandidate(card, { english: 'living things', action: 'accept' });
+  assert.deepEqual(reviewed.word_bank?.[0], {
+    english: 'living things',
+    chinese: '生物',
+    approvalStatus: 'approved',
+    approved: true,
+  });
+});
+
+test('content editors can correct or reject phrase candidates', () => {
+  const card: PublicationCard = {
+    cardId: 'course-phrase-review',
+    status: 'draft',
+    word_bank: [
+      { english: 'living thing', approvalStatus: 'candidate' },
+      { english: 'warm water', approvalStatus: 'candidate' },
+    ],
+  };
+
+  const corrected = reviewPhraseCandidate(card, {
+    english: 'living thing',
+    action: 'correct',
+    correctedEnglish: 'living things',
+  });
+  const rejected = reviewPhraseCandidate(corrected, { english: 'warm water', action: 'reject' });
+  assert.deepEqual(rejected.word_bank?.map(term => ({
+    english: term.english,
+    approved: term.approved,
+    approvalStatus: term.approvalStatus,
+  })), [
+    { english: 'living things', approved: true, approvalStatus: 'approved' },
+    { english: 'warm water', approved: false, approvalStatus: 'rejected' },
+  ]);
+  assert.deepEqual(phraseCandidates(rejected), []);
 });

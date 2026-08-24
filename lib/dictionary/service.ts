@@ -1,6 +1,7 @@
 export type DictionaryLanguage = 'en' | 'zh';
 export type DictionaryCategory = 'level2' | 'level3' | 'science' | 'reference';
 export type CacheStatus = 'hit' | 'miss' | 'stale';
+export type DictionaryLookupContext = { courseId: string; sentence: string };
 
 export type DictionaryMeaning = {
   partOfSpeech: string;
@@ -39,6 +40,7 @@ export type DictionaryResult = {
   lookupSource: string;
   cacheStatus: CacheStatus;
   sourceStatus: { course: 'found' | 'not_found'; provider: 'found' | 'not_found' | 'unavailable' };
+  context: DictionaryLookupContext;
 };
 
 export type DictionaryProvider = (lexeme: string, language: DictionaryLanguage) => Promise<Partial<DictionaryResult> | null>;
@@ -48,8 +50,8 @@ export type DictionaryCache = {
 };
 
 export type DictionaryCatalog = {
-  categoryFor(lexeme: string): Exclude<DictionaryCategory, 'reference'> | null;
-  courseFor(lexeme: string): { meaning?: string; image?: string; sources?: Array<Record<string, unknown>> } | null;
+  categoryFor(lexeme: string, context?: DictionaryLookupContext): Exclude<DictionaryCategory, 'reference'> | null;
+  courseFor(lexeme: string, context?: DictionaryLookupContext): { lexeme?: string; meaning?: string; image?: string; sources?: Array<Record<string, unknown>> } | null;
 };
 
 export type DictionaryServiceOptions = {
@@ -69,16 +71,38 @@ export const isValidLookup = (value: string): boolean => value.length > 0 && val
   && /^[a-z]+(?:['-][a-z]+)*(?:\s+[a-z]+(?:['-][a-z]+)*)*$/.test(value);
 
 const irregularLemmas: Record<string, string> = { grew: 'grow', grown: 'grow', went: 'go', gone: 'go', were: 'be', was: 'be', children: 'child', leaves: 'leaf', mice: 'mouse' };
-export const resolveLexeme = (value: unknown): string => {
-  const normalized = normalizeLookup(value);
-  if (irregularLemmas[normalized]) return irregularLemmas[normalized];
-  if (normalized.endsWith("'s")) return normalized.slice(0, -2);
-  if (normalized.endsWith('ies') && normalized.length > 4) return `${normalized.slice(0, -3)}y`;
-  if (normalized.endsWith('ves') && normalized.length > 4) return `${normalized.slice(0, -3)}f`;
-  if (/(?:ches|shes|sses|xes|zes|oes)$/.test(normalized) && normalized.length > 4) return normalized.slice(0, -2);
-  if (normalized.endsWith('s') && !normalized.endsWith('ss') && normalized.length > 3) return normalized.slice(0, -1);
-  return normalized;
+const likelySilentEStem = (stem: string) => {
+  const vowelCount = (stem.match(/[aeiou]/g) || []).length;
+  return vowelCount === 1 && (stem.length === 2 || /[^aeiou][aeiou][^aeiouwxy]$/.test(stem));
 };
+export const lexemeCandidates = (value: unknown): string[] => {
+  const normalized = normalizeLookup(value);
+  const candidates: string[] = [];
+  const add = (candidate: string) => { if (candidate && candidate !== normalized && !candidates.includes(candidate)) candidates.push(candidate); };
+  if (irregularLemmas[normalized]) add(irregularLemmas[normalized]);
+  if (normalized.endsWith("'s")) add(normalized.slice(0, -2));
+  if (normalized.endsWith('ies') && normalized.length > 4) add(`${normalized.slice(0, -3)}y`);
+  if (normalized.endsWith('ves') && normalized.length > 4) add(`${normalized.slice(0, -3)}f`);
+  if (/(?:ches|shes|sses|xes|zes|oes)$/.test(normalized) && normalized.length > 4) add(normalized.slice(0, -2));
+  if (normalized.endsWith('s') && !normalized.endsWith('ss') && normalized.length > 3) add(normalized.slice(0, -1));
+  if (normalized.endsWith('ied') && normalized.length > 4) add(`${normalized.slice(0, -3)}y`);
+  if (normalized.endsWith('ing') && normalized.length > 5) {
+    const stem = normalized.slice(0, -3);
+    if (stem.at(-1) === stem.at(-2) && !/[sz]$/.test(stem)) add(stem.slice(0, -1));
+    if (likelySilentEStem(stem)) add(`${stem}e`);
+    add(stem);
+    if (!likelySilentEStem(stem)) add(`${stem}e`);
+  }
+  if (normalized.endsWith('ed') && normalized.length > 3) {
+    const stem = normalized.slice(0, -2);
+    if (stem.at(-1) === stem.at(-2) && !/[sz]$/.test(stem)) add(stem.slice(0, -1));
+    if (likelySilentEStem(stem)) add(`${stem}e`);
+    add(stem);
+    if (!likelySilentEStem(stem)) add(`${stem}e`);
+  }
+  return candidates;
+};
+export const resolveLexeme = (value: unknown): string => lexemeCandidates(value)[0] || normalizeLookup(value);
 
 function dedupeMeanings(meanings: DictionaryMeaning[]): DictionaryMeaning[] {
   const seen = new Set<string>();
@@ -109,45 +133,80 @@ export function createDictionaryService(options: DictionaryServiceOptions) {
 
   return {
     async lookup(input: unknown, language: DictionaryLanguage = 'en'): Promise<DictionaryResult> {
-      const request = typeof input === 'object' && input !== null ? input as { surfaceForm?: unknown; scope?: unknown; language?: DictionaryLanguage; alternateScopes?: unknown[] } : null;
+      const request = typeof input === 'object' && input !== null ? input as { surfaceForm?: unknown; scope?: unknown; language?: DictionaryLanguage; alternateScopes?: unknown[]; courseId?: unknown; sentence?: unknown } : null;
       const surfaceForm = String(request?.surfaceForm ?? input ?? '');
       const selectedScope = normalizeLookup(request?.scope ?? surfaceForm);
+      const context = {
+        courseId: String(request?.courseId || '').trim(),
+        sentence: String(request?.sentence || '').trim(),
+      };
       language = request?.language ?? language;
-      const lexeme = resolveLexeme(selectedScope);
       if (!['en', 'zh'].includes(language) || !isValidLookup(selectedScope)) {
         throw Object.assign(new Error('Invalid dictionary lookup'), { code: 'INVALID_LOOKUP', status: 400 });
       }
-      const course = options.catalog?.courseFor(selectedScope) || options.catalog?.courseFor(lexeme);
-      const category = options.catalog?.categoryFor(lexeme) || options.catalog?.categoryFor(selectedScope) || (course ? 'science' : 'reference');
-      let remote: Partial<DictionaryResult> | null = null;
-      let cacheStatus: CacheStatus = 'miss';
-      let hadCache = false;
-      let providerStatus: DictionaryResult['sourceStatus']['provider'] = 'not_found';
-      if (options.cache) {
-        const cached = await options.cache.get(`${language}:${lexeme}`);
-        if (cached) { hadCache = true; remote = cached.value; cacheStatus = cached.status; providerStatus = remote ? 'found' : 'not_found'; }
+
+      async function loadRemote(candidate: string) {
+        let remote: Partial<DictionaryResult> | null = null;
+        let cacheStatus: CacheStatus = 'miss';
+        let hadCache = false;
+        let providerStatus: DictionaryResult['sourceStatus']['provider'] = 'not_found';
+        let providerError: unknown;
+        if (options.cache) {
+          const cached = await options.cache.get(`${language}:${candidate}`);
+          if (cached) { hadCache = true; remote = cached.value; cacheStatus = cached.status; providerStatus = remote ? 'found' : 'not_found'; }
+        }
+        if (!hadCache || cacheStatus === 'stale') {
+          try {
+            remote = await fetchOnce(candidate, language);
+            providerStatus = remote ? 'found' : 'not_found';
+            if (options.cache) await options.cache.set(`${language}:${candidate}`, remote, remote ? ttlMs : negativeTtlMs);
+          } catch (error) {
+            providerError = error;
+            providerStatus = 'unavailable';
+            if (remote) cacheStatus = 'stale';
+          }
+        }
+        return { remote, cacheStatus, providerStatus, providerError };
       }
-      if (!hadCache || cacheStatus === 'stale') {
-        try {
-          remote = await fetchOnce(lexeme, language);
-          providerStatus = remote ? 'found' : 'not_found';
-          if (options.cache) await options.cache.set(`${language}:${lexeme}`, remote, remote ? ttlMs : negativeTtlMs);
-        } catch (error) {
-          providerStatus = 'unavailable';
-          if (!remote && !course && category === 'reference') throw Object.assign(new Error('Dictionary provider unavailable'), { code: 'PROVIDER_UNAVAILABLE', status: 503, cause: error });
-          cacheStatus = 'stale';
+
+      let course = options.catalog?.courseFor(selectedScope, context) || null;
+      let lexeme = selectedScope;
+      let category = options.catalog?.categoryFor(selectedScope, context) || (course ? 'science' : null);
+      let loaded = await loadRemote(selectedScope);
+      let providerError = loaded.providerError;
+      if (!loaded.remote) {
+        const fallbackCandidates = [...new Set([course?.lexeme, ...lexemeCandidates(selectedScope)].filter(Boolean) as string[])]
+          .filter(candidate => candidate !== selectedScope);
+        for (const candidate of fallbackCandidates) {
+          const candidateCourse = options.catalog?.courseFor(candidate, context) || null;
+          const candidateCategory = options.catalog?.categoryFor(candidate, context) || null;
+          const candidateLoaded = await loadRemote(candidate);
+          providerError ||= candidateLoaded.providerError;
+          if (candidateLoaded.remote || candidateCourse || candidateCategory || candidate === course?.lexeme) {
+            lexeme = candidate;
+            course ||= candidateCourse;
+            category ||= candidateCategory || (course ? 'science' : null);
+            loaded = candidateLoaded;
+            break;
+          }
         }
       }
-      if (!remote && !course && category === 'reference') {
+      const { remote, cacheStatus, providerStatus } = loaded;
+      const resolvedCategory: DictionaryCategory = category || 'reference';
+      if (providerError && !remote && !course && resolvedCategory === 'reference') {
+        throw Object.assign(new Error('Dictionary provider unavailable'), { code: 'PROVIDER_UNAVAILABLE', status: 503, cause: providerError });
+      }
+      if (!remote && !course && resolvedCategory === 'reference') {
         throw Object.assign(new Error('Dictionary entry not found'), { code: 'NOT_FOUND', status: 404 });
       }
       return {
         surfaceForm, lexeme, selectedScope, alternateScopes: (request?.alternateScopes || []).map(normalizeLookup).filter(Boolean),
-        word: String(course?.sources?.[0]?.word || selectedScope || lexeme), category, catalogMembership: category === 'reference' ? null : category,
+        word: String(course?.sources?.[0]?.word || selectedScope || lexeme), category: resolvedCategory, catalogMembership: resolvedCategory === 'reference' ? null : resolvedCategory,
         meaning: course?.meaning || '', image: course?.image || '', sources: course?.sources || [],
         phonetic: remote?.phonetic || '', audio: remote?.audio || '', pronunciations: remote?.pronunciations || [], meanings: dedupeMeanings(remote?.meanings || []), provider: remote?.provider || 'Local dictionary',
-        language, lookupSource: remote ? (course || category !== 'reference' ? 'local+provider' : 'provider') : 'local',
+        language, lookupSource: remote ? (course || resolvedCategory !== 'reference' ? 'local+provider' : 'provider') : 'local',
         cacheStatus, sourceStatus: { course: course ? 'found' : 'not_found', provider: providerStatus },
+        context,
       };
     },
   };

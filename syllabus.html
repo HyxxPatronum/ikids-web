@@ -114,7 +114,7 @@
             <div class="lesson-meta"><span>DAY ${String(card.day).padStart(3,'0')}</span><span>·</span><span>${escapeHtml(card.level || 'L1')}</span><span>·</span><span>${escapeHtml(card.theme || '')}</span></div>
             <h3>${escapeHtml(card.title || 'Untitled lesson')}</h3>
             <div class="lesson-progress"><div><span>${value ? `上次学习 ${formatDate(cardProgress(card).updatedAt)}` : '尚未开始'}</span><strong>${value}%</strong></div><div class="progress"><span style="width:${Math.min(100,value)}%"></span></div></div>
-            <div class="card-actions"><span class="badge ${value >= 100 ? 'success' : value > 0 ? 'warning' : ''}"><span class="status-dot"></span>${value >= 100 ? '已完成' : value > 0 ? '学习中' : '新课程'}</span><a class="btn primary" href="/lesson/${encodeURIComponent(card.slug || card.id)}">${label}</a></div>
+            <div class="card-actions"><span class="badge ${value >= 100 ? 'success' : value > 0 ? 'warning' : ''}"><span class="status-dot"></span>${value >= 100 ? '已完成' : value > 0 ? '学习中' : '新课程'}</span><a class="btn primary" href="/index.html?lesson=${encodeURIComponent(card.slug || card.id)}">${label}</a></div>
           </div>
         </article>`;
       }).join('');

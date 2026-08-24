@@ -1,6 +1,7 @@
 import { catalogCategory, catalogIdentity, normalizeCatalogValue } from './catalog.ts';
 import type { CatalogCard, CatalogCategory } from './catalog.ts';
 import { resolveLexeme } from '../dictionary/service.ts';
+import { isApprovedTerm } from '../vocabulary/approval.ts';
 
 export type PublicationSource = {
   cardId: string;
@@ -37,11 +38,44 @@ export type PublicationStore = {
   find(lexeme: string): Promise<StoredPublicationTerm[]>;
 };
 
-function isApproved(term: NonNullable<PublicationCard['word_bank']>[number]) {
-  if (term.approved === false) return false;
-  if (term.approved === true) return true;
-  if (term.approvalStatus) return term.approvalStatus === 'approved';
-  return Boolean(term.status && ['approved', 'published'].includes(term.status));
+type PhraseTerm = NonNullable<PublicationCard['word_bank']>[number];
+export type PhraseReview = {
+  english: string;
+  action: 'accept' | 'correct' | 'reject';
+  correctedEnglish?: string;
+};
+
+const isPhrase = (value: unknown) => normalizeCatalogValue(value).includes(' ');
+
+export function phraseCandidates(card: PublicationCard): PhraseTerm[] {
+  return (card.word_bank || []).filter(term => isPhrase(term.english)
+    && !isApprovedTerm(term)
+    && term.approvalStatus !== 'rejected');
+}
+
+export function reviewPhraseCandidate(card: PublicationCard, review: PhraseReview): PublicationCard {
+  const target = normalizeCatalogValue(review.english);
+  const correctedEnglish = String(review.correctedEnglish || '').trim();
+  if (review.action === 'correct' && !isPhrase(correctedEnglish)) {
+    throw new Error('A corrected phrase must contain at least two words');
+  }
+  let found = false;
+  const word_bank: PhraseTerm[] = (card.word_bank || []).map(term => {
+    if (normalizeCatalogValue(term.english) !== target) return { ...term };
+    found = true;
+    if (review.action === 'reject') return { ...term, approved: false, approvalStatus: 'rejected' as const };
+    return {
+      ...term,
+      english: review.action === 'correct' ? correctedEnglish : term.english,
+      approved: true,
+      approvalStatus: 'approved' as const,
+    };
+  });
+  if (!found) throw new Error('Phrase candidate not found');
+  return {
+    ...card,
+    word_bank,
+  };
 }
 
 function sourceFor(card: PublicationCard): PublicationSource {
@@ -73,7 +107,7 @@ export function createPublicationIndex(store: PublicationStore) {
     const english = String(term.english || '').trim();
     const lexeme = publicationLexeme(english);
     const membership = catalogCategory(lexeme) || catalogCategory(english) || 'science';
-    const approved = isApproved(term);
+    const approved = isApprovedTerm(term);
     return {
       lexeme,
       english,
@@ -106,7 +140,12 @@ export function createPublicationIndex(store: PublicationStore) {
       await store.replaceCourse(card.cardId, [...terms.values()]);
     },
     async entries() { return aggregate(await store.list()); },
-    async lookup(value: unknown) { return aggregate(await store.find(publicationLexeme(value))); },
+    async lookup(value: unknown, context?: { courseId?: string }) {
+      const rows = await store.find(publicationLexeme(value));
+      if (context?.courseId) rows.sort((left, right) =>
+        Number(right.source.cardId === context.courseId) - Number(left.source.cardId === context.courseId));
+      return aggregate(rows);
+    },
   };
 }
 

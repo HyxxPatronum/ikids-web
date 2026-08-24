@@ -1,0 +1,37 @@
+.sentence {
+  display: inline;
+  border-radius: 6px;
+  outline: none;
+}
+
+.sentence:focus-visible {
+  box-shadow: 0 0 0 3px #3979d833;
+}
+
+.word {
+  display: inline;
+  margin: 0;
+  padding: 1px 2px;
+  border: 0;
+  border-radius: 4px;
+  background: transparent;
+  color: inherit;
+  font: inherit;
+  line-height: inherit;
+  cursor: pointer;
+}
+
+.word:hover,
+.word:focus-visible {
+  background: #edf5ff;
+  color: #245fae;
+  outline: 2px solid #8ab5ef;
+  outline-offset: 1px;
+}
+
+.phrase {
+  text-decoration: underline;
+  text-decoration-color: #ef725980;
+  text-decoration-thickness: 2px;
+  text-underline-offset: 4px;
+}

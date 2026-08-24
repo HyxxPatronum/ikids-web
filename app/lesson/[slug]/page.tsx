@@ -1,6 +1,6 @@
-import { redirect } from 'next/navigation';
+import LessonReader from './LessonReader';
 
 export default async function Lesson({ params }: { params: Promise<{ slug: string }> }) {
   const { slug } = await params;
-  redirect(`/index.html?lesson=${encodeURIComponent(slug)}`);
+  return <LessonReader slug={slug} />;
 }

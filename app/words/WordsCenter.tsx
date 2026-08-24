@@ -1,93 +1,16 @@
 'use client';
 
-import { createContext, useCallback, useContext, useEffect, useMemo, useRef, useState } from 'react';
+import { useEffect, useMemo, useRef, useState } from 'react';
 import type { KeyboardEvent } from 'react';
+import { LookupProvider, useLookup } from '../components/Lookup';
 
 type Word = { english: string; meaning?: string; image?: string; category: 'level2' | 'level3' | 'science'; sources?: Array<{ title?: string }> };
-type DictionaryResult = {
-  word: string; surfaceForm?: string; lexeme?: string; selectedScope?: string; alternateScopes?: string[];
-  category?: string; catalogMembership?: string | null; meaning?: string; image?: string; phonetic?: string;
-  pronunciations?: Array<{ region: 'us' | 'uk' | 'other'; label?: string; phonetic?: string; audio?: string }>;
-  meanings?: Array<{ partOfSpeech?: string; definitions?: Array<{ definition: string; example?: string }> }>;
-  provider?: string; cacheStatus?: string; sourceStatus?: { course: string; provider: string }; sources?: Array<{ title?: string; slug?: string }>;
-};
-
-type LookupContextValue = { lookup: (term: string, trigger?: HTMLElement | null) => void };
-const LookupContext = createContext<LookupContextValue | null>(null);
-export const useLookup = () => { const value = useContext(LookupContext); if (!value) throw new Error('useLookup must be used inside LookupProvider'); return value; };
 
 const labels = { level2: ['二级词汇', '小学阶段应掌握的基础词汇'], level3: ['三级词汇', '初中阶段新增的基础词汇'], science: ['Science Core', '来自已发布课程的科学概念'] } as const;
 
 function imageSrc(raw?: string) {
   if (!raw) return '';
   return /^(https?:|data:|\/)/i.test(raw) ? raw : `/${raw.replace(/^\/+/, '')}`;
-}
-
-function DictionaryDrawer({ term, trigger, onClose }: { term: string; trigger: HTMLElement | null; onClose: () => void }) {
-  const [language, setLanguage] = useState<'en' | 'zh'>(() => typeof window !== 'undefined' && localStorage.getItem('fluent-dictionary-language') === 'zh' ? 'zh' : 'en');
-  const [data, setData] = useState<DictionaryResult | null>(null);
-  const [error, setError] = useState('');
-  const [detail, setDetail] = useState(false);
-  const [retry, setRetry] = useState(0);
-  const drawerRef = useRef<HTMLElement>(null);
-  const close = useCallback(() => { onClose(); requestAnimationFrame(() => trigger?.focus()); }, [onClose, trigger]);
-
-  useEffect(() => {
-    let cancelled = false;
-    setData(null); setError(''); setDetail(false);
-    fetch(`/api/dictionary?word=${encodeURIComponent(term)}&lang=${language}`)
-      .then(async response => { const body = await response.json() as DictionaryResult & { error?: string }; if (!response.ok) throw new Error(body.error || '查询失败'); return body; })
-      .then(value => { if (!cancelled) setData(value); })
-      .catch(value => { if (!cancelled) setError(value.message); });
-    return () => { cancelled = true; };
-  }, [term, language, retry]);
-
-  useEffect(() => {
-    drawerRef.current?.focus();
-    const onKey = (event: globalThis.KeyboardEvent) => {
-      if (event.key === 'Escape') close();
-      if (event.key === 'Tab') {
-        const focusable = Array.from(drawerRef.current?.querySelectorAll<HTMLElement>('button:not(:disabled),a[href],input,summary') || []);
-        if (!focusable.length) return;
-        const first = focusable[0]; const last = focusable[focusable.length - 1];
-        if (event.shiftKey && document.activeElement === first) { event.preventDefault(); last.focus(); }
-        else if (!event.shiftKey && document.activeElement === last) { event.preventDefault(); first.focus(); }
-      }
-    };
-    document.body.style.overflow = 'hidden';
-    document.addEventListener('keydown', onKey);
-    return () => { document.body.style.overflow = ''; document.removeEventListener('keydown', onKey); };
-  }, [close]);
-
-  const changeLanguage = (next: 'en' | 'zh') => { localStorage.setItem('fluent-dictionary-language', next); setLanguage(next); };
-  const common = data?.meanings?.slice(0, detail ? 6 : 1) || [];
-  const hasMore = Boolean(data && ((data.meanings?.length || 0) > 1 || data.alternateScopes?.length || data.sources?.length));
-
-  return <div className="react-dictionary-backdrop" role="presentation" onMouseDown={event => { if (event.target === event.currentTarget) close(); }}>
-    <aside className="react-dictionary-drawer" ref={drawerRef} tabIndex={-1} role="dialog" aria-modal="true" aria-labelledby="dictionary-title">
-      <header className="react-dictionary-header"><div><span className="eyebrow">Lookup</span><strong id="dictionary-title">词典释义</strong></div><div className="react-dictionary-actions"><div className="react-dictionary-mode" role="tablist" aria-label="词典语言"><button type="button" role="tab" aria-selected={language === 'en'} onClick={() => changeLanguage('en')}>英英</button><button type="button" role="tab" aria-selected={language === 'zh'} onClick={() => changeLanguage('zh')}>英汉</button></div><button className="icon-button" type="button" aria-label="关闭查词结果" onClick={close}>×</button></div></header>
-      <div className="react-dictionary-content">
-        {error ? <div className="state-box"><strong>查询未完成</strong><span>{error}</span><button className="btn blue" type="button" onClick={() => setRetry(value => value + 1)}>重新查询</button></div> : !data ? <div className="react-dictionary-loading"><h2>{term}</h2><div className="skeleton" /></div> : <>
-          <div className="react-dictionary-hero"><div><span className="badge">{data.catalogMembership || '参考词汇'}</span><div className="react-dictionary-word"><h2>{data.selectedScope || data.word}</h2>{data.phonetic && <span>{data.phonetic}</span>}</div><div className="react-pronunciation-row">{(['us', 'uk'] as const).map(region => { const pronunciation = data.pronunciations?.find(item => item.region === region); return <button key={region} className="react-pronunciation" type="button" disabled={!pronunciation?.audio} title={pronunciation?.audio ? `播放${region === 'us' ? '美音' : '英音'}` : '暂无该音频'} onClick={() => pronunciation?.audio && new Audio(pronunciation.audio).play()}><span>◉</span><small>{region === 'us' ? '美音' : '英音'}<b>{pronunciation?.phonetic || '暂无'}</b></small></button>; })}</div></div>{data.image ? <img className="react-dictionary-image" src={imageSrc(data.image)} alt={`${data.word} 相关课程图示`} /> : <div className="react-dictionary-image placeholder">暂无图示</div>}</div>
-          {data.meaning && <div className="alert success"><strong>课程释义</strong><br />{data.meaning}</div>}
-          {common.length ? <div className="react-meanings">{common.map((group, index) => <section key={`${group.partOfSpeech}-${index}`}><h3>{group.partOfSpeech || 'definition'}</h3>{group.definitions?.map((item, itemIndex) => <div key={itemIndex}><p>{item.definition}</p>{item.example && <small>例：{item.example}</small>}</div>)}</section>)}</div> : <p className="muted">该词已识别，但暂无可显示的释义。</p>}
-          {hasMore && <button className="react-more" type="button" onClick={() => setDetail(value => !value)}>{detail ? '收起详情' : `更多信息（${Math.max(0, (data.meanings?.length || 0) - 1)}）`}</button>}
-          {detail && data.alternateScopes?.length ? <section className="react-detail-block"><h3>词形与备选范围</h3><p>{data.alternateScopes.join(' · ')}</p></section> : null}
-          {detail && data.sources?.length ? <section className="react-detail-block"><h3>课程来源</h3>{data.sources.map((source, index) => source.slug
-            ? <a key={index} href={`/lesson/${encodeURIComponent(source.slug)}`}>{source.title || source.slug}</a>
-            : <p key={index}>{source.title || '已发布课程'}</p>)}</section> : null}
-          {data.cacheStatus === 'stale' && <div className="alert">正在使用已缓存内容，外部词典恢复后会自动更新。</div>}
-          <footer className="react-attribution">来源：{data.provider || '本地词库'}{data.lexeme && ` · Lexeme: ${data.lexeme}`}</footer>
-        </>}
-      </div>
-    </aside>
-  </div>;
-}
-
-export function LookupProvider({ children }: { children: React.ReactNode }) {
-  const [lookup, setLookup] = useState<{ term: string; trigger: HTMLElement | null } | null>(null);
-  const open = useCallback((term: string, trigger: HTMLElement | null = null) => setLookup({ term, trigger }), []);
-  return <LookupContext.Provider value={{ lookup: open }}>{children}{lookup && <DictionaryDrawer term={lookup.term} trigger={lookup.trigger} onClose={() => setLookup(null)} />}</LookupContext.Provider>;
 }
 
 function WordsBrowser() {

@@ -4,7 +4,8 @@ import cactus from '../../../science-reader-100-how-a-cactus-saves-water.json';
 import { createDictionaryService } from '../../../lib/dictionary/service.ts';
 import { buildCatalogFromIndex, catalogCategory } from '../../../lib/catalog/catalog.ts';
 import { createD1PublicationStore } from '../../../lib/catalog/d1-publication-store.ts';
-import { createPublicationIndex, publicationLexeme } from '../../../lib/catalog/publication-index.ts';
+import { createPublicationIndex, phraseCandidates, publicationLexeme, reviewPhraseCandidate } from '../../../lib/catalog/publication-index.ts';
+import { loadPronunciationAudio, PronunciationProxyError } from '../../../lib/pronunciation/proxy-adapter.ts';
 
 type RouteContext = { params: Promise<{ path: string[] }> };
 type Card = Record<string, any>;
@@ -121,6 +122,14 @@ async function handle(request:Request,context:RouteContext){
   const publicationIndex=createPublicationIndex(createD1PublicationStore(db));
   const segments=(await context.params).path||[];const path='/'+segments.join('/');const method=request.method;const url=new URL(request.url);
   if(path==='/health'&&method==='GET')return json({ok:true,service:'fluent-sites-api'});
+  if(path==='/pronunciation'&&method==='GET'){
+    const word=normalizeWord(url.searchParams.get('word'));const region=String(url.searchParams.get('region')||'');
+    if(!word||word.length>80||!['us','uk','other'].includes(region))return json({error:'请输入有效的发音词和口音'},400);
+    try{
+      const audio=await loadPronunciationAudio({word,region:region as 'us'|'uk'|'other',resolveEntry:fetchDictionary});
+      return new Response(audio.body,{headers:{'content-type':audio.contentType,'cache-control':'public, max-age=604800'}});
+    }catch(error){return error instanceof PronunciationProxyError?json({error:error.message},error.status):json({error:'发音服务暂时不可用'},502);}
+  }
   if(path==='/auth/me'&&method==='GET'){const user=requestUser(request);if(!user)return json({error:'请先使用 ChatGPT 登录'},401);const rows=await db.prepare('SELECT payload_json,completed_percent,updated_at FROM learning_progress WHERE user_id=? ORDER BY updated_at DESC').bind(user.id).all();const recent=(rows.results||[]).map((row:any)=>({...JSON.parse(row.payload_json),completedPercent:row.completed_percent,updatedAt:row.updated_at}));const average=recent.length?Math.round(recent.reduce((sum:number,item:any)=>sum+Number(item.completedPercent||0),0)/recent.length):0;return json({user,summary:{started:recent.length,completed:recent.filter((item:any)=>item.completedPercent>=100).length,average,recent:recent.slice(0,5)}});}
   if(path==='/auth/logout'&&method==='POST')return json({ok:true,platformAuth:true});
   if((path==='/auth/login'||path==='/auth/register')&&method==='POST')return json({error:'正式站点使用 ChatGPT 登录，请通过站点登录入口继续。'},400);
@@ -133,27 +142,45 @@ async function handle(request:Request,context:RouteContext){
   if(path==='/cards'&&method==='POST'){const raw:any=await request.json();const result=validateCard(raw);if(!result.valid)return json(result,422);const structure=canonicalStructure(raw.articleStructure||raw.structure);const card={...raw,articleStructure:structure,structure,status:'draft'};const now=new Date().toISOString();await db.prepare('INSERT OR REPLACE INTO cards (id,slug,series_id,course_id,topic,theme,day,level,title,big_question,article_structure,image,content_json,status,updated_at) VALUES (?,?,?,?,?,?,?,?,?,?,?,?,?,?,?)').bind(card.cardId,slugFor(card),card.seriesId||card.courseId,card.courseId,card.topic,card.theme,card.day,card.level,card.title,card.bigQuestion||'',structure,card.image_file||card.image||'day001-flower.png',JSON.stringify(card),'draft',now).run();await publicationIndex.synchronize({...card,cardId:card.cardId,slug:slugFor(card)});return json({id:card.cardId,status:'draft',validation:result},201);}
   if(segments[0]==='cards'&&segments.length===3&&['publish','unpublish','archive'].includes(segments[2])&&method==='POST'){const id=segments[1],status=segments[2]==='publish'?'published':segments[2]==='unpublish'?'unpublished':'archived';const row:any=await db.prepare('SELECT id,slug,title,theme,image,content_json FROM cards WHERE id=?').bind(id).first();if(!row)return json({error:'Card not found'},404);await db.prepare('UPDATE cards SET status=?, updated_at=? WHERE id=?').bind(status,new Date().toISOString(),id).run();await publicationIndex.synchronize({...JSON.parse(String(row.content_json)),cardId:row.id,slug:row.slug,title:row.title,theme:row.theme,image:row.image,status});return json({id,status});}
   if(segments[0]==='cards'&&segments.length===3&&segments[2]==='vocabulary-preview'&&method==='GET'){if(!canPreviewVocabulary(request))return json({error:'仅内容编辑可预览未发布词汇'},403);const id=segments[1];const row:any=await db.prepare('SELECT id,slug,title,theme,image,status,content_json FROM cards WHERE id=? OR slug=?').bind(id,id).first();if(!row)return json({error:'Card not found'},404);const card={...JSON.parse(String(row.content_json)),cardId:row.id,slug:row.slug,title:row.title,theme:row.theme,image:row.image,status:row.status};return json({cardId:row.id,status:row.status,terms:publicationIndex.preview(card)});}
-  if(segments[0]==='cards'&&segments.length===2&&method==='GET'){const id=segments[1];const row:any=await db.prepare('SELECT * FROM cards WHERE id=? OR slug=?').bind(id,id).first();if(!row)return json({error:'Card not found'},404);return json({...JSON.parse(row.content_json),slug:row.slug,status:row.status,articleStructure:row.article_structure,structure:row.article_structure});}
+  if(segments[0]==='cards'&&segments.length===3&&segments[2]==='phrase-candidates'&&['GET','PATCH'].includes(method)){
+    if(!canPreviewVocabulary(request))return json({error:'仅内容编辑可审核短语候选'},403);
+    const id=segments[1];const row:any=await db.prepare('SELECT id,slug,title,theme,image,status,content_json FROM cards WHERE id=? OR slug=?').bind(id,id).first();
+    if(!row)return json({error:'Card not found'},404);
+    let card:any={...JSON.parse(String(row.content_json)),cardId:row.id,slug:row.slug,title:row.title,theme:row.theme,image:row.image,status:row.status};
+    if(method==='PATCH'){
+      if(row.status==='published')return json({error:'请先取消发布，再审核短语候选'},409);
+      const review:any=await request.json();
+      if(!['accept','correct','reject'].includes(review.action))return json({error:'action must be accept, correct, or reject'},400);
+      try{card=reviewPhraseCandidate(card,review);}catch(error:any){return json({error:error.message},400);}
+      await db.prepare('UPDATE cards SET content_json=?, updated_at=? WHERE id=?').bind(JSON.stringify(card),new Date().toISOString(),row.id).run();
+      await publicationIndex.synchronize(card);
+    }
+    return json({cardId:row.id,status:row.status,candidates:phraseCandidates(card),terms:publicationIndex.preview(card)});
+  }
+  if(segments[0]==='cards'&&segments.length===2&&method==='GET'){const id=segments[1];const row:any=await db.prepare('SELECT * FROM cards WHERE id=? OR slug=?').bind(id,id).first();if(!row||row.status!=='published'&&!canPreviewVocabulary(request))return json({error:'Card not found'},404);return json({...JSON.parse(row.content_json),slug:row.slug,status:row.status,articleStructure:row.article_structure,structure:row.article_structure});}
   if(path==='/words'&&method==='GET'){
     return json(buildCatalogFromIndex(await publicationIndex.entries()));
   }
   if(path==='/dictionary'&&method==='GET'){
     const requested=String(url.searchParams.get('word')||'').trim(); const lookup=normalizeWord(requested);const language=String(url.searchParams.get('lang')||'en');
+    const surfaceForm=String(url.searchParams.get('surface')||requested).trim();const courseId=String(url.searchParams.get('courseId')||'').trim();const sentence=String(url.searchParams.get('sentence')||'').trim();
+    const alternateScopes=(url.searchParams.getAll('alternate')||[]).map(value=>String(value).trim()).filter(Boolean);
     if(!['en','zh'].includes(language))return json({error:'词典语言只支持 en 或 zh'},400);
     if(!lookup||lookup.length>80||!/^[a-z]+(?:['-][a-z]+)*(?:\s+[a-z]+(?:['-][a-z]+)*)*$/.test(lookup))return json({error:'请输入有效的英文单词或短语'},400);
-    const indexed=(await publicationIndex.lookup(lookup))[0]||null;
+    if(surfaceForm.length>80||courseId.length>80||sentence.length>500||alternateScopes.length>16||alternateScopes.some(scope=>scope.length>80))return json({error:'查词范围、课程或句子上下文过长'},400);
+    const indexed=(await publicationIndex.lookup(lookup,{courseId}))[0]||null;
     const knownCategory=categoryFor(lookup);const base={word:indexed?.english||requested.toLowerCase(),category:knownCategory||indexed?.membership||'reference',meaning:indexed?.meaning||'',image:indexed?.image||'',sources:indexed?.sources||[]};
     const unifiedService=createDictionaryService({
-      catalog:{categoryFor:word=>categoryFor(word)||((indexed&&indexed.lexeme===publicationLexeme(word))?indexed.membership:null),courseFor:word=>indexed&&indexed.lexeme===publicationLexeme(word)?{meaning:base.meaning,image:base.image,sources:base.sources}:null},
+      catalog:{categoryFor:word=>categoryFor(word)||((indexed&&indexed.lexeme===publicationLexeme(word))?indexed.membership:null),courseFor:word=>indexed&&indexed.lexeme===publicationLexeme(word)?{lexeme:indexed.lexeme,meaning:base.meaning,image:base.image,sources:base.sources}:null},
       provider:async word=>language==='zh'
-        ? (localChineseDictionaryRow(await db.prepare('SELECT word,phonetic,translation,definition,pos,exchange,source FROM dictionary_entries WHERE word=?').bind(word).first()) || (base.meaning?{meanings:[{partOfSpeech:'课程释义',definitions:[{definition:base.meaning,example:''}],synonyms:[],antonyms:[]}],provider:'本地课程词库',language:'zh'}:null))
+        ? (localChineseDictionaryRow(await db.prepare('SELECT word,phonetic,translation,definition,pos,exchange,source FROM dictionary_entries WHERE word=?').bind(word).first()) || (base.meaning&&(!indexed||word===indexed.lexeme)?{meanings:[{partOfSpeech:'课程释义',definitions:[{definition:base.meaning,example:''}],synonyms:[],antonyms:[]}],provider:'本地课程词库',language:'zh'}:null))
         : fetchDictionaryOnce(word),
       cache:{
         async get(key){const word=key.slice(key.indexOf(':')+1);const row:any=await db.prepare('SELECT payload_json,status,expires_at FROM dictionary_cache WHERE word=?').bind(word).first();if(!row)return null;return {value:row.payload_json?JSON.parse(row.payload_json):null,status:row.status==='found'&&Date.parse(row.expires_at)>Date.now()?'hit':row.status==='found'?'stale':'hit'};},
         async set(key,value,ttl){const word=key.slice(key.indexOf(':')+1);const now=new Date();await db.prepare('INSERT INTO dictionary_cache (word,payload_json,status,expires_at,updated_at) VALUES (?,?,?,?,?) ON CONFLICT(word) DO UPDATE SET payload_json=excluded.payload_json,status=excluded.status,expires_at=excluded.expires_at,updated_at=excluded.updated_at').bind(word,value?JSON.stringify(value):null,value?'found':'not_found',new Date(now.getTime()+ttl).toISOString(),now.toISOString()).run();},
       },
     });
-    try{return json(await unifiedService.lookup({surfaceForm:requested,scope:lookup,language}));}catch(error:any){return json({error:error.message,code:error.code},error.status||500);}
+    try{return json(await unifiedService.lookup({surfaceForm,scope:lookup,alternateScopes,courseId,sentence,language}));}catch(error:any){return json({error:error.message,code:error.code},error.status||500);}
   }
   if(path==='/dashboard'&&method==='GET'){const [seriesCount,cardCount,publishedCount,progressCount,recordingCount,cards,series]=await Promise.all([db.prepare('SELECT COUNT(*) count FROM series').first<any>(),db.prepare('SELECT COUNT(*) count FROM cards').first<any>(),db.prepare("SELECT COUNT(*) count FROM cards WHERE status='published'").first<any>(),db.prepare('SELECT COUNT(*) count FROM learning_progress').first<any>(),db.prepare('SELECT COUNT(*) count FROM recording_submissions').first<any>(),db.prepare('SELECT * FROM cards ORDER BY day').all(),db.prepare('SELECT * FROM series ORDER BY sort_order').all()]);return json({counts:{series:seriesCount?.count||0,cards:cardCount?.count||0,published:publishedCount?.count||0,users:0,progress:progressCount?.count||0,recordings:recordingCount?.count||0},cards:(cards.results||[]).map(cardRecord),series:(series.results||[]).map((row:any)=>({id:row.id,name:row.name,subtitle:row.subtitle,description:row.description,sort:row.sort_order,status:row.status}))});}
   if(segments[0]==='progress'&&segments.length===2){const userId=scopedUser(request,segments[1]);if(!userId)return json({error:'无权访问该学习记录'},403);if(method==='GET'){const rows=await db.prepare('SELECT card_id,payload_json,completed_percent,updated_at FROM learning_progress WHERE user_id=?').bind(userId).all();const cards:Record<string,any>={};for(const row of rows.results||[]){const item:any=row;cards[item.card_id]={...JSON.parse(item.payload_json),completedPercent:item.completed_percent,updatedAt:item.updated_at};}return json({cards});}if(method==='PUT'||method==='POST'){const payload:any=await request.json();const percent=Math.max(0,Math.min(100,Number(payload.completedPercent||0)));const now=new Date().toISOString();await db.prepare('INSERT INTO learning_progress (user_id,card_id,payload_json,completed_percent,updated_at) VALUES (?,?,?,?,?) ON CONFLICT(user_id,card_id) DO UPDATE SET payload_json=excluded.payload_json,completed_percent=excluded.completed_percent,updated_at=excluded.updated_at').bind(userId,payload.cardId,JSON.stringify(payload),percent,now).run();return json({...payload,completedPercent:percent,updatedAt:now});}}

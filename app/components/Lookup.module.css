@@ -1,0 +1,33 @@
+.scopePicker {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 7px;
+  margin: 0 0 20px;
+  padding: 12px;
+  border: 1px solid #d7e1ed;
+  border-radius: 12px;
+  background: #f8fafc;
+}
+
+.scopePicker span {
+  flex-basis: 100%;
+  color: #687b92;
+  font-size: 12px;
+  font-weight: 800;
+}
+
+.scopePicker button {
+  padding: 7px 10px;
+  border: 1px solid #d7e1ed;
+  border-radius: 999px;
+  background: #fff;
+  color: #18304f;
+  cursor: pointer;
+}
+
+.scopePicker button[aria-pressed='true'] {
+  border-color: #3979d8;
+  background: #edf5ff;
+  color: #3979d8;
+  font-weight: 800;
+}
