@@ -28,7 +28,7 @@ export async function api(url, options = {}) {
   const response = await fetch(url, { ...options, headers: authHeaders(options.headers || {}) });
   let payload = null;
   try { payload = await response.json(); } catch { payload = null; }
-  if (!response.ok) throw new Error(payload?.error || `Request failed (${response.status})`);
+  if (!response.ok) throw new Error(payload?.error || `请求失败（${response.status}）`);
   return payload;
 }
 

@@ -1,5 +1,13 @@
 {
-  "users": {},
+  "users": {
+    "123@qq.com": {
+      "id": "ef109fde-0abc-47a1-93a8-5389448dfa8e",
+      "email": "123@qq.com",
+      "passwordHash": "8d969eef6ecad3c29a3a629280e686cf0c3f5d5a86aff3ca12020c923adc6c92",
+      "role": "student",
+      "createdAt": "2026-08-24T10:43:44.072Z"
+    }
+  },
   "sessions": {},
   "progress": {
     "demo": {
@@ -125,10 +133,11 @@
       "day": 1,
       "level": "L1",
       "title": "FLOWER",
+      "articleStructure": "Process/Life cycle",
       "image": "day001-flower.png",
       "status": "published",
       "contentFile": "day001-flower.json",
-      "updatedAt": "2026-08-23T14:33:07.996Z"
+      "updatedAt": "2026-08-24T11:12:59.661Z"
     },
     "science-reader-100-how-a-cactus-saves-water": {
       "id": "science-reader-100-how-a-cactus-saves-water",
@@ -140,10 +149,11 @@
       "day": 100,
       "level": "L1",
       "title": "How a Cactus Saves Water",
+      "articleStructure": "Feature-Function",
       "image": "day001-flower.png",
       "status": "published",
       "contentFile": "science-reader-100-how-a-cactus-saves-water.json",
-      "updatedAt": "2026-08-23T14:33:07.996Z"
+      "updatedAt": "2026-08-24T11:12:59.661Z"
     }
   },
   "series": [

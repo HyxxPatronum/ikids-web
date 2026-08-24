@@ -7,6 +7,7 @@ import { createHash, randomUUID } from 'node:crypto';
 
 const root = path.dirname(fileURLToPath(import.meta.url));
 const port = Number(process.env.PORT || 4173);
+const host = process.env.HOST || '0.0.0.0';
 const progressFile = path.join(root, 'data', 'progress.json');
 const usersFile = path.join(root, 'data', 'users.json');
 const mime = { '.html':'text/html; charset=utf-8', '.js':'text/javascript; charset=utf-8', '.json':'application/json; charset=utf-8', '.png':'image/png', '.jpg':'image/jpeg', '.css':'text/css; charset=utf-8' };
@@ -186,4 +187,4 @@ const server = http.createServer(async (req, res) => {
     const content = await fs.readFile(filePath); res.writeHead(200, { 'content-type': mime[path.extname(filePath)] || 'application/octet-stream' }); res.end(content);
   } catch (error) { json(res, 404, { error: error.code === 'ENOENT' ? 'Not found' : error.message }); }
 });
-server.listen(port, () => console.log(`Fluent server running at http://localhost:${port}`));
+server.listen(port, host, () => console.log(`Fluent server running at http://localhost:${port}`));
