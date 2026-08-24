@@ -37,7 +37,7 @@ CREATE TABLE IF NOT EXISTS cards (
   article_structure TEXT NOT NULL,
   image_path TEXT NOT NULL,
   content_json TEXT NOT NULL,
-  status TEXT NOT NULL DEFAULT 'draft' CHECK (status IN ('draft','published','archived')),
+  status TEXT NOT NULL DEFAULT 'draft' CHECK (status IN ('draft','published','unpublished','archived')),
   version INTEGER NOT NULL DEFAULT 1,
   created_at TEXT NOT NULL DEFAULT CURRENT_TIMESTAMP,
   updated_at TEXT NOT NULL DEFAULT CURRENT_TIMESTAMP
@@ -65,7 +65,41 @@ CREATE TABLE IF NOT EXISTS recording_submissions (
   feedback_json TEXT,
   created_at TEXT NOT NULL DEFAULT CURRENT_TIMESTAMP
 );
+CREATE TABLE IF NOT EXISTS dictionary_cache (
+  word TEXT PRIMARY KEY,
+  payload_json TEXT,
+  status TEXT NOT NULL CHECK (status IN ('found','not_found')),
+  expires_at TEXT NOT NULL,
+  updated_at TEXT NOT NULL DEFAULT CURRENT_TIMESTAMP
+);
+CREATE TABLE IF NOT EXISTS dictionary_entries (
+  word TEXT PRIMARY KEY,
+  phonetic TEXT NOT NULL DEFAULT '',
+  translation TEXT NOT NULL,
+  definition TEXT NOT NULL DEFAULT '',
+  pos TEXT NOT NULL DEFAULT '',
+  exchange TEXT NOT NULL DEFAULT '',
+  source TEXT NOT NULL DEFAULT 'ECDICT',
+  updated_at TEXT NOT NULL DEFAULT CURRENT_TIMESTAMP
+);
+CREATE TABLE IF NOT EXISTS published_vocabulary_terms (
+  card_id TEXT NOT NULL REFERENCES cards(id) ON DELETE CASCADE,
+  lexeme TEXT NOT NULL,
+  surface_form TEXT NOT NULL,
+  meaning TEXT NOT NULL DEFAULT '',
+  image TEXT NOT NULL DEFAULT '',
+  membership TEXT NOT NULL CHECK (membership IN ('level2','level3','science')),
+  source_slug TEXT NOT NULL,
+  source_title TEXT NOT NULL DEFAULT '',
+  source_theme TEXT NOT NULL DEFAULT '',
+  source_image TEXT NOT NULL DEFAULT '',
+  updated_at TEXT NOT NULL DEFAULT CURRENT_TIMESTAMP,
+  PRIMARY KEY (card_id, lexeme)
+);
 CREATE INDEX IF NOT EXISTS idx_progress_user ON learning_progress(user_id);
 CREATE INDEX IF NOT EXISTS idx_sessions_user ON sessions(user_id);
 CREATE INDEX IF NOT EXISTS idx_cards_status ON cards(status);
 CREATE INDEX IF NOT EXISTS idx_cards_series ON cards(series_id);
+CREATE INDEX IF NOT EXISTS idx_dictionary_cache_expiry ON dictionary_cache(expires_at);
+CREATE INDEX IF NOT EXISTS idx_published_vocabulary_lexeme ON published_vocabulary_terms(lexeme);
+CREATE INDEX IF NOT EXISTS idx_published_vocabulary_membership ON published_vocabulary_terms(membership, lexeme);

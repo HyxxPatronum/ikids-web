@@ -1,4 +1,4 @@
-import { integer, primaryKey, sqliteTable, text } from 'drizzle-orm/sqlite-core';
+import { index, integer, primaryKey, sqliteTable, text } from 'drizzle-orm/sqlite-core';
 
 export const series = sqliteTable('series', {
   id: text('id').primaryKey(), name: text('name').notNull(), subtitle: text('subtitle').notNull().default(''),
@@ -26,3 +26,21 @@ export const recordingSubmissions = sqliteTable('recording_submissions', {
   status: text('status').notNull().default('uploaded'), createdAt: text('created_at').notNull(),
 });
 
+export const dictionaryEntries = sqliteTable('dictionary_entries', {
+  word: text('word').primaryKey(), phonetic: text('phonetic').notNull().default(''),
+  translation: text('translation').notNull(), definition: text('definition').notNull().default(''),
+  pos: text('pos').notNull().default(''), exchange: text('exchange').notNull().default(''),
+  source: text('source').notNull().default('ECDICT'), updatedAt: text('updated_at').notNull(),
+});
+
+export const publishedVocabularyTerms = sqliteTable('published_vocabulary_terms', {
+  cardId: text('card_id').notNull(), lexeme: text('lexeme').notNull(), surfaceForm: text('surface_form').notNull(),
+  meaning: text('meaning').notNull().default(''), image: text('image').notNull().default(''),
+  membership: text('membership').notNull(), sourceSlug: text('source_slug').notNull(),
+  sourceTitle: text('source_title').notNull().default(''), sourceTheme: text('source_theme').notNull().default(''),
+  sourceImage: text('source_image').notNull().default(''), updatedAt: text('updated_at').notNull(),
+}, table => [
+  primaryKey({ columns: [table.cardId, table.lexeme] }),
+  index('idx_published_vocabulary_lexeme').on(table.lexeme),
+  index('idx_published_vocabulary_membership').on(table.membership, table.lexeme),
+]);

@@ -1,10 +1,14 @@
 node_modules/
+tsconfig.tsbuildinfo
 dist/
 .next/
 .wrangler/
 .vinext/
 .env*
 !.env.example
+.cache/
+playwright-report/
+test-results/
 public/index.html
 public/syllabus.html
 public/words.html

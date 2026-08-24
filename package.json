@@ -2,14 +2,20 @@
   "name": "fluent-science-reading",
   "version": "0.1.0",
   "private": true,
-  "engines": { "node": ">=22.13.0" },
+  "engines": {
+    "node": ">=22.13.0"
+  },
   "type": "module",
   "scripts": {
-    "local": "node server.js",
+    "test": "node --experimental-strip-types --test tests/*.test.ts",
+    "test:e2e": "npm run build && playwright test",
+    "typecheck": "tsc --noEmit",
+    "local": "node --experimental-strip-types server.js",
     "dev": "vinext dev",
     "build": "node scripts/prepare-public.mjs && vinext build",
     "start": "vinext start",
     "check": "node scripts/check-html.mjs && node --check server.js && node --check shared.js && node --check db/store.js",
+    "dictionary:build": "node scripts/build-ecdict-index.mjs",
     "db:generate": "drizzle-kit generate",
     "db:document": "node -e \"console.log('Schema: db/schema.sql; development store: data/app-db.json')\""
   },
@@ -23,6 +29,7 @@
     "@cloudflare/vite-plugin": "1.37.1",
     "@cloudflare/workers-types": "4.20260515.1",
     "@openai/sites-vite-plugin": "^0.2.0",
+    "@playwright/test": "^1.62.1",
     "@tailwindcss/postcss": "4.2.1",
     "@types/node": "22.19.19",
     "@types/react": "19.2.14",
