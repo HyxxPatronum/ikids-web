@@ -6,6 +6,8 @@ import { createStore } from './db/store.js';
 import { createHash, randomUUID } from 'node:crypto';
 
 const root = path.dirname(fileURLToPath(import.meta.url));
+const level2Words = JSON.parse(await fs.readFile(path.join(root, 'data', 'vocabulary-level2.json'), 'utf8'));
+const level3Words = JSON.parse(await fs.readFile(path.join(root, 'data', 'vocabulary-level3.json'), 'utf8'));
 const port = Number(process.env.PORT || 4173);
 const host = process.env.HOST || '0.0.0.0';
 const progressFile = path.join(root, 'data', 'progress.json');
@@ -16,6 +18,37 @@ const cardDataFiles = async () => (await fs.readdir(root)).filter(x => x.endsWit
 async function readCards() { const cards=[]; for (const name of await cardDataFiles()) { try { const card=JSON.parse(await fs.readFile(path.join(root,name),'utf8')); if(card.cardId) cards.push(card); } catch {} } return cards; }
 async function readSeriesSeed() { try { return JSON.parse(await fs.readFile(path.join(root, 'data', 'series.json'), 'utf8')); } catch { return []; } }
 const cardSlug = card => card.slug || `${String(card.courseId || 'course').toLowerCase().replace(/[^a-z0-9]+/g,'-')}-${String(card.day || card.cardId).toLowerCase().replace(/[^a-z0-9]+/g,'-')}-${String(card.title || card.cardId).toLowerCase().replace(/[^a-z0-9]+/g,'-')}`.replace(/-+/g,'-').replace(/^-|-$/g,'');
+const normalizeWord = value => String(value || '').trim().toLowerCase().replace(/[’]/g, "'").replace(/^[^a-z]+|[^a-z]+$/g, '');
+const aliasesForEntry = entry => {
+  const match=entry.match(/^([^()]+?)(?:\s*\(([^)]*)\))?$/);const aliases=new Set();
+  const base=(match?.[1]||entry).trim();base.split(/\s*\/\s*/).map(normalizeWord).filter(Boolean).forEach(word=>aliases.add(word));
+  const note=(match?.[2]||'').trim();
+  if(note){const variants=/\bAmE\b/i.test(note)?note.split(/\bAmE\b/i):note.split(',');variants.map(value=>normalizeWord(value.replace(/^pl\.\s*/i,'').replace(/^=\s*/,''))).filter(Boolean).forEach(word=>aliases.add(word));}
+  return [...aliases].filter(Boolean);
+};
+const level2Aliases = new Set(level2Words.flatMap(aliasesForEntry));
+const level3Aliases = new Set(level3Words.flatMap(aliasesForEntry).filter(word => !level2Aliases.has(word)));
+const categoryFor = word => level2Aliases.has(normalizeWord(word)) ? 'level2' : level3Aliases.has(normalizeWord(word)) ? 'level3' : null;
+function buildWordCatalog(cards) {
+  const science = new Map();
+  for (const card of cards) for (const word of card.word_bank || []) {
+    const key=normalizeWord(word.english); if(!key||categoryFor(key))continue;
+    const entry=science.get(key)||{english:word.english,meaning:word.chinese||word.meaning||'',category:'science',sources:[]};
+    if(!entry.meaning)entry.meaning=word.chinese||word.meaning||'';
+    if(card.status==='published')entry.sources.push({cardId:card.cardId,slug:cardSlug(card),title:card.title,theme:card.theme});
+    science.set(key,entry);
+  }
+  const level2=level2Words.map(english=>({english,meaning:'',category:'level2',sources:[]}));
+  const level3=level3Words.map(english=>({english,meaning:'',category:'level3',sources:[]}));
+  const scienceWords=[...science.values()].sort((a,b)=>a.english.localeCompare(b.english));
+  return {words:[...level2,...level3,...scienceWords],counts:{level2:level2.length,level3:level3.length,science:scienceWords.length}};
+}
+async function fetchDictionary(word) {
+  const response=await fetch(`https://api.dictionaryapi.dev/api/v2/entries/en/${encodeURIComponent(word)}`,{headers:{accept:'application/json'},signal:AbortSignal.timeout(6000)});
+  if(!response.ok)return null;const data=await response.json();const entry=Array.isArray(data)?data[0]:null;if(!entry)return null;
+  const audio=(entry.phonetics||[]).find(item=>item.audio)?.audio||'';
+  return {phonetic:entry.phonetic||(entry.phonetics||[]).find(item=>item.text)?.text||'',audio:audio.startsWith('//')?`https:${audio}`:audio,meanings:(entry.meanings||[]).slice(0,4).map(meaning=>({partOfSpeech:meaning.partOfSpeech||'',definitions:(meaning.definitions||[]).slice(0,2).map(item=>({definition:item.definition||'',example:item.example||''}))}))};
+}
 async function syncCardCatalog(cards) {
   const db = await store.load(); let changed = false;
   for (const card of cards) {
@@ -129,9 +162,17 @@ const server = http.createServer(async (req, res) => {
       return json(res, 200, { cards: seriesId ? cards.filter(c => c.seriesId === seriesId && c.status === 'published') : cards });
     }
     if (req.method === 'GET' && url.pathname === '/api/words') {
-      const cards=(await readCards()).filter(card=>card.status==='published'); const map=new Map();
-      for(const card of cards) for(const word of card.word_bank||[]){const key=String(word.english||'').toLowerCase();if(!key)continue;const entry=map.get(key)||{english:word.english,meaning:word.chinese||word.meaning||'',sources:[]};entry.sources.push({cardId:card.cardId,slug:cardSlug(card),title:card.title,theme:card.theme});map.set(key,entry);}
-      return json(res,200,{words:[...map.values()].sort((a,b)=>a.english.localeCompare(b.english))});
+      const cards=(await readCards()).filter(card=>card.status!=='archived');
+      return json(res,200,buildWordCatalog(cards));
+    }
+    if (req.method === 'GET' && url.pathname === '/api/dictionary') {
+      const requested=String(url.searchParams.get('word')||'').trim();const lookup=normalizeWord(requested);
+      if(!lookup||lookup.length>80||!/^[a-z]+(?:['-][a-z]+)*(?:\s+[a-z]+(?:['-][a-z]+)*)*$/.test(lookup))return json(res,400,{error:'请输入有效的英文单词或短语'});
+      const cards=(await readCards()).filter(card=>card.status!=='archived');let local=null;const sources=[];
+      for(const card of cards)for(const item of card.word_bank||[]){if(normalizeWord(item.english)!==lookup)continue;local ||= item;if(card.status==='published')sources.push({cardId:card.cardId,slug:cardSlug(card),title:card.title,theme:card.theme});}
+      const knownCategory=categoryFor(lookup);let remote=null;try{remote=await fetchDictionary(lookup);}catch{}
+      if(!remote&&!local&&!knownCategory)return json(res,404,{error:`暂时没有找到“${requested}”的词典结果，请检查拼写后重试。`});
+      return json(res,200,{word:local?.english||requested.toLowerCase(),category:knownCategory||(local?'science':'reference'),meaning:local?.chinese||local?.meaning||'',sources,...(remote||{phonetic:'',audio:'',meanings:[]})});
     }
     if (req.method === 'GET' && url.pathname === '/api/dashboard') {
       const cards=await readCards(); const db=await syncCardCatalog(cards); const progress=Object.values(db.progress||{}).flatMap(user=>Object.values(user.cards||{}));

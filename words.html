@@ -1,21 +1,62 @@
 <!doctype html>
 <html lang="zh-CN">
 <head>
-  <meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
-  <meta name="description" content="复习 Fluent Science Reading 课程中的核心科学英语词汇。"><meta property="og:title" content="Fluent Science Reading · Core Words"><meta property="og:description" content="在科学故事中复习核心英语词汇。"><meta property="og:image" content="/og.png"><meta name="twitter:card" content="summary_large_image">
-  <title>核心词库 · Fluent Science Reading</title>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="description" content="查询 Fluent Science Reading 中的二级、三级与科学核心词汇。">
+  <meta property="og:title" content="Fluent Science Reading · 词汇中心">
+  <meta property="og:description" content="按课程标准分级查词，并回到词汇出现的科学阅读卡片。">
+  <meta property="og:image" content="/og.png">
+  <meta name="twitter:card" content="summary_large_image">
+  <title>词汇中心 · Fluent Science Reading</title>
   <link rel="stylesheet" href="/styles.css">
   <style>
-    .words-hero { display:grid;grid-template-columns:1fr minmax(220px,.45fr);gap:24px;align-items:end;padding:28px;margin-bottom:18px;background:linear-gradient(135deg,#fff,#eff7ff) }
-    .search {display:flex;gap:8px;padding:8px;border:1px solid var(--line);border-radius:15px;background:#fff}.search input{min-width:0;flex:1;border:0;padding:8px;outline:0;color:var(--ink)}
-    .word-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:12px}.word-card{padding:18px;display:grid;gap:10px}.word-card h2{margin:0;font-size:25px}.word-card p{margin:0;color:var(--muted)}.source{padding-top:10px;border-top:1px dashed var(--line);font-size:12px}.source a{color:var(--blue);font-weight:850}.word-actions{display:flex;justify-content:space-between;align-items:center;gap:8px}
-    @media(max-width:900px){.word-grid{grid-template-columns:repeat(2,1fr)}}@media(max-width:600px){.words-hero{grid-template-columns:1fr;padding:20px}.word-grid{grid-template-columns:1fr}}
+    .words-hero{display:grid;grid-template-columns:minmax(0,1fr) minmax(300px,.62fr);gap:30px;align-items:center;padding:32px;margin-bottom:18px;background:var(--surface)}
+    .words-hero p{max-width:62ch;margin:10px 0 0}.search-form{display:flex;gap:8px;padding:7px;border:1px solid var(--line);border-radius:14px;background:#fff}.search-form input{min-width:0;flex:1;border:0;padding:9px 10px;outline:0;color:var(--ink);font-size:16px}.search-form input::placeholder{color:#8292a6}
+    .category-tabs{display:grid;grid-template-columns:repeat(3,1fr);gap:8px;padding:8px;margin-bottom:18px}.category-tab{min-width:0;border:0;border-radius:12px;padding:12px;background:transparent;color:var(--muted);text-align:left;cursor:pointer}.category-tab strong,.category-tab span{display:block}.category-tab strong{color:inherit}.category-tab span{margin-top:2px;font-size:12px}.category-tab[aria-selected="true"]{background:var(--blue-soft);color:var(--blue)}
+    .dictionary-layout{display:grid;grid-template-columns:minmax(0,1.35fr) minmax(310px,.65fr);gap:18px;align-items:start}.word-browser,.word-detail{padding:24px}.word-detail{position:sticky;top:18px;min-height:280px}.browser-head{display:flex;justify-content:space-between;gap:16px;align-items:end;margin-bottom:16px}.browser-head p{margin:4px 0 0}.word-list{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));border-top:1px solid var(--line)}.word-row{display:flex;justify-content:space-between;gap:12px;align-items:center;min-width:0;border:0;border-bottom:1px solid var(--line);padding:13px 10px;background:transparent;color:var(--ink);text-align:left;cursor:pointer}.word-row:nth-child(odd){border-right:1px solid var(--line)}.word-row:hover{background:var(--surface-subtle)}.word-row strong{min-width:0;overflow-wrap:anywhere}.word-row small{flex:0 0 auto;color:var(--muted)}.load-row{display:flex;justify-content:center;padding-top:18px}
+    .detail-head{display:flex;justify-content:space-between;gap:12px;align-items:flex-start}.detail-head h2{margin:8px 0 0;font-size:30px;overflow-wrap:anywhere}.phonetic{margin:3px 0 14px;color:var(--muted)}.definitions{display:grid;gap:14px;margin:16px 0}.definition{padding-top:13px;border-top:1px solid var(--line)}.definition h3{margin:0 0 6px;color:var(--blue);font-size:13px}.definition p{margin:6px 0}.definition small{display:block;color:var(--muted)}.source-list{display:grid;gap:7px;margin-top:14px}.source-list a{color:var(--blue);font-weight:800;text-underline-offset:3px}
+    @media(max-width:860px){.words-hero,.dictionary-layout{grid-template-columns:1fr}.word-detail{position:static;order:-1}.category-tabs{overflow-x:auto;grid-template-columns:repeat(3,minmax(180px,1fr))}}
+    @media(max-width:580px){.words-hero,.word-browser,.word-detail{padding:20px}.word-list{grid-template-columns:1fr}.word-row:nth-child(odd){border-right:0}.browser-head{align-items:flex-start;flex-direction:column}.search-form{display:grid;grid-template-columns:1fr auto}}
   </style>
 </head>
-<body><div class="shell"><div id="nav"></div><section class="panel words-hero"><div><p class="eyebrow">Core word bank</p><h1 class="page-title">把科学词汇带回原文</h1><p class="muted">搜索、听发音，并随时回到词汇出现的阅读卡片。</p></div><label class="search"><span class="hidden">搜索词汇</span><input id="search" type="search" placeholder="搜索单词或释义…" autocomplete="off"><span class="badge" id="count">0 words</span></label></section><main id="words" class="word-grid" aria-live="polite"><div class="skeleton"></div><div class="skeleton"></div><div class="skeleton"></div></main></div>
-<script type="module">
-import{$,api,escapeHtml,nav,speak}from'/shared.js';$('#nav').innerHTML=nav('words');const state={words:[],query:''};
-function render(){const query=state.query.trim().toLowerCase();const visible=state.words.filter(word=>!query||`${word.english} ${word.meaning}`.toLowerCase().includes(query));$('#count').textContent=`${visible.length} words`;$('#words').innerHTML=visible.length?visible.map(word=>`<article class="panel word-card"><div><p class="eyebrow">Science word</p><h2>${escapeHtml(word.english)}</h2><p>${escapeHtml(word.meaning||'暂无释义')}</p></div><div class="source">来自 ${word.sources.map(source=>`<a href="/lesson/${encodeURIComponent(source.slug)}">${escapeHtml(source.title)}</a>`).join('、')}</div><div class="word-actions"><span class="badge">${escapeHtml(word.sources[0]?.theme||'Science')}</span><button class="btn blue" type="button" data-speak="${escapeHtml(word.english)}">播放发音</button></div></article>`).join(''):'<div class="state-box"><strong>没有找到匹配词汇</strong>试试更短的关键词。</div>';document.querySelectorAll('[data-speak]').forEach(button=>button.onclick=()=>speak(button.dataset.speak));}
-$('#search').oninput=event=>{state.query=event.target.value;render()};
-api('/api/words').then(data=>{state.words=data.words||[];render()}).catch(error=>{$('#words').innerHTML=`<div class="state-box"><strong>词库加载失败</strong>${escapeHtml(error.message)}<br><button class="btn" onclick="location.reload()">重新加载</button></div>`});
-</script></body></html>
+<body>
+  <div class="shell">
+    <div id="nav"></div>
+    <main>
+      <section class="panel words-hero" aria-labelledby="pageTitle">
+        <div><h1 class="page-title" id="pageTitle">每个词，都可以查</h1><p class="muted">按义务教育课程标准分级浏览词汇，或直接输入文章里的任意英文词。Science Core 会随着课程内容导入持续丰富。</p></div>
+        <form class="search-form" id="searchForm" role="search"><input id="search" type="search" placeholder="输入英文单词或短语" autocomplete="off" aria-label="查询英文词汇"><button class="btn blue" type="submit">查询</button></form>
+      </section>
+      <nav class="panel category-tabs" id="categoryTabs" aria-label="词汇分类" role="tablist"></nav>
+      <div class="dictionary-layout">
+        <section class="panel word-browser" aria-labelledby="listTitle">
+          <div class="browser-head"><div><h2 class="section-title" id="listTitle">二级词汇</h2><p class="muted" id="listDescription">小学阶段应学习和掌握的基本词汇</p></div><span class="badge" id="visibleCount">正在载入</span></div>
+          <div class="word-list" id="words" aria-live="polite"><div class="skeleton"></div><div class="skeleton"></div></div>
+          <div class="load-row"><button class="btn hidden" id="loadMore" type="button">显示更多</button></div>
+        </section>
+        <aside class="panel word-detail" id="wordDetail" aria-live="polite" aria-labelledby="detailTitle">
+          <h2 class="section-title" id="detailTitle">查词结果</h2><p class="muted">点击左侧词汇，或在上方输入任意英文词。这里会显示分级、发音、课程释义和英文词典释义。</p>
+        </aside>
+      </div>
+    </main>
+  </div>
+  <script type="module">
+    import{$,api,escapeHtml,nav,speak}from'/shared.js';
+    $('#nav').innerHTML=nav('words');
+    const meta={level2:{title:'二级词汇',description:'小学阶段应学习和掌握的基本词汇'},level3:{title:'三级词汇',description:'初中阶段新增的基本词汇'},science:{title:'Science Core',description:'随课程卡片导入动态积累的科学概念词'}};
+    const state={words:[],counts:{level2:505,level3:1095,science:0},category:'level2',query:'',limit:80,lookup:0};
+    const lookupTerm=word=>word.category==='science'?word.english:(word.english.match(/[A-Za-z]+(?:['-][A-Za-z]+)*/)||[word.english])[0];
+    function categoryWords(){const query=state.query.trim().toLowerCase();return state.words.filter(word=>word.category===state.category&&(!query||`${word.english} ${word.meaning||''}`.toLowerCase().includes(query)))}
+    function renderTabs(){$('#categoryTabs').innerHTML=Object.entries(meta).map(([id,item])=>`<button class="category-tab" type="button" role="tab" data-category="${id}" aria-selected="${state.category===id}"><strong>${item.title}</strong><span>${state.counts[id]||0} 词</span></button>`).join('');document.querySelectorAll('[data-category]').forEach(button=>button.onclick=()=>{state.category=button.dataset.category;state.limit=80;render()})}
+    function renderList(){const all=categoryWords(),visible=all.slice(0,state.limit),item=meta[state.category];$('#listTitle').textContent=item.title;$('#listDescription').textContent=item.description;$('#visibleCount').textContent=state.query?`${all.length} 个匹配`:`${all.length} 词`;$('#words').innerHTML=visible.length?visible.map(word=>`<button class="word-row" type="button" data-lookup="${escapeHtml(lookupTerm(word))}"><strong>${escapeHtml(word.english)}</strong>${word.meaning?`<small>${escapeHtml(word.meaning)}</small>`:''}</button>`).join(''):`<div class="state-box"><strong>当前分类没有匹配词汇</strong>${state.query?`可以直接查询“${escapeHtml(state.query)}”获取词典结果。`:'导入含有新 Science Core 的课程卡片后，它会显示在这里。'}</div>`;$('#loadMore').classList.toggle('hidden',visible.length>=all.length);document.querySelectorAll('[data-lookup]').forEach(button=>button.onclick=()=>lookup(button.dataset.lookup))}
+    function render(){renderTabs();renderList()}
+    function bindDetail(word){const button=$('#speakWord');if(button)button.onclick=()=>speak(word)}
+    async function lookup(word){const term=String(word||'').trim();if(!term)return;const request=++state.lookup;const detail=$('#wordDetail');detail.setAttribute('aria-busy','true');detail.innerHTML=`<h2 class="section-title" id="detailTitle">${escapeHtml(term)}</h2><p class="muted">正在查询词义…</p><div class="skeleton"></div>`;try{const data=await api(`/api/dictionary?word=${encodeURIComponent(term)}`);if(request!==state.lookup)return;const category={level2:'二级词汇',level3:'三级词汇',science:'Science Core',reference:'扩展词汇'}[data.category]||'扩展词汇';const definitions=(data.meanings||[]).map(group=>`<section class="definition"><h3>${escapeHtml(group.partOfSpeech||'definition')}</h3>${group.definitions.map(item=>`<p>${escapeHtml(item.definition)}</p>${item.example?`<small>例：${escapeHtml(item.example)}</small>`:''}`).join('')}</section>`).join('');const sources=(data.sources||[]).length?`<div class="source-list"><strong>出现于课程</strong>${data.sources.map(source=>`<a href="/lesson/${encodeURIComponent(source.slug)}">${escapeHtml(source.title)}</a>`).join('')}</div>`:'';detail.innerHTML=`<div class="detail-head"><div><span class="badge">${category}</span><h2 id="detailTitle">${escapeHtml(data.word)}</h2><p class="phonetic">${escapeHtml(data.phonetic||'暂无音标')}</p></div><button class="btn blue" id="speakWord" type="button">播放发音</button></div>${data.meaning?`<div class="alert success"><strong>课程释义</strong><br>${escapeHtml(data.meaning)}</div>`:''}${definitions?`<div class="definitions">${definitions}</div>`:'<p class="muted">该词暂无扩展英文释义。</p>'}${sources}`;detail.setAttribute('aria-busy','false');bindDetail(data.word)}catch(error){if(request!==state.lookup)return;detail.innerHTML=`<h2 class="section-title" id="detailTitle">${escapeHtml(term)}</h2><div class="alert error"><strong>查询失败</strong><br>${escapeHtml(error.message)}</div><div class="btn-row" style="margin-top:12px"><button class="btn" id="retryLookup" type="button">重新查询</button><button class="btn blue" id="speakWord" type="button">播放发音</button></div>`;detail.setAttribute('aria-busy','false');$('#retryLookup').onclick=()=>lookup(term);bindDetail(term)}}
+    $('#search').oninput=event=>{state.query=event.target.value;state.limit=80;renderList()};
+    $('#searchForm').onsubmit=event=>{event.preventDefault();lookup($('#search').value)};
+    $('#loadMore').onclick=()=>{state.limit+=80;renderList()};
+    api('/api/words').then(data=>{state.words=data.words||[];state.counts=data.counts||state.counts;render()}).catch(error=>{$('#words').innerHTML=`<div class="state-box"><strong>词库加载失败</strong>${escapeHtml(error.message)}<br><button class="btn" id="reloadWords" type="button">重新加载</button></div>`;$('#reloadWords').onclick=()=>location.reload()});
+  </script>
+</body>
+</html>
