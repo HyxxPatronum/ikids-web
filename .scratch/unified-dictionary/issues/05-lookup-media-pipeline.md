@@ -28,9 +28,9 @@ Course Term 发布索引现在持久化经过规范化的 Illustration Asset 与
 
 ## Verification
 
-- `npm test`：53/53 通过。
+- `npm test`：54/54 通过。
 - `npm run typecheck`：通过。
 - `npm run check`：通过。
 - `npm run build`：通过。
 - `npx playwright test e2e/lookup-media.spec.ts`：9/9 场景逐项通过；Windows 下 vinext 测试子进程在场景结束后未自动退出，因此 runner 最终由人工终止。
-- 双轴复核发现的 Standards 2 个硬性问题、1 个判断项，以及 Spec 4 个问题均已修正或以类型化边界收敛。
+- 双轴复核发现的 Standards 2 个硬性问题、1 个判断项，以及 Spec 5 个问题均已修正或以类型化边界收敛；最终复核无剩余发现。

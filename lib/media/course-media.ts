@@ -16,6 +16,7 @@ export type CourseMedia = { illustration: IllustrationAsset | null; pronunciatio
 
 export const pronunciationAccents: PronunciationAccent[] = ['us', 'uk'];
 const reviews: IllustrationReview[] = ['pending', 'approved', 'rejected'];
+const pronunciationAvailabilities: PronunciationAvailability[] = ['ready', 'pending', 'missing', 'conflict'];
 const text = (value: unknown) => String(value ?? '').trim();
 
 // Course media is prepared before publication and stored with the course, so a student-facing
@@ -68,8 +69,8 @@ export function normalizePronunciationAssets(value: unknown): PronunciationAsset
     const declared = text(raw?.availability) as PronunciationAvailability;
     const availability: PronunciationAvailability = !identity || !source || !storage ? 'missing'
       : used.has(identity) ? 'conflict'
-      : declared === 'pending' || declared === 'missing' || declared === 'conflict' ? declared
-      : 'ready';
+      : pronunciationAvailabilities.includes(declared) ? declared
+      : 'pending';
     if (availability === 'ready') used.add(identity);
     assets.push({ region, src, source, storage, availability });
   }

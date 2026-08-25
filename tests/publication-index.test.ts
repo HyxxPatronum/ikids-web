@@ -151,7 +151,7 @@ test('editor preview carries illustration review state and per-accent pronunciat
         english: 'petals', chinese: '花瓣', approved: true,
         illustration: { src: 'media/petals.png', alt: '张开的花瓣', source: '课程插图库 2024', review: 'approved' },
         pronunciations: [
-          { region: 'us', src: 'media/petals-us.mp3', source: '课程录音棚', storage: 'r2:course-audio' },
+          { region: 'us', src: 'media/petals-us.mp3', source: '课程录音棚', storage: 'r2:course-audio', availability: 'ready' },
           { region: 'uk', src: 'media/petals-uk.mp3', source: '课程录音棚', storage: 'r2:course-audio', availability: 'pending' },
         ],
       },
@@ -186,7 +186,7 @@ test('published media keeps the first usable asset when courses share a Lexeme',
     word_bank: [{
       english: 'flower', chinese: '花', approved: true,
       illustration: { src: 'media/flower.png', alt: '一朵花', source: '课程插图库', review: 'approved' },
-      pronunciations: [{ region: 'uk', src: 'media/flower-uk.mp3', source: '课程录音棚', storage: 'r2:course-audio' }],
+      pronunciations: [{ region: 'uk', src: 'media/flower-uk.mp3', source: '课程录音棚', storage: 'r2:course-audio', availability: 'ready' }],
     }],
   });
 

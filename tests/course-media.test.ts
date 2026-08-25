@@ -37,7 +37,7 @@ test('unreviewed, rejected, alt-less, and remote illustrations stay out of stude
 
 test('US and UK Pronunciation Assets record source, accent, storage, and availability independently', () => {
   const assets = normalizePronunciationAssets({
-    us: { src: 'audio/flower-us.mp3', source: '课程录音棚', storage: 'r2:course-audio' },
+    us: { src: 'audio/flower-us.mp3', source: '课程录音棚', storage: 'r2:course-audio', availability: 'ready' },
     uk: { src: 'audio/flower-uk.mp3', source: '课程录音棚', storage: 'r2:course-audio', availability: 'pending' },
   });
   assert.deepEqual(assets, [
@@ -50,8 +50,8 @@ test('US and UK Pronunciation Assets record source, accent, storage, and availab
 
 test('one recording cannot be published under both accent labels', () => {
   const assets = normalizePronunciationAssets([
-    { region: 'us', src: 'audio/flower.mp3', source: '课程录音棚', storage: 'r2:course-audio' },
-    { region: 'uk', src: 'audio/flower.mp3', source: '课程录音棚', storage: 'r2:course-audio' },
+    { region: 'us', src: 'audio/flower.mp3', source: '课程录音棚', storage: 'r2:course-audio', availability: 'ready' },
+    { region: 'uk', src: 'audio/flower.mp3', source: '课程录音棚', storage: 'r2:course-audio', availability: 'ready' },
   ]);
   assert.deepEqual(assets.map(asset => [asset.region, asset.availability]), [['us', 'ready'], ['uk', 'conflict']]);
   assert.equal(assets.filter(isPronunciationReady).length, 1);
@@ -59,8 +59,8 @@ test('one recording cannot be published under both accent labels', () => {
 
 test('equivalent asset paths cannot publish one recording under both accent labels', () => {
   const assets = normalizePronunciationAssets([
-    { region: 'us', src: 'audio/flower.mp3', source: '课程录音棚', storage: 'r2:course-audio' },
-    { region: 'uk', src: '/audio/flower.mp3', source: '课程录音棚', storage: 'r2:course-audio' },
+    { region: 'us', src: 'audio/flower.mp3', source: '课程录音棚', storage: 'r2:course-audio', availability: 'ready' },
+    { region: 'uk', src: '/audio/flower.mp3', source: '课程录音棚', storage: 'r2:course-audio', availability: 'ready' },
   ]);
   assert.deepEqual(assets.map(asset => [asset.region, asset.availability]), [['us', 'ready'], ['uk', 'conflict']]);
 });
@@ -71,6 +71,15 @@ test('an editor-declared pronunciation conflict remains unavailable', () => {
   ]);
   assert.equal(asset.availability, 'conflict');
   assert.equal(isPronunciationReady(asset), false);
+});
+
+test('missing or invalid pronunciation availability fails closed', () => {
+  const assets = normalizePronunciationAssets([
+    { region: 'us', src: 'audio/flower-us.mp3', source: '课程录音棚', storage: 'r2:course-audio' },
+    { region: 'uk', src: 'audio/flower-uk.mp3', source: '课程录音棚', storage: 'r2:course-audio', availability: 'reday' },
+  ]);
+  assert.deepEqual(assets.map(asset => [asset.region, asset.availability]), [['us', 'pending'], ['uk', 'pending']]);
+  assert.equal(assets.filter(isPronunciationReady).length, 0);
 });
 
 test('remote or unusable pronunciation locations are never treated as available', () => {
