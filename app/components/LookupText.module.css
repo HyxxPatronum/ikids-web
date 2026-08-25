@@ -1,5 +1,6 @@
 .sentence {
   display: inline;
+  overflow-wrap: anywhere;
   border-radius: 6px;
   outline: none;
 }
@@ -19,6 +20,7 @@
   font: inherit;
   line-height: inherit;
   cursor: pointer;
+  overflow-wrap: anywhere;
 }
 
 .word:hover,

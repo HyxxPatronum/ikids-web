@@ -6,7 +6,12 @@ import type { AccentOption } from '../pronunciation/accents.ts';
 export type DictionaryLanguage = 'en' | 'zh';
 export type DictionaryCategory = 'level2' | 'level3' | 'science' | 'reference';
 export type CacheStatus = 'hit' | 'miss' | 'stale';
+export type LookupBlockStatus = 'ready' | 'empty' | 'unavailable' | 'stale' | 'not_requested';
 export type DictionaryLookupContext = { courseId: string; sentence: string };
+
+export const DEFAULT_POSITIVE_TTL_MS = 7 * 24 * 60 * 60 * 1000;
+export const DEFAULT_NEGATIVE_TTL_MS = 30 * 60 * 1000;
+export const DEFAULT_STALE_TTL_MS = DEFAULT_POSITIVE_TTL_MS;
 
 export type DictionaryMeaning = {
   partOfSpeech: string;
@@ -46,14 +51,24 @@ export type DictionaryResult = {
   language: DictionaryLanguage;
   lookupSource: string;
   cacheStatus: CacheStatus;
-  sourceStatus: { course: 'found' | 'not_found'; provider: 'found' | 'not_found' | 'unavailable' };
+  sourceStatus: {
+    course: 'found' | 'not_found';
+    provider: 'found' | 'not_found' | 'unavailable';
+    blocks: {
+      courseSense: LookupBlockStatus;
+      localDictionary: LookupBlockStatus;
+      externalDictionary: LookupBlockStatus;
+      pronunciation: LookupBlockStatus;
+      illustration: LookupBlockStatus;
+    };
+  };
   context: DictionaryLookupContext;
 };
 
 export type DictionaryProvider = (lexeme: string, language: DictionaryLanguage) => Promise<Partial<DictionaryResult> | null>;
 export type DictionaryCache = {
   get(key: string): Promise<{ value: Partial<DictionaryResult> | null; status: CacheStatus } | null>;
-  set(key: string, value: Partial<DictionaryResult> | null, ttlMs: number): Promise<void>;
+  set(key: string, value: Partial<DictionaryResult> | null, ttlMs: number, staleTtlMs?: number): Promise<void>;
 };
 
 export type DictionaryCatalog = {
@@ -66,8 +81,20 @@ export type DictionaryServiceOptions = {
   catalog?: DictionaryCatalog;
   cache?: DictionaryCache;
   now?: () => number;
+  positiveTtlMs?: number;
   ttlMs?: number;
   negativeTtlMs?: number;
+  staleTtlMs?: number;
+  observe?: (metric: DictionaryLookupMetric) => void;
+};
+
+export type DictionaryLookupMetric = {
+  name: 'dictionary.lookup';
+  outcome: 'success' | 'not_found' | 'provider_failure';
+  durationMs: number;
+  cacheStatus: CacheStatus;
+  providerStatus: DictionaryResult['sourceStatus']['provider'];
+  stale: boolean;
 };
 
 export const normalizeLookup = (value: unknown): string => String(value ?? '')
@@ -125,9 +152,15 @@ function dedupeMeanings(meanings: DictionaryMeaning[]): DictionaryMeaning[] {
 }
 
 export function createDictionaryService(options: DictionaryServiceOptions) {
-  const ttlMs = options.ttlMs ?? 7 * 24 * 60 * 60 * 1000;
-  const negativeTtlMs = options.negativeTtlMs ?? 30 * 60 * 1000;
+  const positiveTtlMs = options.positiveTtlMs ?? options.ttlMs ?? DEFAULT_POSITIVE_TTL_MS;
+  const negativeTtlMs = options.negativeTtlMs ?? DEFAULT_NEGATIVE_TTL_MS;
+  const staleTtlMs = options.staleTtlMs ?? DEFAULT_STALE_TTL_MS;
+  const now = options.now ?? Date.now;
   const inflight = new Map<string, Promise<Partial<DictionaryResult> | null>>();
+
+  function observe(metric: DictionaryLookupMetric) {
+    try { options.observe?.(metric); } catch { /* Metrics must never change lookup behavior. */ }
+  }
 
   async function fetchOnce(lexeme: string, language: DictionaryLanguage) {
     const key = `${language}:${lexeme}`;
@@ -151,6 +184,18 @@ export function createDictionaryService(options: DictionaryServiceOptions) {
       if (!['en', 'zh'].includes(language) || !isValidLookup(selectedScope)) {
         throw Object.assign(new Error('Invalid dictionary lookup'), { code: 'INVALID_LOOKUP', status: 400 });
       }
+      const startedAt = now();
+      let observedCacheStatus: CacheStatus = 'miss';
+      let observedProviderStatus: DictionaryResult['sourceStatus']['provider'] = 'not_found';
+
+      const finish = (outcome: DictionaryLookupMetric['outcome']) => observe({
+        name: 'dictionary.lookup',
+        outcome,
+        durationMs: Math.max(0, now() - startedAt),
+        cacheStatus: observedCacheStatus,
+        providerStatus: observedProviderStatus,
+        stale: observedCacheStatus === 'stale',
+      });
 
       async function loadRemote(candidate: string) {
         let remote: Partial<DictionaryResult> | null = null;
@@ -165,8 +210,14 @@ export function createDictionaryService(options: DictionaryServiceOptions) {
         if (!hadCache || cacheStatus === 'stale') {
           try {
             remote = await fetchOnce(candidate, language);
+            cacheStatus = 'miss';
             providerStatus = remote ? 'found' : 'not_found';
-            if (options.cache) await options.cache.set(`${language}:${candidate}`, remote, remote ? ttlMs : negativeTtlMs);
+            if (options.cache) await options.cache.set(
+              `${language}:${candidate}`,
+              remote,
+              remote ? positiveTtlMs : negativeTtlMs,
+              remote ? staleTtlMs : 0,
+            );
           } catch (error) {
             providerError = error;
             providerStatus = 'unavailable';
@@ -199,24 +250,48 @@ export function createDictionaryService(options: DictionaryServiceOptions) {
         }
       }
       const { remote, cacheStatus, providerStatus } = loaded;
+      observedCacheStatus = cacheStatus;
+      observedProviderStatus = providerStatus;
       const resolvedCategory: DictionaryCategory = category || 'reference';
       if (providerError && !remote && !course && resolvedCategory === 'reference') {
+        finish('provider_failure');
         throw Object.assign(new Error('Dictionary provider unavailable'), { code: 'PROVIDER_UNAVAILABLE', status: 503, cause: providerError });
       }
       if (!remote && !course && resolvedCategory === 'reference') {
+        finish('not_found');
         throw Object.assign(new Error('Dictionary entry not found'), { code: 'NOT_FOUND', status: 404 });
       }
-      return {
+      const illustration = studentIllustration(normalizeIllustration(course?.illustration));
+      const coursePronunciations = normalizePronunciationAssets(course?.pronunciations ?? []);
+      const accents = resolveAccentOptions({ lexeme, course: coursePronunciations, provider: remote?.pronunciations });
+      const dictionaryStatus: LookupBlockStatus = remote?.meanings?.length
+        ? (cacheStatus === 'stale' ? 'stale' : 'ready')
+        : providerStatus === 'unavailable' ? 'unavailable' : 'empty';
+      const result: DictionaryResult = {
         surfaceForm, lexeme, selectedScope, alternateScopes: (request?.alternateScopes || []).map(normalizeLookup).filter(Boolean),
         word: String(course?.sources?.[0]?.word || selectedScope || lexeme), category: resolvedCategory, catalogMembership: resolvedCategory === 'reference' ? null : resolvedCategory,
         meaning: course?.meaning || '', image: course?.image || '', sources: course?.sources || [],
-        illustration: studentIllustration(normalizeIllustration(course?.illustration)),
-        accents: resolveAccentOptions({ lexeme, course: normalizePronunciationAssets(course?.pronunciations ?? []), provider: remote?.pronunciations }),
+        illustration,
+        accents,
         phonetic: remote?.phonetic || '', audio: remote?.audio || '', pronunciations: remote?.pronunciations || [], meanings: dedupeMeanings(remote?.meanings || []), provider: remote?.provider || 'Local dictionary',
         language, lookupSource: remote ? (course || resolvedCategory !== 'reference' ? 'local+provider' : 'provider') : 'local',
-        cacheStatus, sourceStatus: { course: course ? 'found' : 'not_found', provider: providerStatus },
+        cacheStatus, sourceStatus: {
+          course: course ? 'found' : 'not_found',
+          provider: providerStatus,
+          blocks: {
+            courseSense: course?.meaning ? 'ready' : 'empty',
+            localDictionary: language === 'zh' ? dictionaryStatus : 'not_requested',
+            externalDictionary: language === 'en' ? dictionaryStatus : 'not_requested',
+            pronunciation: accents.some(accent => accent.source === 'course') ? 'ready' : accents.some(accent => accent.source !== 'none')
+              ? (cacheStatus === 'stale' ? 'stale' : 'ready')
+              : providerStatus === 'unavailable' ? 'unavailable' : 'empty',
+            illustration: illustration ? 'ready' : 'empty',
+          },
+        },
         context,
       };
+      finish('success');
+      return result;
     },
   };
 }

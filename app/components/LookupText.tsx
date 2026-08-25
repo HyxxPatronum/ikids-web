@@ -12,16 +12,18 @@ export function LookupText({ text, terms, courseId }: { text: string; terms: Loo
   const wordRefs = useRef<Array<HTMLButtonElement | null>>([]);
   const { lookup } = useLookup();
 
-  const move = (event: KeyboardEvent<HTMLElement>, direction: number) => {
-    if (!['ArrowLeft', 'ArrowRight', 'ArrowUp', 'ArrowDown'].includes(event.key)) return;
+  const move = (event: KeyboardEvent<HTMLElement>) => {
+    if (!['ArrowLeft', 'ArrowRight', 'ArrowUp', 'ArrowDown', 'Home', 'End'].includes(event.key)) return;
     event.preventDefault();
     const current = wordRefs.current.findIndex(node => node === document.activeElement);
-    const next = current < 0 ? (direction > 0 ? 0 : wordRefs.current.length - 1) : current + direction;
+    const direction = event.key === 'ArrowLeft' || event.key === 'ArrowUp' ? -1 : 1;
+    const next = event.key === 'Home' ? 0 : event.key === 'End' ? wordRefs.current.length - 1
+      : current < 0 ? (direction > 0 ? 0 : wordRefs.current.length - 1) : current + direction;
     wordRefs.current[Math.max(0, Math.min(wordRefs.current.length - 1, next))]?.focus();
   };
 
   let wordIndex = 0;
-  return <span className={styles.sentence} tabIndex={0} aria-label={text.trim()} onKeyDown={event => move(event, event.key === 'ArrowLeft' || event.key === 'ArrowUp' ? -1 : 1)}>
+  return <span className={styles.sentence} data-lookup-sentence role="group" tabIndex={0} aria-label={text.trim()} onKeyDown={move}>
     {parts.map((part, index) => {
       if (part.type === 'text') return <span key={index}>{part.text}</span>;
       const referenceIndex = wordIndex++;

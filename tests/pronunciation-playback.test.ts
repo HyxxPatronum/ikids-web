@@ -31,7 +31,7 @@ function createHarness(overrides: Partial<PronunciationPlaybackPort> = {}) {
     ...overrides,
   };
   const player = createPronunciationPlayer(port, status => states.push(`${status.region}:${status.state}`));
-  return { player, states, audioCalls, speechCalls, stopped, audioFinished, speechFinished };
+  return { player, port, states, audioCalls, speechCalls, stopped, audioFinished, speechFinished };
 }
 
 test('a prepared accent recording reports starting then playing then idle', async () => {
@@ -46,13 +46,20 @@ test('a prepared accent recording reports starting then playing then idle', asyn
 });
 
 test('a failed accent recording falls back to device speech with an explicit fallback state', async () => {
+  const metrics: Array<Record<string, unknown>> = [];
   const harness = createHarness({ playAudio: async () => { throw new Error('audio unavailable'); } });
-  const played = harness.player.play({ region: 'uk', text: 'flower', audioUrl: '/api/pronunciation?word=flower&region=uk' });
+  const player = createPronunciationPlayer(
+    { playAudio: async () => { throw new Error('audio unavailable'); }, speak: harness.port.speak },
+    status => harness.states.push(`${status.region}:${status.state}`),
+    metric => metrics.push(metric),
+  );
+  const played = player.play({ region: 'uk', text: 'flower', audioUrl: '/api/pronunciation?word=flower&region=uk' });
   await tick();
   harness.speechFinished.resolve();
   await played;
   assert.deepEqual(harness.states, ['uk:starting', 'uk:fallback', 'uk:idle']);
   assert.deepEqual(harness.speechCalls, ['uk:flower']);
+  assert.deepEqual(metrics, [{ name: 'pronunciation.playback', outcome: 'fallback', region: 'uk', reason: 'audio_failed' }]);
 });
 
 test('a word without any recording goes straight to device speech fallback', async () => {

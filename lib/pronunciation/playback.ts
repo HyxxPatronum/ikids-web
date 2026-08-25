@@ -8,12 +8,22 @@ export type PronunciationPlaybackPort = {
   speak(text: string, region: PronunciationAccent): Promise<PronunciationPlaybackHandle>;
 };
 export type PronunciationPlayRequest = { region: PronunciationAccent; text: string; audioUrl?: string };
+export type PronunciationPlaybackMetric = {
+  name: 'pronunciation.playback';
+  outcome: 'fallback';
+  region: PronunciationAccent;
+  reason: 'audio_failed' | 'audio_unavailable';
+};
 
 type Session = { region: PronunciationAccent; stop: (() => void) | null; cancelled: Promise<void>; cancel(): void };
 
 // One player owns every accent control in a lookup, so a repeated tap on the playing accent is
 // ignored and switching accents silences the previous recording before the next one starts.
-export function createPronunciationPlayer(port: PronunciationPlaybackPort, onStatus: (status: PronunciationPlaybackStatus) => void) {
+export function createPronunciationPlayer(
+  port: PronunciationPlaybackPort,
+  onStatus: (status: PronunciationPlaybackStatus) => void,
+  observe?: (metric: PronunciationPlaybackMetric) => void,
+) {
   let active: Session | null = null;
   const emit = (region: PronunciationAccent, state: PronunciationPlaybackState) => onStatus({ region, state });
   const release = (session: Session) => { if (active === session) { active = null; emit(session.region, 'idle'); } };
@@ -40,6 +50,7 @@ export function createPronunciationPlayer(port: PronunciationPlaybackPort, onSta
     active = session;
     emit(session.region, 'starting');
     const audioUrl = String(request.audioUrl || '');
+    const fallbackReason: PronunciationPlaybackMetric['reason'] = audioUrl ? 'audio_failed' : 'audio_unavailable';
     if (audioUrl) {
       try {
         const playback = await port.playAudio(audioUrl);
@@ -58,6 +69,7 @@ export function createPronunciationPlayer(port: PronunciationPlaybackPort, onSta
       const speech = await port.speak(request.text, session.region);
       if (active !== session) { speech.stop(); return; }
       session.stop = speech.stop;
+      try { observe?.({ name: 'pronunciation.playback', outcome: 'fallback', region: session.region, reason: fallbackReason }); } catch { /* Metrics must never interrupt playback. */ }
       emit(session.region, 'fallback');
       await Promise.race([speech.finished, session.cancelled]);
       if (active !== session) return;

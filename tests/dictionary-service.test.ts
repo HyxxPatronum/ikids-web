@@ -136,6 +136,125 @@ test('deduplicates concurrent provider requests and serves the positive cache', 
   assert.equal(cached.cacheStatus, 'hit');
 });
 
+test('applies configurable positive, negative, and stale-success cache lifetimes', async () => {
+  let now = 1_000;
+  let providerAvailable = true;
+  const cache = createMemoryCache(() => now);
+  const service = createDictionaryService({
+    provider: async lexeme => {
+      if (!providerAvailable) throw new Error('offline');
+      return lexeme === 'flower' ? { provider: 'Fixture', meanings: [{ partOfSpeech: 'noun', definitions: [{ definition: 'a bloom' }] }] } : null;
+    },
+    cache,
+    positiveTtlMs: 100,
+    negativeTtlMs: 20,
+    staleTtlMs: 300,
+  });
+
+  assert.equal((await service.lookup('flower')).cacheStatus, 'miss');
+  now += 101;
+  providerAvailable = false;
+  assert.equal((await service.lookup('flower')).cacheStatus, 'stale');
+  now += 300;
+  await assert.rejects(service.lookup('flower'), (error: any) => error.code === 'PROVIDER_UNAVAILABLE');
+
+  providerAvailable = true;
+  await assert.rejects(service.lookup('absent'), (error: any) => error.code === 'NOT_FOUND');
+  providerAvailable = false;
+  now += 19;
+  await assert.rejects(service.lookup('absent'), (error: any) => error.code === 'NOT_FOUND');
+  now += 2;
+  await assert.rejects(service.lookup('absent'), (error: any) => error.code === 'PROVIDER_UNAVAILABLE');
+});
+
+test('reports independent result-block state while preserving local results through provider failure', async () => {
+  const service = createDictionaryService({
+    provider: async () => { throw new Error('offline'); },
+    catalog: courseCatalog({
+      meaning: 'the lesson meaning',
+      illustration: { src: 'media/flower.png', alt: 'A flower opening', source: 'course-library', review: 'approved' },
+      pronunciations: [{ region: 'us', src: 'media/flower-us.mp3', source: 'studio', storage: 'r2', availability: 'ready' }],
+    }),
+  });
+
+  const result = await service.lookup('flower');
+  assert.equal(result.meaning, 'the lesson meaning');
+  assert.equal(result.illustration?.src, 'media/flower.png');
+  assert.deepEqual(result.sourceStatus.blocks, {
+    courseSense: 'ready',
+    localDictionary: 'not_requested',
+    externalDictionary: 'unavailable',
+    pronunciation: 'ready',
+    illustration: 'ready',
+  });
+});
+
+test('a prepared course pronunciation stays ready while an external dictionary uses stale cache', async () => {
+  let now = 100;
+  let available = true;
+  const service = createDictionaryService({
+    now: () => now,
+    cache: createMemoryCache(() => now),
+    positiveTtlMs: 10,
+    staleTtlMs: 20,
+    provider: async () => {
+      if (!available) throw new Error('offline');
+      return { provider: 'Fixture', meanings: [{ partOfSpeech: 'noun', definitions: [{ definition: 'cached meaning' }] }] };
+    },
+    catalog: courseCatalog({
+      pronunciations: [{ region: 'us', src: 'media/flower-us.mp3', source: 'studio', storage: 'r2', availability: 'ready' }],
+    }),
+  });
+
+  await service.lookup('flower');
+  now += 11;
+  available = false;
+  const stale = await service.lookup('flower');
+  assert.equal(stale.sourceStatus.blocks.externalDictionary, 'stale');
+  assert.equal(stale.sourceStatus.blocks.pronunciation, 'ready');
+});
+
+test('emits one aggregate metric for success, not-found, provider failure, cache hits, and stale use', async () => {
+  let now = 10;
+  let mode: 'found' | 'missing' | 'failed' = 'found';
+  const metrics: Array<Record<string, unknown>> = [];
+  const service = createDictionaryService({
+    now: () => now,
+    cache: createMemoryCache(() => now),
+    positiveTtlMs: 10,
+    staleTtlMs: 20,
+    provider: async () => {
+      now += 7;
+      if (mode === 'failed') throw new Error('offline');
+      return mode === 'found' ? { provider: 'Fixture' } : null;
+    },
+    observe: metric => metrics.push(metric),
+  });
+
+  await service.lookup('flower');
+  await service.lookup('flower');
+  mode = 'missing';
+  await assert.rejects(service.lookup('absent'), (error: any) => error.code === 'NOT_FOUND');
+  mode = 'failed';
+  await assert.rejects(service.lookup('broken'), (error: any) => error.code === 'PROVIDER_UNAVAILABLE');
+  now += 11;
+  assert.equal((await service.lookup('flower')).cacheStatus, 'stale');
+
+  assert.deepEqual(metrics.map(metric => ({
+    outcome: metric.outcome,
+    cacheStatus: metric.cacheStatus,
+    providerStatus: metric.providerStatus,
+    stale: metric.stale,
+  })), [
+    { outcome: 'success', cacheStatus: 'miss', providerStatus: 'found', stale: false },
+    { outcome: 'success', cacheStatus: 'hit', providerStatus: 'found', stale: false },
+    { outcome: 'not_found', cacheStatus: 'miss', providerStatus: 'not_found', stale: false },
+    { outcome: 'provider_failure', cacheStatus: 'miss', providerStatus: 'unavailable', stale: false },
+    { outcome: 'success', cacheStatus: 'stale', providerStatus: 'unavailable', stale: true },
+  ]);
+  assert.deepEqual(metrics.map(metric => metric.durationMs), [7, 0, 7, 7, 7]);
+});
+
 const courseCatalog = (course: Record<string, unknown>) => ({
   categoryFor: () => 'science' as const,
   courseFor: () => course,

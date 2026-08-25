@@ -1,7 +1,7 @@
 import { env } from 'cloudflare:workers';
 import flower from '../../../day001-flower.json';
 import cactus from '../../../science-reader-100-how-a-cactus-saves-water.json';
-import { createDictionaryService } from '../../../lib/dictionary/service.ts';
+import { createDictionaryService, DEFAULT_NEGATIVE_TTL_MS, DEFAULT_POSITIVE_TTL_MS, DEFAULT_STALE_TTL_MS } from '../../../lib/dictionary/service.ts';
 import { buildCatalogFromIndex, catalogCategory } from '../../../lib/catalog/catalog.ts';
 import { createD1PublicationStore } from '../../../lib/catalog/d1-publication-store.ts';
 import { createPublicationIndex, phraseCandidates, publicationLexeme, reviewPhraseCandidate } from '../../../lib/catalog/publication-index.ts';
@@ -13,8 +13,10 @@ const seedCards: Card[] = [flower, cactus];
 const normalizeWord = (value: unknown) => String(value || '').trim().toLowerCase().replace(/[’]/g, "'").replace(/^[^a-z]+|[^a-z]+$/g, '');
 const categoryFor = catalogCategory;
 
-const DICTIONARY_TTL=7*24*60*60*1000;
-const DICTIONARY_NEGATIVE_TTL=30*60*1000;
+const cacheDuration=(value:unknown,fallback:number)=>{const parsed=Number(value);return Number.isFinite(parsed)&&parsed>=0?parsed:fallback;};
+const DICTIONARY_TTL=cacheDuration(env.DICTIONARY_POSITIVE_TTL_MS,DEFAULT_POSITIVE_TTL_MS);
+const DICTIONARY_NEGATIVE_TTL=cacheDuration(env.DICTIONARY_NEGATIVE_TTL_MS,DEFAULT_NEGATIVE_TTL_MS);
+const DICTIONARY_STALE_TTL=cacheDuration(env.DICTIONARY_STALE_TTL_MS,DEFAULT_STALE_TTL_MS);
 const dictionaryInflight=new Map<string,Promise<any>>();
 const uniqueTerms=(values:unknown[])=>[...new Set((values||[]).map(value=>String(value||'').trim()).filter(Boolean))];
 function normalizeDictionaryEntry(entry:any){
@@ -167,6 +169,7 @@ async function handle(request:Request,context:RouteContext){
     const requested=String(url.searchParams.get('word')||'').trim(); const lookup=normalizeWord(requested);const language=String(url.searchParams.get('lang')||'en');
     const surfaceForm=String(url.searchParams.get('surface')||requested).trim();const courseId=String(url.searchParams.get('courseId')||'').trim();const sentence=String(url.searchParams.get('sentence')||'').trim();
     const alternateScopes=(url.searchParams.getAll('alternate')||[]).map(value=>String(value).trim()).filter(Boolean);
+    const localOnly=url.searchParams.get('source')==='local';
     if(!['en','zh'].includes(language))return json({error:'词典语言只支持 en 或 zh'},400);
     if(!lookup||lookup.length>80||!/^[a-z]+(?:['-][a-z]+)*(?:\s+[a-z]+(?:['-][a-z]+)*)*$/.test(lookup))return json({error:'请输入有效的英文单词或短语'},400);
     if(surfaceForm.length>80||courseId.length>80||sentence.length>500||alternateScopes.length>16||alternateScopes.some(scope=>scope.length>80))return json({error:'查词范围、课程或句子上下文过长'},400);
@@ -174,15 +177,19 @@ async function handle(request:Request,context:RouteContext){
     const knownCategory=categoryFor(lookup);const base={word:indexed?.english||requested.toLowerCase(),category:knownCategory||indexed?.membership||'reference',meaning:indexed?.meaning||'',image:indexed?.image||'',illustration:indexed?.illustration||null,pronunciations:indexed?.pronunciations||[],sources:indexed?.sources||[]};
     const unifiedService=createDictionaryService({
       catalog:{categoryFor:word=>categoryFor(word)||((indexed&&indexed.lexeme===publicationLexeme(word))?indexed.membership:null),courseFor:word=>indexed&&indexed.lexeme===publicationLexeme(word)?{lexeme:indexed.lexeme,meaning:base.meaning,image:base.image,illustration:base.illustration,pronunciations:base.pronunciations,sources:base.sources}:null},
-      provider:async word=>language==='zh'
+      provider:async word=>localOnly?null:language==='zh'
         ? (localChineseDictionaryRow(await db.prepare('SELECT word,phonetic,translation,definition,pos,exchange,source FROM dictionary_entries WHERE word=?').bind(word).first()) || (base.meaning&&(!indexed||word===indexed.lexeme)?{meanings:[{partOfSpeech:'课程释义',definitions:[{definition:base.meaning,example:''}],synonyms:[],antonyms:[]}],provider:'本地课程词库',language:'zh'}:null))
         : fetchDictionaryOnce(word),
-      cache:{
-        async get(key){const word=key.slice(key.indexOf(':')+1);const row:any=await db.prepare('SELECT payload_json,status,expires_at FROM dictionary_cache WHERE word=?').bind(word).first();if(!row)return null;return {value:row.payload_json?JSON.parse(row.payload_json):null,status:row.status==='found'&&Date.parse(row.expires_at)>Date.now()?'hit':row.status==='found'?'stale':'hit'};},
-        async set(key,value,ttl){const word=key.slice(key.indexOf(':')+1);const now=new Date();await db.prepare('INSERT INTO dictionary_cache (word,payload_json,status,expires_at,updated_at) VALUES (?,?,?,?,?) ON CONFLICT(word) DO UPDATE SET payload_json=excluded.payload_json,status=excluded.status,expires_at=excluded.expires_at,updated_at=excluded.updated_at').bind(word,value?JSON.stringify(value):null,value?'found':'not_found',new Date(now.getTime()+ttl).toISOString(),now.toISOString()).run();},
+      cache:localOnly?undefined:{
+        async get(key){const row:any=await db.prepare('SELECT payload_json,status,expires_at FROM dictionary_cache WHERE word=?').bind(key).first();if(!row)return null;const now=Date.now(),expiresAt=Date.parse(row.expires_at);if(expiresAt>now)return {value:row.payload_json?JSON.parse(row.payload_json):null,status:'hit' as const};if(row.status==='found'&&expiresAt+DICTIONARY_STALE_TTL>now)return {value:row.payload_json?JSON.parse(row.payload_json):null,status:'stale' as const};await db.prepare('DELETE FROM dictionary_cache WHERE word=?').bind(key).run();return null;},
+        async set(key,value,ttl){const now=new Date();await db.prepare('INSERT INTO dictionary_cache (word,payload_json,status,expires_at,updated_at) VALUES (?,?,?,?,?) ON CONFLICT(word) DO UPDATE SET payload_json=excluded.payload_json,status=excluded.status,expires_at=excluded.expires_at,updated_at=excluded.updated_at').bind(key,value?JSON.stringify(value):null,value?'found':'not_found',new Date(now.getTime()+ttl).toISOString(),now.toISOString()).run();},
       },
+      positiveTtlMs:DICTIONARY_TTL,
+      negativeTtlMs:DICTIONARY_NEGATIVE_TTL,
+      staleTtlMs:DICTIONARY_STALE_TTL,
+      observe:localOnly?undefined:metric=>console.info('lookup_metric',JSON.stringify(metric)),
     });
-    try{return json(await unifiedService.lookup({surfaceForm,scope:lookup,alternateScopes,courseId,sentence,language}));}catch(error:any){return json({error:error.message,code:error.code},error.status||500);}
+    try{const result=await unifiedService.lookup({surfaceForm,scope:lookup,alternateScopes,courseId,sentence,language});if(localOnly&&language==='en')result.sourceStatus.blocks.externalDictionary='not_requested';return json(result);}catch(error:any){return json({error:error.message,code:error.code},error.status||500);}
   }
   if(path==='/dashboard'&&method==='GET'){const [seriesCount,cardCount,publishedCount,progressCount,recordingCount,cards,series]=await Promise.all([db.prepare('SELECT COUNT(*) count FROM series').first<any>(),db.prepare('SELECT COUNT(*) count FROM cards').first<any>(),db.prepare("SELECT COUNT(*) count FROM cards WHERE status='published'").first<any>(),db.prepare('SELECT COUNT(*) count FROM learning_progress').first<any>(),db.prepare('SELECT COUNT(*) count FROM recording_submissions').first<any>(),db.prepare('SELECT * FROM cards ORDER BY day').all(),db.prepare('SELECT * FROM series ORDER BY sort_order').all()]);return json({counts:{series:seriesCount?.count||0,cards:cardCount?.count||0,published:publishedCount?.count||0,users:0,progress:progressCount?.count||0,recordings:recordingCount?.count||0},cards:(cards.results||[]).map(cardRecord),series:(series.results||[]).map((row:any)=>({id:row.id,name:row.name,subtitle:row.subtitle,description:row.description,sort:row.sort_order,status:row.status}))});}
   if(segments[0]==='progress'&&segments.length===2){const userId=scopedUser(request,segments[1]);if(!userId)return json({error:'无权访问该学习记录'},403);if(method==='GET'){const rows=await db.prepare('SELECT card_id,payload_json,completed_percent,updated_at FROM learning_progress WHERE user_id=?').bind(userId).all();const cards:Record<string,any>={};for(const row of rows.results||[]){const item:any=row;cards[item.card_id]={...JSON.parse(item.payload_json),completedPercent:item.completed_percent,updatedAt:item.updated_at};}return json({cards});}if(method==='PUT'||method==='POST'){const payload:any=await request.json();const percent=Math.max(0,Math.min(100,Number(payload.completedPercent||0)));const now=new Date().toISOString();await db.prepare('INSERT INTO learning_progress (user_id,card_id,payload_json,completed_percent,updated_at) VALUES (?,?,?,?,?) ON CONFLICT(user_id,card_id) DO UPDATE SET payload_json=excluded.payload_json,completed_percent=excluded.completed_percent,updated_at=excluded.updated_at').bind(userId,payload.cardId,JSON.stringify(payload),percent,now).run();return json({...payload,completedPercent:percent,updatedAt:now});}}

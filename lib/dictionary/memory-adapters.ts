@@ -9,15 +9,19 @@ export function createMemoryProvider(entries: Record<string, Partial<DictionaryR
 }
 
 export function createMemoryCache(now: () => number = Date.now): DictionaryCache {
-  const values = new Map<string, { value: Partial<DictionaryResult> | null; expiresAt: number }>();
+  const values = new Map<string, { value: Partial<DictionaryResult> | null; expiresAt: number; staleUntil: number }>();
   return {
     async get(key) {
       const entry = values.get(key);
       if (!entry) return null;
+      if (entry.staleUntil <= now()) { values.delete(key); return null; }
       const status: CacheStatus = entry.expiresAt > now() ? 'hit' : 'stale';
       return { value: entry.value, status };
     },
-    async set(key, value, ttlMs) { values.set(key, { value, expiresAt: now() + ttlMs }); },
+    async set(key, value, ttlMs, staleTtlMs = 0) {
+      const expiresAt = now() + ttlMs;
+      values.set(key, { value, expiresAt, staleUntil: expiresAt + staleTtlMs });
+    },
   };
 }
 

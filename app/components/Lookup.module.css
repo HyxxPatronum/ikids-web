@@ -1,3 +1,7 @@
+.application {
+  display: contents;
+}
+
 .scopePicker {
   display: flex;
   flex-wrap: wrap;
@@ -30,4 +34,171 @@
   background: #edf5ff;
   color: #3979d8;
   font-weight: 800;
+}
+
+.resultBlock {
+  margin: 18px 0;
+  padding: 16px;
+  border: 1px solid #d7e1ed;
+  border-radius: 12px;
+}
+
+.resultBlock > h3,
+.blockHeading h3 {
+  margin: 0;
+  color: #18304f;
+  font-size: 15px;
+}
+
+.resultBlock > p {
+  margin: 8px 0 0;
+  line-height: 1.6;
+}
+
+.blockHeading {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+}
+
+.blockHeading span {
+  color: #687b92;
+  font-size: 12px;
+}
+
+.blockError {
+  display: grid;
+  gap: 6px;
+  margin-top: 12px;
+  padding: 12px;
+  border-radius: 10px;
+  background: #fff4e8;
+  color: #784919;
+}
+
+:global(.react-dictionary-backdrop) {
+  padding-left: max(var(--lookup-safe-left, 0px), env(safe-area-inset-left));
+  opacity: 1;
+  animation: lookup-backdrop-in 180ms ease-out;
+  transition: opacity 180ms ease;
+}
+
+:global(.react-dictionary-backdrop[data-closing='true']) {
+  pointer-events: none;
+  opacity: 0;
+}
+
+:global(.react-dictionary-drawer) {
+  height: 100dvh;
+  max-height: 100dvh;
+  overscroll-behavior: contain;
+  transform: translateX(0);
+  animation: lookup-drawer-in 180ms ease-out;
+  transition: transform 180ms ease;
+}
+
+:global(.react-dictionary-backdrop[data-closing='true'] .react-dictionary-drawer) {
+  transform: translateX(100%);
+}
+
+:global(.react-dictionary-header) {
+  padding-top: max(14px, var(--lookup-safe-top, 0px), env(safe-area-inset-top));
+  padding-right: max(20px, var(--lookup-safe-right, 0px), env(safe-area-inset-right));
+}
+
+:global(.react-dictionary-content) {
+  padding-right: max(30px, var(--lookup-safe-right, 0px), env(safe-area-inset-right));
+  padding-bottom: max(48px, var(--lookup-safe-bottom, 0px), env(safe-area-inset-bottom));
+}
+
+:global(.react-dictionary-drawer .icon-button) {
+  display: grid;
+  min-width: 44px;
+  min-height: 44px;
+  place-items: center;
+  border: 0;
+  border-radius: 9px;
+  background: transparent;
+  color: #18304f;
+  font-size: 23px;
+  cursor: pointer;
+}
+
+:global(.react-dictionary-drawer button:focus-visible),
+:global(.react-dictionary-drawer a:focus-visible) {
+  outline: 3px solid #3979d8;
+  outline-offset: 2px;
+}
+
+:global(.react-dictionary-mode button) {
+  color: #4d6077;
+}
+
+:global(.react-dictionary-mode button[aria-selected='true']),
+:global(.react-dictionary-drawer .badge) {
+  color: #245fae;
+}
+
+:global(.react-pronunciation small),
+:global(.react-dictionary-image.placeholder) {
+  color: #4d6077;
+}
+
+@keyframes lookup-backdrop-in {
+  from { opacity: 0; }
+}
+
+@keyframes lookup-drawer-in {
+  from { transform: translateX(100%); }
+}
+
+@media (max-width: 760px) {
+  :global(.react-dictionary-header) {
+    gap: 10px;
+    padding-left: max(14px, var(--lookup-safe-left, 0px), env(safe-area-inset-left));
+    padding-right: max(14px, var(--lookup-safe-right, 0px), env(safe-area-inset-right));
+  }
+
+  :global(.react-dictionary-actions) {
+    gap: 6px;
+  }
+
+  :global(.react-dictionary-mode button) {
+    min-height: 40px;
+    padding-inline: 9px;
+  }
+
+  :global(.react-dictionary-content) {
+    padding-left: max(20px, var(--lookup-safe-left, 0px), env(safe-area-inset-left));
+    padding-right: max(20px, var(--lookup-safe-right, 0px), env(safe-area-inset-right));
+    padding-bottom: max(40px, var(--lookup-safe-bottom, 0px), env(safe-area-inset-bottom));
+  }
+
+  :global(.react-dictionary-word h2) {
+    font-size: clamp(30px, 10vw, 42px);
+  }
+}
+
+@media (max-height: 440px) and (orientation: landscape) {
+  :global(.react-dictionary-header) {
+    padding-top: max(8px, var(--lookup-safe-top, 0px), env(safe-area-inset-top));
+    padding-bottom: 8px;
+  }
+
+  :global(.react-dictionary-header .eyebrow) {
+    display: none;
+  }
+
+  :global(.react-dictionary-content) {
+    padding-top: 16px;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  :global(.react-dictionary-backdrop),
+  :global(.react-dictionary-drawer) {
+    animation: none;
+    transition: none;
+  }
 }
