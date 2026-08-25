@@ -1,6 +1,6 @@
 import assert from 'node:assert/strict';
 import test from 'node:test';
-import { loadPronunciationAudio, PronunciationProxyError } from '../lib/pronunciation/proxy-adapter.ts';
+import { createHttpPronunciationSourceAdapter, loadPronunciationAudio, PronunciationProxyError } from '../lib/pronunciation/proxy-adapter.ts';
 
 const audioResponse = (body: ArrayBuffer, headers: Record<string, string> = {}) =>
   new Response(body, { headers: { 'content-type': 'audio/mpeg', ...headers } });
@@ -94,4 +94,17 @@ test('a provider timeout is reported as an unavailable upstream, not a crash', a
     resolveEntry: entryWith('https://api.dictionaryapi.dev/media/pronunciations/en/flower-us.mp3'),
     fetcher: (async () => { throw Object.assign(new Error('The operation was aborted'), { name: 'TimeoutError' }); }) as unknown as typeof fetch,
   }), (error: PronunciationProxyError) => error instanceof PronunciationProxyError && error.status === 504);
+});
+
+test('pronunciation delivery accepts a replaceable source adapter', async () => {
+  const requested: string[] = [];
+  const source = createHttpPronunciationSourceAdapter({
+    hosts: ['audio.local.example'],
+    fetcher: (async input => { requested.push(String(input)); return audioResponse(new ArrayBuffer(12)); }) as typeof fetch,
+  });
+  const audio = await loadPronunciationAudio({
+    word: 'flower', region: 'us', resolveEntry: entryWith('https://audio.local.example/flower.mp3'), source,
+  });
+  assert.equal(audio.body.byteLength, 12);
+  assert.deepEqual(requested, ['https://audio.local.example/flower.mp3']);
 });

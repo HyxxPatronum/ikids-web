@@ -28,8 +28,8 @@
 ## Verification
 
 - `npm run typecheck`：通过。
-- `npm test`：72/72 通过。
+- `npm test`：76/76 通过。
 - `npm run check`：通过。
 - `npm run build`：通过。
-- 隔离 D1 环境连续执行两次 `initialize:local`：通过；最终为 60000 条 ECDICT、12 条 published Catalog term、2 个初始化状态标记。
+- 隔离 D1/R2 环境连续执行两次 `initialize:local`：通过；每次均报告 60000 条 ECDICT、12 条 published Catalog term、1 个已验证媒体资源。
 - `npx playwright test`：20/20 用例通过；Windows runner 在 webServer 清理阶段未自动退出，测试进程随后手动终止。

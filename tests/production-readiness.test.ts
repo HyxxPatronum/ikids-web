@@ -43,14 +43,15 @@ test('fresh initialization and repeated initialization use the same ordered, ide
     migrate: async () => { calls.push('migrate'); },
     importEcdict: async () => { calls.push('ecdict'); return { imported: 60_000 }; },
     rebuildCatalog: async () => { calls.push('catalog'); return { indexed: 12 }; },
+    prepareMedia: async () => { calls.push('media'); return { prepared: 1 }; },
     verify: async () => { calls.push('verify'); return { ready: true }; },
   };
 
   const first = await initializeProduction(initialization);
   const second = await initializeProduction(initialization);
-  assert.deepEqual(first, { status: 'ready', ecdictEntries: 60_000, catalogEntries: 12 });
+  assert.deepEqual(first, { status: 'ready', ecdictEntries: 60_000, catalogEntries: 12, mediaAssets: 1 });
   assert.deepEqual(second, first);
-  assert.deepEqual(calls, ['migrate', 'ecdict', 'catalog', 'verify', 'migrate', 'ecdict', 'catalog', 'verify']);
+  assert.deepEqual(calls, ['migrate', 'ecdict', 'catalog', 'media', 'verify', 'migrate', 'ecdict', 'catalog', 'media', 'verify']);
 });
 
 test('initialization stops at a failed phase and a later run safely resumes the complete workflow', async () => {
@@ -64,13 +65,14 @@ test('initialization stops at a failed phase and a later run safely resumes the 
       if (catalogAttempts === 1) throw new Error('temporary database failure');
       return { indexed: 12 };
     },
+    prepareMedia: async () => ({ prepared: 1 }),
     verify: async () => { verified += 1; return { ready: true }; },
   };
 
   await assert.rejects(initializeProduction(initialization), /catalog: temporary database failure/);
   assert.equal(verified, 0);
   assert.deepEqual(await initializeProduction(initialization), {
-    status: 'ready', ecdictEntries: 60_000, catalogEntries: 12,
+    status: 'ready', ecdictEntries: 60_000, catalogEntries: 12, mediaAssets: 1,
   });
   assert.equal(verified, 1);
 });
@@ -110,4 +112,15 @@ test('structured observability records operational fields without student free t
     name: 'dictionary.lookup', outcome: 'success', durationMs: 18, cacheStatus: 'hit',
     providerStatus: 'found', stale: false,
   }]);
+});
+
+test('production initialization rejects a dictionary payload below the required operational size', async () => {
+  const initialization: ProductionInitialization = {
+    migrate: async () => {},
+    importEcdict: async () => { throw new Error('expected at least 50000 entries'); },
+    rebuildCatalog: async () => ({ indexed: 0 }),
+    prepareMedia: async () => ({ prepared: 0 }),
+    verify: async () => ({ ready: true }),
+  };
+  await assert.rejects(initializeProduction(initialization), /ecdict: expected at least 50000 entries/);
 });

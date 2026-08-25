@@ -1,7 +1,24 @@
 type PronunciationRegion = 'us' | 'uk' | 'other';
 type PronunciationEntry = { pronunciations?: Array<{ region: PronunciationRegion; audio?: string }> };
 
-const pronunciationHosts = new Set(['api.dictionaryapi.dev', 'ssl.gstatic.com']);
+export type PronunciationSourceAdapter = {
+  load(source: URL, signal: AbortSignal): Promise<Response>;
+};
+
+export function createHttpPronunciationSourceAdapter(options: { hosts: string[]; fetcher?: typeof fetch }): PronunciationSourceAdapter {
+  const hosts = new Set(options.hosts);
+  const fetcher = options.fetcher || fetch;
+  return {
+    async load(source, signal) {
+      if (source.protocol !== 'https:' || !hosts.has(source.hostname)) throw new PronunciationProxyError('发音来源不受支持', 400);
+      try {
+        return await fetcher(source, { headers: { accept: 'audio/*', 'user-agent': 'FluentScienceReading/0.1' }, redirect: 'error', signal });
+      } catch { throw new PronunciationProxyError('发音来源响应超时', 504); }
+    },
+  };
+}
+
+const defaultSource = createHttpPronunciationSourceAdapter({ hosts: ['api.dictionaryapi.dev', 'ssl.gstatic.com'] });
 const maximumAudioBytes = 5_000_000;
 // A proxied recording is immutable for a given word and accent, so it may be cached publicly.
 const audioCacheControl = 'public, max-age=604800';
@@ -40,6 +57,7 @@ export async function loadPronunciationAudio(options: {
   region: 'us' | 'uk';
   resolveEntry: (word: string) => Promise<PronunciationEntry | null>;
   fetcher?: typeof fetch;
+  source?: PronunciationSourceAdapter;
 }) {
   const entry = await options.resolveEntry(options.word);
   const pronunciation = entry?.pronunciations?.find(item => item.region === options.region);
@@ -47,20 +65,11 @@ export async function loadPronunciationAudio(options: {
 
   let source: URL;
   try { source = new URL(pronunciation.audio); } catch { throw new PronunciationProxyError('发音来源不受支持', 400); }
-  if (source.protocol !== 'https:' || !pronunciationHosts.has(source.hostname)) {
-    throw new PronunciationProxyError('发音来源不受支持', 400);
-  }
-
   let response: Response;
-  try {
-    response = await (options.fetcher || fetch)(source, {
-      headers: { accept: 'audio/*', 'user-agent': 'FluentScienceReading/0.1' },
-      redirect: 'error',
-      signal: AbortSignal.timeout(6500),
-    });
-  } catch {
-    throw new PronunciationProxyError('发音来源响应超时', 504);
-  }
+  const adapter = options.source || (options.fetcher
+    ? createHttpPronunciationSourceAdapter({ hosts: ['api.dictionaryapi.dev', 'ssl.gstatic.com'], fetcher: options.fetcher })
+    : defaultSource);
+  response = await adapter.load(source, AbortSignal.timeout(6500));
   const contentType = String(response.headers.get('content-type') || '');
   const declaredSize = Number(response.headers.get('content-length') || 0);
   if (!response.ok || !contentType.startsWith('audio/') || declaredSize > maximumAudioBytes) {

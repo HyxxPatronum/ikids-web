@@ -10,7 +10,8 @@ import { createHealthService, liveness } from '../../../lib/infrastructure/healt
 import { createStructuredObserver } from '../../../lib/infrastructure/observability.ts';
 import { createR2ObjectStorage } from '../../../lib/infrastructure/r2-object-storage.ts';
 import { validateProductionConfig } from '../../../lib/infrastructure/config.ts';
-import { loadPronunciationAudio, PronunciationProxyError } from '../../../lib/pronunciation/proxy-adapter.ts';
+import { canonicalStructure, cardSlug } from '../../../lib/content/card-normalization.ts';
+import { createHttpPronunciationSourceAdapter, loadPronunciationAudio, PronunciationProxyError } from '../../../lib/pronunciation/proxy-adapter.ts';
 
 type RouteContext = { params: Promise<{ path: string[] }> };
 type Card = Record<string, any>;
@@ -22,19 +23,9 @@ const DICTIONARY_TTL=cacheDuration(env.DICTIONARY_POSITIVE_TTL_MS,DEFAULT_POSITI
 const DICTIONARY_NEGATIVE_TTL=cacheDuration(env.DICTIONARY_NEGATIVE_TTL_MS,DEFAULT_NEGATIVE_TTL_MS);
 const DICTIONARY_STALE_TTL=cacheDuration(env.DICTIONARY_STALE_TTL_MS,DEFAULT_STALE_TTL_MS);
 const externalDictionary=createFreeDictionaryAdapter();
+const pronunciationSource=createHttpPronunciationSourceAdapter({hosts:['api.dictionaryapi.dev','ssl.gstatic.com']});
 const observe=createStructuredObserver(record=>console.info('operational_metric',JSON.stringify(record)));
-const canonicalStructures = ['Feature-Function','Cause-Effect','Process/Life cycle','Compare-Contrast','Fact/Explanation'];
-const aliases = new Map([
-  ['feature-function','Feature-Function'],['feature / function','Feature-Function'],['feature → function','Feature-Function'],
-  ['cause-effect','Cause-Effect'],['cause / effect','Cause-Effect'],['cause → effect','Cause-Effect'],
-  ['process/life cycle','Process/Life cycle'],['process / life cycle','Process/Life cycle'],
-  ['compare-contrast','Compare-Contrast'],['compare / contrast','Compare-Contrast'],
-  ['fact/explanation','Fact/Explanation'],['fact / explanation','Fact/Explanation'],
-]);
-
 const json = (body: unknown, status=200) => Response.json(body, { status, headers: { 'cache-control':'no-store' } });
-const canonicalStructure = (value: unknown) => aliases.get(String(value||'').trim().toLowerCase()) || null;
-const slugFor = (card: Card) => card.slug || `${String(card.courseId||'course').toLowerCase()}-${card.day}-${String(card.title||card.cardId).toLowerCase().replace(/[^a-z0-9]+/g,'-')}`.replace(/-+/g,'-').replace(/^-|-$/g,'');
 
 function validateCard(card: Card) {
   const errors: string[]=[];
@@ -90,7 +81,7 @@ async function handle(request:Request,context:RouteContext){
     const word=normalizeWord(url.searchParams.get('word'));const region=String(url.searchParams.get('region')||'');
     if(!word||word.length>80||!['us','uk'].includes(region))return json({error:'请输入有效的发音词和口音'},400);
     try{
-      const audio=await loadPronunciationAudio({word,region:region as 'us'|'uk',resolveEntry:lexeme=>externalDictionary(lexeme,'en')});
+      const audio=await loadPronunciationAudio({word,region:region as 'us'|'uk',resolveEntry:lexeme=>externalDictionary(lexeme,'en'),source:pronunciationSource});
       return new Response(audio.body,{headers:{'content-type':audio.contentType,'cache-control':audio.cacheControl}});
     }catch(error){return error instanceof PronunciationProxyError?json({error:error.message},error.status):json({error:'发音服务暂时不可用'},502);}
   }
@@ -103,7 +94,7 @@ async function handle(request:Request,context:RouteContext){
   if(seriesId&&method==='DELETE'){await db.prepare("UPDATE series SET status='archived', updated_at=? WHERE id=?").bind(new Date().toISOString(),seriesId).run();return json({id:seriesId,status:'archived'});}
   if(path==='/cards'&&method==='GET'){const series=url.searchParams.get('seriesId');const query=series?db.prepare("SELECT * FROM cards WHERE series_id=? AND status='published' ORDER BY day").bind(series):db.prepare('SELECT * FROM cards ORDER BY day');const rows=await query.all();return json({cards:(rows.results||[]).map(cardRecord)});}
   if(path==='/cards/validate'&&method==='POST')return json(validateCard(await request.json() as Card));
-  if(path==='/cards'&&method==='POST'){const raw:any=await request.json();const result=validateCard(raw);if(!result.valid)return json(result,422);const structure=canonicalStructure(raw.articleStructure||raw.structure);const card={...raw,articleStructure:structure,structure,status:'draft'};const now=new Date().toISOString();await db.prepare('INSERT OR REPLACE INTO cards (id,slug,series_id,course_id,topic,theme,day,level,title,big_question,article_structure,image,content_json,status,updated_at) VALUES (?,?,?,?,?,?,?,?,?,?,?,?,?,?,?)').bind(card.cardId,slugFor(card),card.seriesId||card.courseId,card.courseId,card.topic,card.theme,card.day,card.level,card.title,card.bigQuestion||'',structure,card.image_file||card.image||'day001-flower.png',JSON.stringify(card),'draft',now).run();await publicationIndex.synchronize({...card,cardId:card.cardId,slug:slugFor(card)});return json({id:card.cardId,status:'draft',validation:result},201);}
+  if(path==='/cards'&&method==='POST'){const raw:any=await request.json();const result=validateCard(raw);if(!result.valid)return json(result,422);const structure=canonicalStructure(raw.articleStructure||raw.structure);const card={...raw,articleStructure:structure,structure,status:'draft'};const now=new Date().toISOString();await db.prepare('INSERT OR REPLACE INTO cards (id,slug,series_id,course_id,topic,theme,day,level,title,big_question,article_structure,image,content_json,status,updated_at) VALUES (?,?,?,?,?,?,?,?,?,?,?,?,?,?,?)').bind(card.cardId,cardSlug(card),card.seriesId||card.courseId,card.courseId,card.topic,card.theme,card.day,card.level,card.title,card.bigQuestion||'',structure,card.image_file||card.image||'day001-flower.png',JSON.stringify(card),'draft',now).run();await publicationIndex.synchronize({...card,cardId:card.cardId,slug:cardSlug(card)});return json({id:card.cardId,status:'draft',validation:result},201);}
   if(segments[0]==='cards'&&segments.length===3&&['publish','unpublish','archive'].includes(segments[2])&&method==='POST'){const id=segments[1],status=segments[2]==='publish'?'published':segments[2]==='unpublish'?'unpublished':'archived';const row:any=await db.prepare('SELECT id,slug,title,theme,image,content_json FROM cards WHERE id=?').bind(id).first();if(!row)return json({error:'Card not found'},404);await db.prepare('UPDATE cards SET status=?, updated_at=? WHERE id=?').bind(status,new Date().toISOString(),id).run();await publicationIndex.synchronize({...JSON.parse(String(row.content_json)),cardId:row.id,slug:row.slug,title:row.title,theme:row.theme,image:row.image,status});return json({id,status});}
   if(segments[0]==='cards'&&segments.length===3&&segments[2]==='vocabulary-preview'&&method==='GET'){if(!canPreviewVocabulary(request))return json({error:'仅内容编辑可预览未发布词汇'},403);const id=segments[1];const row:any=await db.prepare('SELECT id,slug,title,theme,image,status,content_json FROM cards WHERE id=? OR slug=?').bind(id,id).first();if(!row)return json({error:'Card not found'},404);const card={...JSON.parse(String(row.content_json)),cardId:row.id,slug:row.slug,title:row.title,theme:row.theme,image:row.image,status:row.status};return json({cardId:row.id,status:row.status,terms:publicationIndex.preview(card)});}
   if(segments[0]==='cards'&&segments.length===3&&segments[2]==='phrase-candidates'&&['GET','PATCH'].includes(method)){

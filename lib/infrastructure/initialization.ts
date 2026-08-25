@@ -2,6 +2,7 @@ export type ProductionInitialization = {
   migrate(): Promise<void>;
   importEcdict(): Promise<{ imported: number }>;
   rebuildCatalog(): Promise<{ indexed: number }>;
+  prepareMedia(): Promise<{ prepared: number }>;
   verify(): Promise<{ ready: boolean }>;
 };
 
@@ -9,6 +10,7 @@ export type ProductionInitializationResult = {
   status: 'ready';
   ecdictEntries: number;
   catalogEntries: number;
+  mediaAssets: number;
 };
 
 async function phase<T>(name: string, operation: () => Promise<T>): Promise<T> {
@@ -24,7 +26,8 @@ export async function initializeProduction(initialization: ProductionInitializat
   await phase('migration', () => initialization.migrate());
   const ecdict = await phase('ecdict', () => initialization.importEcdict());
   const catalog = await phase('catalog', () => initialization.rebuildCatalog());
+  const media = await phase('media', () => initialization.prepareMedia());
   const verification = await phase('verification', () => initialization.verify());
   if (!verification.ready) throw new Error('verification: production dependencies are not ready');
-  return { status: 'ready', ecdictEntries: ecdict.imported, catalogEntries: catalog.indexed };
+  return { status: 'ready', ecdictEntries: ecdict.imported, catalogEntries: catalog.indexed, mediaAssets: media.prepared };
 }
