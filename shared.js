@@ -57,7 +57,7 @@ export function nav(active) {
     </a>
     <nav class="site-nav" aria-label="主导航">
       <a href="/syllabus.html" ${active === 'courses' ? 'aria-current="page"' : ''}>课程</a>
-      <a href="/words.html" ${active === 'words' ? 'aria-current="page"' : ''}>核心词</a>
+      <a href="/words" ${active === 'words' ? 'aria-current="page"' : ''}>核心词</a>
       <a href="/account.html" ${active === 'account' ? 'aria-current="page"' : ''}>我的学习</a>
       <a href="/admin.html" ${active === 'admin' ? 'aria-current="page"' : ''}>内容工作台</a>
     </nav>

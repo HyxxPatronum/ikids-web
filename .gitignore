@@ -11,7 +11,6 @@ playwright-report/
 test-results/
 public/index.html
 public/syllabus.html
-public/words.html
 public/account.html
 public/admin.html
 public/styles.css

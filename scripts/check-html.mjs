@@ -1,6 +1,6 @@
 import fs from 'node:fs';
 
-const files = ['syllabus.html', 'index.html', 'words.html', 'account.html', 'admin.html'];
+const files = ['syllabus.html', 'index.html', 'account.html', 'admin.html'];
 
 for (const file of files) {
   const source = fs.readFileSync(new URL(`../${file}`, import.meta.url), 'utf8');

@@ -27,20 +27,8 @@
     .cover { display: block; width: 100%; max-height: 560px; object-fit: cover; object-position: top; border-radius: 15px; background: #eef2f6; }
     .article-copy { padding: 22px; }
     .article-copy p { margin: 0 0 14px; font-size: clamp(19px,2.3vw,25px); line-height: 1.8; font-weight: 750; }
-    .term { display: inline; border: 0; border-bottom: 1px dotted #8da2ba; border-radius: 4px; padding: 1px 2px; background: transparent; color: inherit; font: inherit; cursor: pointer; }
-    .term:hover { background: var(--surface-warm); border-bottom-color: var(--brand); }
-    .term.core { border-bottom-style: solid; border-bottom-color: #9dbde8; background: var(--blue-soft); font-weight: 850; }
-    .sentence { border-radius: 9px; cursor: pointer; }
+    .sentence { border: 0; padding: 0; background: transparent; color: inherit; font: inherit; text-align: left; border-radius: 9px; cursor: pointer; }
     .sentence:hover, .sentence.current { background: #fff0e9; }
-    .word-popover { position: fixed; z-index: 50; inset: auto auto 24px 50%; transform: translateX(-50%); width: min(430px,calc(100vw - 28px)); padding: 18px; }
-    .word-popover h3 { margin: 0; font-size: 26px; }
-    .popover-head { display: flex; justify-content: space-between; gap: 10px; }
-    .word-phonetic { margin: 2px 0 12px; color: var(--muted); font-size: 14px; }
-    .definition-list { display: grid; gap: 12px; margin: 14px 0; }
-    .definition-list section { padding-top: 12px; border-top: 1px solid var(--line); }
-    .definition-list h4 { margin: 0 0 5px; color: var(--blue); font-size: 12px; text-transform: lowercase; }
-    .definition-list p { margin: 5px 0; }
-    .definition-list small { display: block; color: var(--muted); }
     .listen-stage { padding: 26px; }
     .big-question { margin: 12px 0 22px; padding: 18px; border-radius: 12px; background: var(--surface-warm); font-size: 22px; font-weight: 850; }
     .player { display: grid; grid-template-columns: auto 1fr; gap: 16px; align-items: center; padding: 17px; border-radius: 17px; background: var(--ink); color: #fff; }
@@ -108,8 +96,6 @@
     </div>
     <section id="fatal" class="panel state-box hidden"><strong>这张学习卡片暂时打不开</strong><span id="fatalMessage"></span><br><a class="btn" href="/syllabus.html">返回课程目录</a></section>
   </div>
-  <div id="wordPopover" class="panel word-popover hidden" role="dialog" aria-modal="false" aria-labelledby="wordTitle" tabindex="-1"></div>
-
   <script type="module">
     import { $, $$, api, currentUserId, escapeHtml, nav, speak, toast, formatDate } from '/shared.js';
     $('#nav').innerHTML = nav();
@@ -130,13 +116,7 @@
     const completedCount = () => ['reading','listening','words','comprehension','rebuild','result'].filter(isDone).length;
 
     function highlightSentence(text, index) {
-      const coreTokens = new Set(words().flatMap(word => String(word.english || '').toLowerCase().match(/[a-z]+(?:['-][a-z]+)*/g) || []));
-      const html = String(text).split(/([A-Za-z]+(?:[’'][A-Za-z]+)*(?:-[A-Za-z]+)*)/g).map(part => {
-        if (!/^[A-Za-z]/.test(part)) return escapeHtml(part);
-        const normalized = part.toLowerCase().replace('’', "'");
-        return `<button type="button" class="term ${coreTokens.has(normalized)?'core':''}" data-word="${escapeHtml(normalized)}" aria-label="查询 ${escapeHtml(part)}">${escapeHtml(part)}</button>`;
-      }).join('');
-      return `<span class="sentence ${state.current === index ? 'current' : ''}" data-sentence="${index}" tabindex="0" role="button" aria-label="朗读句子 ${index+1}">${html}</span>`;
+      return `<button type="button" class="sentence ${state.current === index ? 'current' : ''}" data-sentence="${index}" aria-label="播放句子 ${index+1}">${escapeHtml(text)}</button>`;
     }
 
     function renderNav() {
@@ -164,34 +144,11 @@
         return `<p>${html}</p>`;
       }).join('');
       $('#readingModule').innerHTML = `<div class="split"><div class="panel content-card"><img class="cover" src="/${escapeHtml(state.card.image_file || state.card.image || 'day001-flower.png')}" alt="${escapeHtml(state.card.title)} 科普阅读卡片"></div><article class="panel article-copy"><p class="eyebrow">Read the science story</p><h2 class="section-title">图文阅读</h2><div style="margin:18px 0">${paragraphs}</div><div class="btn-row"><button class="btn primary" id="finishReading" type="button">${isDone('reading')?'已完成阅读':'完成阅读'}</button><button class="btn" id="readAll" type="button">朗读全文</button><button class="btn ghost" data-next="listening" type="button">下一步：听读</button></div></article></div>`;
-      bindTerms();
-      $$('[data-sentence]').forEach(node => { const play = () => { state.current = Number(node.dataset.sentence); renderReading(); speak(sentences()[state.current], state.rate); }; node.onclick = event => { if (!event.target.closest('.term')) play(); }; node.onkeydown = event => { if (event.key==='Enter'||event.key===' ') { event.preventDefault(); play(); } }; });
+      $$('[data-sentence]').forEach(node => { node.onclick = () => { state.current = Number(node.dataset.sentence); renderReading(); speak(sentences()[state.current], state.rate); }; });
       $('#finishReading').onclick = () => complete('reading',100,'阅读模块已完成');
       $('#readAll').onclick = () => playAll(() => complete('reading',100,'全文朗读完成'));
       bindNext();
     }
-
-    function bindTerms() {
-      $$('.term').forEach(button => button.onclick = event => { event.stopPropagation(); showWord(button.dataset.word); });
-    }
-    let lookupRequest = 0;
-    function closeWord() { $('#wordPopover').classList.add('hidden'); }
-    function bindWordPopover(term) { $('#closeWord').onclick=closeWord; const speakButton=$('#speakWord'); if(speakButton)speakButton.onclick=()=>speak(term,state.rate); }
-    async function showWord(term) {
-      const request=++lookupRequest; const box=$('#wordPopover');
-      box.classList.remove('hidden');box.setAttribute('aria-busy','true');
-      box.innerHTML=`<div class="popover-head"><div><h3 id="wordTitle">${escapeHtml(term)}</h3><p class="word-phonetic">正在查询词义…</p></div><button class="btn" id="closeWord" type="button" aria-label="关闭词义卡">关闭</button></div><div class="skeleton"></div>`;
-      bindWordPopover(term);box.focus();
-      try{
-        const data=await api(`/api/dictionary?word=${encodeURIComponent(term)}`);if(request!==lookupRequest)return;
-        const category={level2:'二级词汇',level3:'三级词汇',science:'Science Core',reference:'扩展词汇'}[data.category]||'扩展词汇';
-        const definitions=(data.meanings||[]).map(group=>`<section><h4>${escapeHtml(group.partOfSpeech||'definition')}</h4>${group.definitions.map(item=>`<p>${escapeHtml(item.definition)}</p>${item.example?`<small>例：${escapeHtml(item.example)}</small>`:''}`).join('')}</section>`).join('');
-        const sources=(data.sources||[]).length?`<p class="muted">课程来源：${data.sources.map(source=>`<a href="/lesson/${encodeURIComponent(source.slug)}">${escapeHtml(source.title)}</a>`).join('、')}</p>`:'';
-        box.innerHTML=`<div class="popover-head"><div><span class="badge">${category}</span><h3 id="wordTitle">${escapeHtml(data.word)}</h3><p class="word-phonetic">${escapeHtml(data.phonetic||'暂无音标')}</p></div><button class="btn" id="closeWord" type="button" aria-label="关闭词义卡">关闭</button></div>${data.meaning?`<div class="alert success"><strong>课程释义</strong><br>${escapeHtml(data.meaning)}</div>`:''}${definitions?`<div class="definition-list">${definitions}</div>`:'<p class="muted">该词暂无扩展英文释义。</p>'}${sources}<div class="btn-row"><button class="btn blue" id="speakWord" type="button">播放发音</button></div>`;
-        box.setAttribute('aria-busy','false');bindWordPopover(data.word);
-      }catch(error){if(request!==lookupRequest)return;box.innerHTML=`<div class="popover-head"><div><h3 id="wordTitle">${escapeHtml(term)}</h3></div><button class="btn" id="closeWord" type="button">关闭</button></div><div class="alert error"><strong>没有查到这个词</strong><br>${escapeHtml(error.message)}</div><div class="btn-row" style="margin-top:12px"><button class="btn" id="retryWord" type="button">重新查询</button><button class="btn blue" id="speakWord" type="button">播放发音</button></div>`;box.setAttribute('aria-busy','false');bindWordPopover(term);$('#retryWord').onclick=()=>showWord(term);}
-    }
-    document.addEventListener('keydown',event=>{if(event.key==='Escape')closeWord()});
 
     function playAll(onfinish) {
       if (state.playing) { speechSynthesis.cancel(); state.playing=false; renderListening(); return; }

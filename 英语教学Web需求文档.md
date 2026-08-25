@@ -4,7 +4,7 @@
 > 产品阶段：可用型 MVP / 模块闭环建设  
 > 更新日期：2026-08-23  
 > 适用对象：产品、设计、前端、后端、内容教研、测试与运营  
-> 需求基线：当前 `syllabus.html`、`index.html`、`server.js`、卡片 JSON 与数据库设计
+> 需求基线：当前 `syllabus.html`、`index.html`、Next 产品 API（`app/api/[...path]/route.ts`）、卡片 JSON 与数据库设计
 
 ## 1. 文档目的
 
@@ -107,7 +107,7 @@ Fluent Science Reading 是面向小学阶段学习者的英语科普阅读 Web �
 |---|---|---|---|
 | 我的课程 | `/`、`/syllabus.html` | 全部 | 浏览系列、筛选卡片、继续学习 |
 | 卡片学习 | `/lesson/:slug` | 学生 | 完成六模块学习闭环 |
-| 核心词库 | `/words.html` | 学生 | 汇总、搜索和复习卡片词汇 |
+| 核心词库 | `/words` | 学生 | 汇总、搜索和复习卡片词汇 |
 | 学习账号 | `/account.html` | 学生 | 注册、登录、查看汇总、退出 |
 | 内容工作台 | `/admin.html` | 编辑/管理员 | 内容校验、创建、发布和下架 |
 | 健康检查 | `/api/health` | 系统 | 检查服务可用性 |
@@ -451,9 +451,9 @@ MVP 可先在学习进度中保留等价字段，不要求接入第三方分析�
 | 课程目录 | FR-CAT | `syllabus.html` | 系列/卡片接口、真实进度筛选 |
 | 学习闭环 | FR-REA/LIS/WOR/COM/REB/RES | `index.html` | 两张卡片全模块交互 |
 | 账号 | FR-ACC | `account.html` + auth API | 注册、登录、退出、统计 |
-| 词库 | FR-WBK | `words.html` | 汇总、搜索、发音、回原文 |
+| 词库 | FR-WBK | `app/words/WordsCenter.tsx` | 汇总、搜索、发音、回原文 |
 | 内容后台 | FR-ADM | `admin.html` + content API | 校验、保存、发布、下架 |
-| 持久化 | 数据模型/API | `server.js`、`db/`、`data/` | 刷新恢复、数据隔离 |
+| 持久化 | 数据模型/API | Next 产品 API、D1/Drizzle、`data/` | 刷新恢复、数据隔离 |
 | 通用质量 | FR-STA/NFR | 全站 | 错误态、键盘、响应式 |
 
 ## 16. 实施优先级与里程碑
