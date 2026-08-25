@@ -97,6 +97,26 @@ CREATE TABLE IF NOT EXISTS published_vocabulary_terms (
   updated_at TEXT NOT NULL DEFAULT CURRENT_TIMESTAMP,
   PRIMARY KEY (card_id, lexeme)
 );
+CREATE TABLE IF NOT EXISTS published_vocabulary_terms_staging (
+  card_id TEXT NOT NULL,
+  lexeme TEXT NOT NULL,
+  surface_form TEXT NOT NULL,
+  meaning TEXT NOT NULL DEFAULT '',
+  image TEXT NOT NULL DEFAULT '',
+  media_json TEXT NOT NULL DEFAULT '{}',
+  membership TEXT NOT NULL CHECK (membership IN ('level2','level3','science')),
+  source_slug TEXT NOT NULL,
+  source_title TEXT NOT NULL DEFAULT '',
+  source_theme TEXT NOT NULL DEFAULT '',
+  source_image TEXT NOT NULL DEFAULT '',
+  updated_at TEXT NOT NULL DEFAULT CURRENT_TIMESTAMP,
+  PRIMARY KEY (card_id, lexeme)
+);
+CREATE TABLE IF NOT EXISTS infrastructure_state (
+  name TEXT PRIMARY KEY,
+  value TEXT NOT NULL,
+  updated_at TEXT NOT NULL DEFAULT CURRENT_TIMESTAMP
+);
 CREATE INDEX IF NOT EXISTS idx_progress_user ON learning_progress(user_id);
 CREATE INDEX IF NOT EXISTS idx_sessions_user ON sessions(user_id);
 CREATE INDEX IF NOT EXISTS idx_cards_status ON cards(status);

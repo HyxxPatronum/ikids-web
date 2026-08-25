@@ -19,7 +19,7 @@ export default defineConfig({
     {
       name: 'Cloudflare API',
       command: 'node node_modules/vinext/dist/cli.js dev --port 4176',
-      url: 'http://127.0.0.1:4176/api/health',
+      url: 'http://127.0.0.1:4176/api/live',
       reuseExistingServer: true,
       env: { ...process.env, CONTENT_EDITOR_PREVIEW_TOKEN: 'playwright-preview-token' },
       timeout: 120_000,

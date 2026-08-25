@@ -1,15 +1,19 @@
 import { env } from 'cloudflare:workers';
-import flower from '../../../day001-flower.json';
-import cactus from '../../../science-reader-100-how-a-cactus-saves-water.json';
 import { createDictionaryService, DEFAULT_NEGATIVE_TTL_MS, DEFAULT_POSITIVE_TTL_MS, DEFAULT_STALE_TTL_MS } from '../../../lib/dictionary/service.ts';
+import { createFreeDictionaryAdapter } from '../../../lib/dictionary/free-dictionary-adapter.ts';
 import { buildCatalogFromIndex, catalogCategory } from '../../../lib/catalog/catalog.ts';
 import { createD1PublicationStore } from '../../../lib/catalog/d1-publication-store.ts';
 import { createPublicationIndex, phraseCandidates, publicationLexeme, reviewPhraseCandidate } from '../../../lib/catalog/publication-index.ts';
+import { createD1DictionaryCache, createD1EcdictAdapter } from '../../../lib/infrastructure/d1-dictionary-adapters.ts';
+import { createD1HealthDependencies } from '../../../lib/infrastructure/d1-adapter.ts';
+import { createHealthService, liveness } from '../../../lib/infrastructure/health.ts';
+import { createStructuredObserver } from '../../../lib/infrastructure/observability.ts';
+import { createR2ObjectStorage } from '../../../lib/infrastructure/r2-object-storage.ts';
+import { validateProductionConfig } from '../../../lib/infrastructure/config.ts';
 import { loadPronunciationAudio, PronunciationProxyError } from '../../../lib/pronunciation/proxy-adapter.ts';
 
 type RouteContext = { params: Promise<{ path: string[] }> };
 type Card = Record<string, any>;
-const seedCards: Card[] = [flower, cactus];
 const normalizeWord = (value: unknown) => String(value || '').trim().toLowerCase().replace(/[’]/g, "'").replace(/^[^a-z]+|[^a-z]+$/g, '');
 const categoryFor = catalogCategory;
 
@@ -17,43 +21,8 @@ const cacheDuration=(value:unknown,fallback:number)=>{const parsed=Number(value)
 const DICTIONARY_TTL=cacheDuration(env.DICTIONARY_POSITIVE_TTL_MS,DEFAULT_POSITIVE_TTL_MS);
 const DICTIONARY_NEGATIVE_TTL=cacheDuration(env.DICTIONARY_NEGATIVE_TTL_MS,DEFAULT_NEGATIVE_TTL_MS);
 const DICTIONARY_STALE_TTL=cacheDuration(env.DICTIONARY_STALE_TTL_MS,DEFAULT_STALE_TTL_MS);
-const dictionaryInflight=new Map<string,Promise<any>>();
-const uniqueTerms=(values:unknown[])=>[...new Set((values||[]).map(value=>String(value||'').trim()).filter(Boolean))];
-function normalizeDictionaryEntry(entry:any){
-  const phonetics=entry.phonetics||[];const audioRaw=phonetics.find((item:any)=>item.audio)?.audio||'';
-  const pronunciations:any[]=[];const seenRegions=new Set<string>();
-  for(const item of phonetics){const raw=String(item.audio||'');if(!raw)continue;const audio=raw.startsWith('//')?`https:${raw}`:raw;const hint=`${audio} ${item.sourceUrl||''}`.toLowerCase();const region=/(?:^|[-_/])(us|usa)(?:[-_./]|$)|en[-_]us|american/.test(hint)?'us':/(?:^|[-_/])(uk|gb)(?:[-_./]|$)|en[-_](?:gb|uk)|british/.test(hint)?'uk':'other';if(seenRegions.has(region))continue;seenRegions.add(region);pronunciations.push({region,label:region==='us'?'美音':region==='uk'?'英音':'词典音频',phonetic:item.text||'',audio,sourceUrl:item.sourceUrl||'',license:item.license?.name||'',licenseUrl:item.license?.url||''});}
-  const meanings=(entry.meanings||[]).slice(0,6).map((meaning:any)=>{const definitions=(meaning.definitions||[]).filter((item:any)=>item.definition).slice(0,5);return {partOfSpeech:meaning.partOfSpeech||'definition',definitions:definitions.map((item:any)=>({definition:item.definition,example:item.example||''})),synonyms:uniqueTerms([...(meaning.synonyms||[]),...definitions.flatMap((item:any)=>item.synonyms||[])]).slice(0,5),antonyms:uniqueTerms([...(meaning.antonyms||[]),...definitions.flatMap((item:any)=>item.antonyms||[])]).slice(0,3)};}).filter((group:any)=>group.definitions.length);
-  return {phonetic:entry.phonetic||phonetics.find((item:any)=>item.text)?.text||'',audio:audioRaw.startsWith('//')?`https:${audioRaw}`:audioRaw,pronunciations,meanings,provider:'Free Dictionary API',providerUrl:(entry.sourceUrls||[])[0]||`https://en.wiktionary.org/wiki/${encodeURIComponent(entry.word||'')}`,license:entry.license?.name||'',licenseUrl:entry.license?.url||''};
-}
-async function fetchDictionary(word: string) {
-  let lastError:unknown;
-  for(let attempt=0;attempt<2;attempt+=1){
-    try{
-      const response=await fetch(`https://api.dictionaryapi.dev/api/v2/entries/en/${encodeURIComponent(word)}`,{headers:{accept:'application/json','user-agent':'FluentScienceReading/0.1'},signal:AbortSignal.timeout(attempt?6500:4000)});
-      if(response.status===404)return null;
-      if(!response.ok)throw new Error(`Dictionary provider returned ${response.status}`);
-      const data:any=await response.json();const entry=Array.isArray(data)?data[0]:null;
-      return entry?normalizeDictionaryEntry(entry):null;
-    }catch(error){lastError=error;if(attempt===0)await new Promise(resolve=>setTimeout(resolve,180));}
-  }
-  throw lastError||new Error('Dictionary provider unavailable');
-}
-async function fetchDictionaryOnce(word:string){
-  if(dictionaryInflight.has(word))return dictionaryInflight.get(word);
-  const request=fetchDictionary(word).finally(()=>dictionaryInflight.delete(word));
-  dictionaryInflight.set(word,request);return request;
-}
-const stripMarkup=(value:unknown)=>String(value||'').replace(/<[^>]*>/g,'').replace(/\s+/g,' ').trim();
-function chineseMeaningGroups(lines:unknown[]){
-  const groups=new Map<string,any[]>();
-  for(const raw of uniqueTerms(lines).slice(0,10)){const line=stripMarkup(raw);if(!line)continue;const match=line.match(/^([a-z]+(?:\.[a-z]+)*\.)\s*(.+)$/i);const partOfSpeech=match?.[1]||'中文释义';const definition=match?.[2]||line;if(!groups.has(partOfSpeech))groups.set(partOfSpeech,[]);groups.get(partOfSpeech)!.push({definition,example:''});}
-  return [...groups].slice(0,5).map(([partOfSpeech,definitions])=>({partOfSpeech,definitions:definitions.slice(0,3),synonyms:[],antonyms:[]}));
-}
-function localChineseDictionaryRow(row:any){
-  if(!row)return null;const meanings=chineseMeaningGroups(String(row.translation||'').split(/\\n|\n/));if(!meanings.length)return null;
-  return {phonetic:row.phonetic||'',audio:'',meanings,provider:'ECDICT 本地词典',providerUrl:'https://github.com/skywind3000/ECDICT',license:'MIT',licenseUrl:'https://github.com/skywind3000/ECDICT/blob/master/LICENSE',language:'zh',lookupSource:'ecdict'};
-}
+const externalDictionary=createFreeDictionaryAdapter();
+const observe=createStructuredObserver(record=>console.info('operational_metric',JSON.stringify(record)));
 const canonicalStructures = ['Feature-Function','Cause-Effect','Process/Life cycle','Compare-Contrast','Fact/Explanation'];
 const aliases = new Map([
   ['feature-function','Feature-Function'],['feature / function','Feature-Function'],['feature → function','Feature-Function'],
@@ -82,31 +51,6 @@ function validateCard(card: Card) {
   return { valid:errors.length===0, errors };
 }
 
-async function ensureDatabase(db: D1Database) {
-  await db.batch([
-    db.prepare('CREATE TABLE IF NOT EXISTS series (id TEXT PRIMARY KEY, name TEXT NOT NULL, subtitle TEXT NOT NULL DEFAULT \'\', description TEXT NOT NULL DEFAULT \'\', sort_order INTEGER NOT NULL DEFAULT 0, status TEXT NOT NULL DEFAULT \'draft\', created_at TEXT NOT NULL, updated_at TEXT NOT NULL)'),
-    db.prepare('CREATE TABLE IF NOT EXISTS cards (id TEXT PRIMARY KEY, slug TEXT NOT NULL UNIQUE, series_id TEXT NOT NULL, course_id TEXT NOT NULL, topic TEXT NOT NULL, theme TEXT NOT NULL, day INTEGER NOT NULL, level TEXT NOT NULL, title TEXT NOT NULL, big_question TEXT NOT NULL DEFAULT \'\', article_structure TEXT NOT NULL, image TEXT NOT NULL, content_json TEXT NOT NULL, status TEXT NOT NULL DEFAULT \'draft\', updated_at TEXT NOT NULL)'),
-    db.prepare('CREATE TABLE IF NOT EXISTS learning_progress (user_id TEXT NOT NULL, card_id TEXT NOT NULL, payload_json TEXT NOT NULL DEFAULT \'{}\', completed_percent INTEGER NOT NULL DEFAULT 0, updated_at TEXT NOT NULL, PRIMARY KEY (user_id, card_id))'),
-    db.prepare('CREATE TABLE IF NOT EXISTS recording_submissions (id TEXT PRIMARY KEY, user_id TEXT NOT NULL, card_id TEXT NOT NULL, target_sentence TEXT NOT NULL, mime TEXT, size INTEGER, status TEXT NOT NULL DEFAULT \'uploaded\', created_at TEXT NOT NULL)'),
-    db.prepare('CREATE TABLE IF NOT EXISTS dictionary_cache (word TEXT PRIMARY KEY, payload_json TEXT, status TEXT NOT NULL, expires_at TEXT NOT NULL, updated_at TEXT NOT NULL)'),
-    db.prepare('CREATE TABLE IF NOT EXISTS dictionary_entries (word TEXT PRIMARY KEY, phonetic TEXT NOT NULL DEFAULT \'\', translation TEXT NOT NULL, definition TEXT NOT NULL DEFAULT \'\', pos TEXT NOT NULL DEFAULT \'\', exchange TEXT NOT NULL DEFAULT \'\', source TEXT NOT NULL DEFAULT \'ECDICT\', updated_at TEXT NOT NULL)'),
-    db.prepare("CREATE TABLE IF NOT EXISTS published_vocabulary_terms (card_id TEXT NOT NULL, lexeme TEXT NOT NULL, surface_form TEXT NOT NULL, meaning TEXT NOT NULL DEFAULT '', image TEXT NOT NULL DEFAULT '', media_json TEXT NOT NULL DEFAULT '{}', membership TEXT NOT NULL CHECK (membership IN ('level2','level3','science')), source_slug TEXT NOT NULL, source_title TEXT NOT NULL DEFAULT '', source_theme TEXT NOT NULL DEFAULT '', source_image TEXT NOT NULL DEFAULT '', updated_at TEXT NOT NULL, PRIMARY KEY (card_id,lexeme))"),
-    db.prepare('CREATE INDEX IF NOT EXISTS idx_published_vocabulary_lexeme ON published_vocabulary_terms(lexeme)'),
-    db.prepare('CREATE INDEX IF NOT EXISTS idx_published_vocabulary_membership ON published_vocabulary_terms(membership,lexeme)'),
-  ]);
-  const publicationColumns=await db.prepare('PRAGMA table_info(published_vocabulary_terms)').all<{name:string}>();
-  if(!(publicationColumns.results||[]).some(column=>column.name==='media_json'))await db.prepare("ALTER TABLE published_vocabulary_terms ADD COLUMN media_json TEXT NOT NULL DEFAULT '{}'").run();
-  const now=new Date().toISOString();
-  await db.prepare('INSERT OR IGNORE INTO series (id,name,subtitle,description,sort_order,status,created_at,updated_at) VALUES (?,?,?,?,?,?,?,?)').bind('science-reading','Science Reading','Nature, life science, and science stories','Learn science English through reading, listening, and practice',10,'published',now,now).run();
-  for(const raw of seedCards){const card:Card={...raw,articleStructure:canonicalStructure(raw.articleStructure||raw.structure),structure:canonicalStructure(raw.articleStructure||raw.structure)};await db.prepare('INSERT OR IGNORE INTO cards (id,slug,series_id,course_id,topic,theme,day,level,title,big_question,article_structure,image,content_json,status,updated_at) VALUES (?,?,?,?,?,?,?,?,?,?,?,?,?,?,?)').bind(card.cardId,slugFor(card),card.seriesId||card.courseId,card.courseId,card.topic,card.theme,card.day,card.level,card.title,card.bigQuestion||'',card.articleStructure,card.image_file||card.image,JSON.stringify(card),card.status||'published',now).run();}
-  const publicationIndex=createPublicationIndex(createD1PublicationStore(db));
-  const indexed:any=await db.prepare('SELECT COUNT(*) count FROM published_vocabulary_terms').first();
-  if(!Number(indexed?.count||0)){
-    const rows=await db.prepare("SELECT id,slug,title,theme,image,status,content_json FROM cards WHERE status='published'").all();
-    for(const row of rows.results||[]){const item:any=row;await publicationIndex.synchronize({...JSON.parse(String(item.content_json)),cardId:item.id,slug:item.slug,title:item.title,theme:item.theme,image:item.image,status:item.status});}
-  }
-}
-
 function requestUser(request: Request) {
   const id=request.headers.get('oai-authenticated-user-id'); const email=request.headers.get('oai-authenticated-user-email');
   return id&&email?{id,email,role:'student',createdAt:new Date().toISOString()}:null;
@@ -115,22 +59,38 @@ function canPreviewVocabulary(request:Request){const token=String(env.CONTENT_ED
 function scopedUser(request:Request,requested:string){const user=requestUser(request);if(user)return requested==='demo'||requested===user.id?user.id:null;return requested==='demo'?'demo':null;}
 const cardRecord=(row:any)=>({id:row.id,slug:row.slug,seriesId:row.series_id,courseId:row.course_id,topic:row.topic,theme:row.theme,day:row.day,level:row.level,title:row.title,articleStructure:row.article_structure,image:row.image,status:row.status,updatedAt:row.updated_at});
 
-async function getCachedDictionary(db:D1Database,word:string){
-  const now=Date.now();const cacheRow:any=await db.prepare('SELECT payload_json,status,expires_at FROM dictionary_cache WHERE word=?').bind(word).first();const cachedPayload=cacheRow?.payload_json?JSON.parse(cacheRow.payload_json):null;const currentShape=cacheRow?.status==='not_found'||Array.isArray(cachedPayload?.pronunciations);const fresh=Boolean(cacheRow&&currentShape&&Date.parse(cacheRow.expires_at)>now);let remote:any=fresh&&cacheRow.status==='found'?cachedPayload:null;let cacheStatus=fresh?'hit':'miss';let providerUnavailable=false;
-  if(!fresh){try{remote=await fetchDictionaryOnce(word);const updatedAt=new Date(now).toISOString();const expiresAt=new Date(now+(remote?DICTIONARY_TTL:DICTIONARY_NEGATIVE_TTL)).toISOString();await db.prepare('INSERT INTO dictionary_cache (word,payload_json,status,expires_at,updated_at) VALUES (?,?,?,?,?) ON CONFLICT(word) DO UPDATE SET payload_json=excluded.payload_json,status=excluded.status,expires_at=excluded.expires_at,updated_at=excluded.updated_at').bind(word,remote?JSON.stringify(remote):null,remote?'found':'not_found',expiresAt,updatedAt).run();}catch{providerUnavailable=true;if(cacheRow?.status==='found'&&currentShape){remote=cachedPayload;cacheStatus='stale';}}}
-  return {remote,cacheStatus,providerUnavailable};
-}
-
 async function handle(request:Request,context:RouteContext){
-  const db=env.DB;if(!db)return json({error:'Database binding unavailable'},503);await ensureDatabase(db);
-  const publicationIndex=createPublicationIndex(createD1PublicationStore(db));
   const segments=(await context.params).path||[];const path='/'+segments.join('/');const method=request.method;const url=new URL(request.url);
-  if(path==='/health'&&method==='GET')return json({ok:true,service:'fluent-sites-api'});
+  if(path==='/live'&&method==='GET')return json(liveness());
+  const configErrors=validateProductionConfig(env);
+  if(configErrors.length)return json({status:'degraded',errors:configErrors},503);
+  const db=env.DB;
+  const storage=createR2ObjectStorage(env.FILES);
+  const health=createHealthService(createD1HealthDependencies(db,storage));
+  if(path==='/health'&&method==='GET'){
+    const readiness=await health.readiness();
+    return json(readiness,readiness.status==='ready'?200:503);
+  }
+  if(segments[0]==='media'&&segments.length>1){
+    const key=segments.slice(1).join('/');
+    if(method==='GET'){
+      const asset=await storage.get(key);if(!asset)return json({error:'Media asset not found'},404);
+      return new Response(asset.body.slice().buffer,{headers:{'content-type':asset.contentType,'cache-control':'public, max-age=31536000, immutable'}});
+    }
+    if(method==='PUT'){
+      if(!canPreviewVocabulary(request))return json({error:'Media upload authorization required'},403);
+      const contentType=String(request.headers.get('content-type')||'');if(!/^(?:image|audio)\//.test(contentType))return json({error:'Only image and audio assets are supported'},415);
+      const body=new Uint8Array(await request.arrayBuffer());if(!body.byteLength||body.byteLength>5_000_000)return json({error:'Media asset must be between 1 byte and 5 MB'},413);
+      await storage.put(key,body,{contentType});const stored=await storage.get(key);
+      return json({key,contentType:stored?.contentType||contentType,size:stored?.size||0},201);
+    }
+  }
+  const publicationIndex=createPublicationIndex(createD1PublicationStore(db));
   if(path==='/pronunciation'&&method==='GET'){
     const word=normalizeWord(url.searchParams.get('word'));const region=String(url.searchParams.get('region')||'');
     if(!word||word.length>80||!['us','uk'].includes(region))return json({error:'请输入有效的发音词和口音'},400);
     try{
-      const audio=await loadPronunciationAudio({word,region:region as 'us'|'uk',resolveEntry:fetchDictionary});
+      const audio=await loadPronunciationAudio({word,region:region as 'us'|'uk',resolveEntry:lexeme=>externalDictionary(lexeme,'en')});
       return new Response(audio.body,{headers:{'content-type':audio.contentType,'cache-control':audio.cacheControl}});
     }catch(error){return error instanceof PronunciationProxyError?json({error:error.message},error.status):json({error:'发音服务暂时不可用'},502);}
   }
@@ -177,17 +137,12 @@ async function handle(request:Request,context:RouteContext){
     const knownCategory=categoryFor(lookup);const base={word:indexed?.english||requested.toLowerCase(),category:knownCategory||indexed?.membership||'reference',meaning:indexed?.meaning||'',image:indexed?.image||'',illustration:indexed?.illustration||null,pronunciations:indexed?.pronunciations||[],sources:indexed?.sources||[]};
     const unifiedService=createDictionaryService({
       catalog:{categoryFor:word=>categoryFor(word)||((indexed&&indexed.lexeme===publicationLexeme(word))?indexed.membership:null),courseFor:word=>indexed&&indexed.lexeme===publicationLexeme(word)?{lexeme:indexed.lexeme,meaning:base.meaning,image:base.image,illustration:base.illustration,pronunciations:base.pronunciations,sources:base.sources}:null},
-      provider:async word=>localOnly?null:language==='zh'
-        ? (localChineseDictionaryRow(await db.prepare('SELECT word,phonetic,translation,definition,pos,exchange,source FROM dictionary_entries WHERE word=?').bind(word).first()) || (base.meaning&&(!indexed||word===indexed.lexeme)?{meanings:[{partOfSpeech:'课程释义',definitions:[{definition:base.meaning,example:''}],synonyms:[],antonyms:[]}],provider:'本地课程词库',language:'zh'}:null))
-        : fetchDictionaryOnce(word),
-      cache:localOnly?undefined:{
-        async get(key){const row:any=await db.prepare('SELECT payload_json,status,expires_at FROM dictionary_cache WHERE word=?').bind(key).first();if(!row)return null;const now=Date.now(),expiresAt=Date.parse(row.expires_at);if(expiresAt>now)return {value:row.payload_json?JSON.parse(row.payload_json):null,status:'hit' as const};if(row.status==='found'&&expiresAt+DICTIONARY_STALE_TTL>now)return {value:row.payload_json?JSON.parse(row.payload_json):null,status:'stale' as const};await db.prepare('DELETE FROM dictionary_cache WHERE word=?').bind(key).run();return null;},
-        async set(key,value,ttl){const now=new Date();await db.prepare('INSERT INTO dictionary_cache (word,payload_json,status,expires_at,updated_at) VALUES (?,?,?,?,?) ON CONFLICT(word) DO UPDATE SET payload_json=excluded.payload_json,status=excluded.status,expires_at=excluded.expires_at,updated_at=excluded.updated_at').bind(key,value?JSON.stringify(value):null,value?'found':'not_found',new Date(now.getTime()+ttl).toISOString(),now.toISOString()).run();},
-      },
+      provider:localOnly?async()=>null:language==='zh'?createD1EcdictAdapter(db):externalDictionary,
+      cache:localOnly?undefined:createD1DictionaryCache(db,DICTIONARY_STALE_TTL),
       positiveTtlMs:DICTIONARY_TTL,
       negativeTtlMs:DICTIONARY_NEGATIVE_TTL,
       staleTtlMs:DICTIONARY_STALE_TTL,
-      observe:localOnly?undefined:metric=>console.info('lookup_metric',JSON.stringify(metric)),
+      observe:localOnly?undefined:metric=>observe(metric),
     });
     try{const result=await unifiedService.lookup({surfaceForm,scope:lookup,alternateScopes,courseId,sentence,language});if(localOnly&&language==='en')result.sourceStatus.blocks.externalDictionary='not_requested';return json(result);}catch(error:any){return json({error:error.message,code:error.code},error.status||500);}
   }
