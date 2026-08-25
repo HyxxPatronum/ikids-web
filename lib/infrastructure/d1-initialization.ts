@@ -95,8 +95,9 @@ export async function initializeD1Production(options: D1InitializationOptions) {
         }
       }
       let prepared = 0;
-      for (const key of assets) {
-        if (/^[a-z][a-z0-9+.-]*:/i.test(key) || key.includes('..') || key.includes('\\')) throw new Error(`invalid media asset path: ${key}`);
+      for (const rawKey of assets) {
+        const key = rawKey.replace(/^\/+/, '');
+        if (!key || /^[a-z][a-z0-9+.-]*:/i.test(key) || key.includes('..') || key.includes('\\')) throw new Error(`invalid media asset path: ${rawKey}`);
         const filename = path.join(options.root, key);
         try { await fs.access(filename); } catch {
           const probe = path.join(cache, 'media-object-probe');

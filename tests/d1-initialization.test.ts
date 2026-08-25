@@ -66,7 +66,7 @@ test('Wrangler initializes fresh D1/R2 state, reuses stored media, and recovers 
     dictionary: { source: 'ECDICT', count: 2, entries: { flower: ['', '花', '', '', ''], microscope: ['', '显微镜', '', '', ''] } },
     seedCards: [{
       cardId: 'integration-card', courseId: 'integration-course', day: 1, title: 'Integration',
-      image: mediaKey, status: 'published', word_bank: [{ english: 'flower', approved: true }],
+      image: `/${mediaKey}`, status: 'published', word_bank: [{ english: 'flower', approved: true }],
     }],
     async verify() {
       verifications += 1;

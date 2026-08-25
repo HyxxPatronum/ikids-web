@@ -9,7 +9,7 @@ import { accentLabels } from '../../lib/pronunciation/accents.ts';
 import type { AccentOption } from '../../lib/pronunciation/accents.ts';
 import type { PronunciationAccent } from '../../lib/media/course-media.ts';
 import type { DictionaryResult as ServiceDictionaryResult } from '../../lib/dictionary/service.ts';
-import { mediaAssetUrl } from '../../lib/media/asset-url.ts';
+import { mediaAssetUrl, pronunciationAssetUrl } from '../../lib/media/asset-url.ts';
 
 export type LookupRequest = {
   surfaceForm: string;
@@ -38,7 +38,9 @@ export const useLookup = () => {
 // device speech synthesis stays the last explicit step of the playback chain.
 const browserPlaybackPort: PronunciationPlaybackPort = {
   async playAudio(url) {
-    const audio = new Audio(mediaAssetUrl(url));
+    const source = pronunciationAssetUrl(url);
+    if (!source) throw new Error('External audio must be proxied by the product API');
+    const audio = new Audio(source);
     const finished = new Promise<void>((resolve, reject) => {
       audio.onended = () => resolve();
       audio.onerror = () => reject(new Error('无法播放该录音'));
