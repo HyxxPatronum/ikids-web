@@ -3,6 +3,7 @@ import test from 'node:test';
 import { createHealthService, type ReadinessDependencies } from '../lib/infrastructure/health.ts';
 import { initializeProduction, type ProductionInitialization } from '../lib/infrastructure/initialization.ts';
 import { createMemoryObjectStorage, verifyStoredAsset } from '../lib/infrastructure/object-storage.ts';
+import { mediaAssetUrl } from '../lib/media/asset-url.ts';
 import { validateProductionConfig } from '../lib/infrastructure/config.ts';
 import { createStructuredObserver } from '../lib/infrastructure/observability.ts';
 
@@ -90,6 +91,12 @@ test('Illustration and Pronunciation Assets can be uploaded, read, and verified 
   assert.deepEqual(await verifyStoredAsset(storage, 'pronunciations/flower-us.mp3'), {
     ok: true, contentType: 'audio/mpeg', size: 9,
   });
+});
+
+test('relative prepared media paths are read through the product media API', () => {
+  assert.equal(mediaAssetUrl('media/flower image.png'), '/api/media/media/flower%20image.png');
+  assert.equal(mediaAssetUrl('/api/pronunciation?word=flower&region=us'), '/api/pronunciation?word=flower&region=us');
+  assert.equal(mediaAssetUrl('https://example.test/flower.png'), 'https://example.test/flower.png');
 });
 
 test('production configuration fails closed when a required adapter binding or initialization secret is missing', () => {

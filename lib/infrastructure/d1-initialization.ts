@@ -2,7 +2,8 @@ import fs from 'node:fs/promises';
 import path from 'node:path';
 import { spawnSync } from 'node:child_process';
 import { normalizeContentCard } from '../content/card-normalization.ts';
-import { createMemoryPublicationStore, createPublicationIndex } from '../catalog/publication-index.ts';
+import { buildPublishedCatalogTerms } from '../catalog/rebuild.ts';
+import type { PublicationCard } from '../catalog/publication-index.ts';
 import { initializeProduction } from './initialization.ts';
 
 export type D1InitializationOptions = {
@@ -71,11 +72,9 @@ export async function initializeD1Production(options: D1InitializationOptions) {
       await fs.writeFile(seedFilename, seedSql.join('\n')); executeFile(seedFilename);
 
       const query = run(['d1', 'execute', 'DB', mode, ...persistence, '--command=SELECT id,slug,title,theme,image,status,content_json FROM cards WHERE status=\'published\' ORDER BY id', '--json', ...config], true);
-      const cards = (JSON.parse(query)[0]?.results || []).map((row: Record<string, string>) => ({ ...JSON.parse(row.content_json), cardId: row.id, slug: row.slug, title: row.title, theme: row.theme, image: row.image, status: row.status }));
+      const cards: PublicationCard[] = (JSON.parse(query)[0]?.results || []).map((row: Record<string, string>) => ({ ...JSON.parse(row.content_json), cardId: row.id, slug: row.slug, title: row.title, theme: row.theme, image: row.image, status: row.status }));
       publishedCards = cards;
-      const publicationStore = createMemoryPublicationStore(); const publicationIndex = createPublicationIndex(publicationStore);
-      for (const card of cards) await publicationIndex.synchronize(card);
-      const terms = await publicationStore.list();
+      const terms = await buildPublishedCatalogTerms(cards);
       const statements = ['DELETE FROM published_vocabulary_terms_staging;'];
       for (const term of terms) {
         const media = JSON.stringify({ illustration: term.illustration, pronunciations: term.pronunciations });
@@ -99,7 +98,18 @@ export async function initializeD1Production(options: D1InitializationOptions) {
       for (const key of assets) {
         if (/^[a-z][a-z0-9+.-]*:/i.test(key) || key.includes('..') || key.includes('\\')) throw new Error(`invalid media asset path: ${key}`);
         const filename = path.join(options.root, key);
-        try { await fs.access(filename); } catch { throw new Error(`referenced media asset is missing: ${key}`); }
+        try { await fs.access(filename); } catch {
+          const probe = path.join(cache, 'media-object-probe');
+          try {
+            run(['r2', 'object', 'get', `${options.bucketName}/${key}`, mode, ...persistence, `--file=${probe}`, ...config], true);
+            await fs.rm(probe, { force: true });
+            prepared += 1;
+            continue;
+          } catch {
+            await fs.rm(probe, { force: true });
+            throw new Error(`referenced media asset is missing locally and from object storage: ${key}`);
+          }
+        }
         const contentType = /\.png$/i.test(key) ? 'image/png' : /\.jpe?g$/i.test(key) ? 'image/jpeg' : /\.mp3$/i.test(key) ? 'audio/mpeg' : /\.wav$/i.test(key) ? 'audio/wav' : 'application/octet-stream';
         run(['r2', 'object', 'put', `${options.bucketName}/${key}`, mode, ...persistence, `--file=${filename}`, `--content-type=${contentType}`, '--force', ...config], true);
         prepared += 1;

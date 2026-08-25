@@ -9,6 +9,7 @@ import { accentLabels } from '../../lib/pronunciation/accents.ts';
 import type { AccentOption } from '../../lib/pronunciation/accents.ts';
 import type { PronunciationAccent } from '../../lib/media/course-media.ts';
 import type { DictionaryResult as ServiceDictionaryResult } from '../../lib/dictionary/service.ts';
+import { mediaAssetUrl } from '../../lib/media/asset-url.ts';
 
 export type LookupRequest = {
   surfaceForm: string;
@@ -33,16 +34,11 @@ export const useLookup = () => {
   return value;
 };
 
-function assetUrl(raw?: string) {
-  if (!raw) return '';
-  return /^(https?:|data:|\/)/i.test(raw) ? raw : `/${raw.replace(/^\/+/, '')}`;
-}
-
 // Recordings are always fetched from our own origin, so the browser never binds a provider domain;
 // device speech synthesis stays the last explicit step of the playback chain.
 const browserPlaybackPort: PronunciationPlaybackPort = {
   async playAudio(url) {
-    const audio = new Audio(assetUrl(url));
+    const audio = new Audio(mediaAssetUrl(url));
     const finished = new Promise<void>((resolve, reject) => {
       audio.onended = () => resolve();
       audio.onerror = () => reject(new Error('无法播放该录音'));
@@ -248,7 +244,7 @@ function DictionaryDrawer({ request, onClose }: { request: LookupRequest; onClos
               </div>
               <p className="react-pronunciation-status" role="status">{playback ? `${accentLabels[playback.region]} ${playbackLabels[playback.state]}` : ''}</p>
             </div>
-            {data.illustration ? <img className="react-dictionary-image" src={assetUrl(data.illustration.src)} alt={data.illustration.alt} /> : <div className="react-dictionary-image placeholder" role="status">暂无图示</div>}
+            {data.illustration ? <img className="react-dictionary-image" src={mediaAssetUrl(data.illustration.src)} alt={data.illustration.alt} /> : <div className="react-dictionary-image placeholder" role="status">暂无图示</div>}
           </div>
           {blocks?.pronunciation === 'unavailable' && <div className="alert" role="alert">录音暂时不可用，仍可使用设备发音。<button className="btn blue" type="button" onClick={retryLookup}>重试发音资源</button></div>}
           {blocks?.pronunciation === 'stale' && <div className="alert" role="status">正在使用已缓存录音，可重试检查更新。</div>}

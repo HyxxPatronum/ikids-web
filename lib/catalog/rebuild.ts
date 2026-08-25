@@ -6,12 +6,16 @@ export type PublishedCatalogRebuildStore = {
   replaceAll(terms: StoredPublicationTerm[]): Promise<void>;
 };
 
-export async function rebuildPublishedCatalog(store: PublishedCatalogRebuildStore) {
-  const cards = await store.publishedCards();
+export async function buildPublishedCatalogTerms(cards: PublicationCard[]) {
   const staged = createMemoryPublicationStore();
   const index = createPublicationIndex(staged);
   for (const card of cards) await index.synchronize(card);
-  const terms = await staged.list();
+  return staged.list();
+}
+
+export async function rebuildPublishedCatalog(store: PublishedCatalogRebuildStore) {
+  const cards = await store.publishedCards();
+  const terms = await buildPublishedCatalogTerms(cards);
   await store.replaceAll(terms);
   return { indexed: terms.length, courses: cards.length };
 }

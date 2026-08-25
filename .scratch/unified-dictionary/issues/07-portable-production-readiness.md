@@ -28,7 +28,7 @@
 ## Verification
 
 - `npm run typecheck`：通过。
-- `npm test`：76/76 通过。
+- `npm test`：78/78 通过（包含真实 Wrangler D1/R2 全新初始化、重复执行、媒体复用和失败恢复）。
 - `npm run check`：通过。
 - `npm run build`：通过。
 - 隔离 D1/R2 环境连续执行两次 `initialize:local`：通过；每次均报告 60000 条 ECDICT、12 条 published Catalog term、1 个已验证媒体资源。

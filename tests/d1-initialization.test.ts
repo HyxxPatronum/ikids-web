@@ -45,3 +45,42 @@ test('the real D1 initializer stops before Catalog and media after an ECDICT fai
   }), /ecdict: data\/ecdict-compact\.json must contain at least 2/);
   assert.equal(calls.filter(args => args[0] === 'd1' && args[1] === 'execute').length, 0);
 });
+
+test('Wrangler initializes fresh D1/R2 state, reuses stored media, and recovers after a failed verification', { timeout: 120_000 }, async t => {
+  const root = process.cwd();
+  const persistence = await fs.mkdtemp(path.join(os.tmpdir(), 'fluent-wrangler-init-'));
+  const mediaDirectory = path.join(root, '.cache', `integration-media-${process.pid}-${Date.now()}`);
+  const mediaFile = path.join(mediaDirectory, 'flower.png');
+  const mediaKey = path.relative(root, mediaFile).replaceAll('\\', '/');
+  await fs.mkdir(mediaDirectory, { recursive: true });
+  await fs.writeFile(mediaFile, new Uint8Array([137, 80, 78, 71]));
+  t.after(async () => {
+    await fs.rm(persistence, { recursive: true, force: true });
+    await fs.rm(mediaDirectory, { recursive: true, force: true });
+  });
+
+  let verifications = 0;
+  const options = {
+    root, remote: false, persistArg: `--persist-to=${persistence}`,
+    databaseId: 'local', databaseName: 'local', bucketName: 'media', minimumEcdictEntries: 2,
+    dictionary: { source: 'ECDICT', count: 2, entries: { flower: ['', '花', '', '', ''], microscope: ['', '显微镜', '', '', ''] } },
+    seedCards: [{
+      cardId: 'integration-card', courseId: 'integration-course', day: 1, title: 'Integration',
+      image: mediaKey, status: 'published', word_bank: [{ english: 'flower', approved: true }],
+    }],
+    async verify() {
+      verifications += 1;
+      if (verifications === 2) throw new Error('temporary readiness failure');
+      return { ready: true };
+    },
+  };
+
+  assert.deepEqual(await initializeD1Production(options), {
+    status: 'ready', ecdictEntries: 2, catalogEntries: 1, mediaAssets: 1,
+  });
+  await fs.rm(mediaDirectory, { recursive: true, force: true });
+  await assert.rejects(initializeD1Production(options), /verification: temporary readiness failure/);
+  assert.deepEqual(await initializeD1Production(options), {
+    status: 'ready', ecdictEntries: 2, catalogEntries: 1, mediaAssets: 1,
+  });
+});
