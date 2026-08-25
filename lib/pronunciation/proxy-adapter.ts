@@ -6,6 +6,27 @@ const maximumAudioBytes = 5_000_000;
 // A proxied recording is immutable for a given word and accent, so it may be cached publicly.
 const audioCacheControl = 'public, max-age=604800';
 
+async function readLimitedAudioBody(response: Response) {
+  if (!response.body) return response.arrayBuffer();
+  const reader = response.body.getReader();
+  const chunks: Uint8Array[] = [];
+  let size = 0;
+  while (true) {
+    const { done, value } = await reader.read();
+    if (done) break;
+    size += value.byteLength;
+    if (size > maximumAudioBytes) {
+      await reader.cancel();
+      throw new PronunciationProxyError('发音资源过大', 502);
+    }
+    chunks.push(value);
+  }
+  const body = new Uint8Array(size);
+  let offset = 0;
+  for (const chunk of chunks) { body.set(chunk, offset); offset += chunk.byteLength; }
+  return body.buffer;
+}
+
 export class PronunciationProxyError extends Error {
   status: number;
   constructor(message: string, status: number) {
@@ -45,7 +66,6 @@ export async function loadPronunciationAudio(options: {
   if (!response.ok || !contentType.startsWith('audio/') || declaredSize > maximumAudioBytes) {
     throw new PronunciationProxyError('发音资源不可用', 502);
   }
-  const body = await response.arrayBuffer();
-  if (body.byteLength > maximumAudioBytes) throw new PronunciationProxyError('发音资源过大', 502);
+  const body = await readLimitedAudioBody(response);
   return { body, contentType, cacheControl: audioCacheControl };
 }

@@ -1,5 +1,6 @@
 import type { PublicationStore, StoredPublicationTerm } from './publication-index.ts';
 import { normalizeIllustration, normalizePronunciationAssets } from '../media/course-media.ts';
+import type { CourseMedia } from '../media/course-media.ts';
 
 type PublicationRow = {
   card_id: string;
@@ -15,13 +16,18 @@ type PublicationRow = {
   source_image: string;
 };
 
-const parseMedia = (value: unknown) => {
+const parseMedia = (value: unknown): CourseMedia => {
   let media: Record<string, unknown> = {};
   try { media = JSON.parse(String(value || '{}')) || {}; } catch { media = {}; }
   return {
     illustration: normalizeIllustration(media.illustration),
     pronunciations: normalizePronunciationAssets(media.pronunciations ?? []),
   };
+};
+
+const serializeMedia = (term: Pick<StoredPublicationTerm, 'illustration' | 'pronunciations'>) => {
+  const media: CourseMedia = { illustration: term.illustration, pronunciations: term.pronunciations };
+  return JSON.stringify(media);
 };
 
 const rowToTerm = (row: PublicationRow): StoredPublicationTerm => ({
@@ -50,7 +56,7 @@ export function createD1PublicationStore(db: D1Database): PublicationStore {
         db.prepare('DELETE FROM published_vocabulary_terms WHERE card_id=?').bind(cardId),
         ...terms.map(term => db.prepare('INSERT INTO published_vocabulary_terms (card_id,lexeme,surface_form,meaning,image,media_json,membership,source_slug,source_title,source_theme,source_image,updated_at) VALUES (?,?,?,?,?,?,?,?,?,?,?,?)').bind(
           cardId, term.lexeme, term.english, term.meaning, term.image,
-          JSON.stringify({ illustration: term.illustration, pronunciations: term.pronunciations }),
+          serializeMedia(term),
           term.membership, term.source.slug,
           term.source.title || '', term.source.theme || '', term.source.image || '', now,
         )),

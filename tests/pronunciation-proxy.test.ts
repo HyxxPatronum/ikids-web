@@ -71,6 +71,23 @@ test('non-audio, failed, and oversized provider responses are rejected', async (
   }
 });
 
+test('an unbounded audio stream is cancelled as soon as it crosses the size limit', async () => {
+  let cancelled = false;
+  const stream = new ReadableStream<Uint8Array>({
+    start(controller) {
+      controller.enqueue(new Uint8Array(4_000_000));
+    },
+    pull(controller) { controller.enqueue(new Uint8Array(1_000_001)); },
+    cancel() { cancelled = true; },
+  });
+  await assert.rejects(loadPronunciationAudio({
+    word: 'flower', region: 'us',
+    resolveEntry: entryWith('https://api.dictionaryapi.dev/media/pronunciations/en/flower-us.mp3'),
+    fetcher: (async () => new Response(stream, { headers: { 'content-type': 'audio/mpeg' } })) as unknown as typeof fetch,
+  }), (error: PronunciationProxyError) => error.status === 502);
+  assert.equal(cancelled, true);
+});
+
 test('a provider timeout is reported as an unavailable upstream, not a crash', async () => {
   await assert.rejects(loadPronunciationAudio({
     word: 'flower', region: 'us',

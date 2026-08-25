@@ -20,10 +20,15 @@ const text = (value: unknown) => String(value ?? '').trim();
 
 // Course media is prepared before publication and stored with the course, so a student-facing
 // asset location must stay inside product storage instead of pointing at a third-party domain.
-const isCourseAssetPath = (value: string) => Boolean(value)
-  && !/^[a-z][a-z0-9+.-]*:/i.test(value)
-  && !value.startsWith('//')
-  && !value.split(/[\\/]/).includes('..');
+const courseAssetOrigin = 'https://course-assets.invalid';
+function courseAssetIdentity(value: string) {
+  if (!value || value.includes('\\') || /^[a-z][a-z0-9+.-]*:/i.test(value) || value.startsWith('//') || value.split('/').includes('..')) return '';
+  try {
+    const asset = new URL(value, `${courseAssetOrigin}/`);
+    return asset.origin === courseAssetOrigin && !asset.search && !asset.hash ? asset.pathname : '';
+  } catch { return ''; }
+}
+const isCourseAssetPath = (value: string) => Boolean(courseAssetIdentity(value));
 
 export function normalizeIllustration(value: unknown): IllustrationAsset | null {
   const raw = typeof value === 'string' ? { src: value } : value as Record<string, unknown> | null;
@@ -39,7 +44,7 @@ export function normalizeIllustration(value: unknown): IllustrationAsset | null 
 }
 
 export function studentIllustration(asset: IllustrationAsset | null): StudentIllustration | null {
-  if (!asset || asset.review !== 'approved' || !asset.alt) return null;
+  if (!asset || asset.review !== 'approved' || !asset.alt || !asset.source) return null;
   const { review: _review, ...visible } = asset;
   return visible;
 }
@@ -57,13 +62,16 @@ export function normalizePronunciationAssets(value: unknown): PronunciationAsset
     const region = text(raw?.region ?? raw?.accent).toLowerCase() as PronunciationAccent;
     if (!pronunciationAccents.includes(region) || assets.some(asset => asset.region === region)) continue;
     const src = text(raw?.src ?? raw?.audio ?? raw?.file);
+    const source = text(raw?.source);
+    const storage = text(raw?.storage);
+    const identity = courseAssetIdentity(src);
     const declared = text(raw?.availability) as PronunciationAvailability;
-    const availability: PronunciationAvailability = !isCourseAssetPath(src) ? 'missing'
-      : used.has(src) ? 'conflict'
-      : declared === 'pending' || declared === 'missing' ? declared
+    const availability: PronunciationAvailability = !identity || !source || !storage ? 'missing'
+      : used.has(identity) ? 'conflict'
+      : declared === 'pending' || declared === 'missing' || declared === 'conflict' ? declared
       : 'ready';
-    if (availability === 'ready') used.add(src);
-    assets.push({ region, src, source: text(raw?.source), storage: text(raw?.storage), availability });
+    if (availability === 'ready') used.add(identity);
+    assets.push({ region, src, source, storage, availability });
   }
   return assets;
 }

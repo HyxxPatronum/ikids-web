@@ -28,7 +28,9 @@ test('unreviewed, rejected, alt-less, and remote illustrations stay out of stude
   assert.equal(studentIllustration(legacy), null);
   assert.equal(studentIllustration(normalizeIllustration({ src: 'a.png', alt: '花', review: 'rejected' })), null);
   assert.equal(studentIllustration(normalizeIllustration({ src: 'a.png', alt: '', review: 'approved' })), null);
+  assert.equal(studentIllustration(normalizeIllustration({ src: 'a.png', alt: '花', review: 'approved' })), null);
   assert.equal(normalizeIllustration({ src: 'https://images.example.com/a.png', alt: '花', review: 'approved' }), null);
+  assert.equal(normalizeIllustration({ src: '\\\\images.example.com\\a.png', alt: '花', source: '外部素材', review: 'approved' }), null);
   assert.equal(normalizeIllustration({ src: '../secrets/a.png', alt: '花', review: 'approved' }), null);
   assert.equal(studentIllustration(null), null);
 });
@@ -48,11 +50,27 @@ test('US and UK Pronunciation Assets record source, accent, storage, and availab
 
 test('one recording cannot be published under both accent labels', () => {
   const assets = normalizePronunciationAssets([
-    { region: 'us', src: 'audio/flower.mp3', source: '课程录音棚' },
-    { region: 'uk', src: 'audio/flower.mp3', source: '课程录音棚' },
+    { region: 'us', src: 'audio/flower.mp3', source: '课程录音棚', storage: 'r2:course-audio' },
+    { region: 'uk', src: 'audio/flower.mp3', source: '课程录音棚', storage: 'r2:course-audio' },
   ]);
   assert.deepEqual(assets.map(asset => [asset.region, asset.availability]), [['us', 'ready'], ['uk', 'conflict']]);
   assert.equal(assets.filter(isPronunciationReady).length, 1);
+});
+
+test('equivalent asset paths cannot publish one recording under both accent labels', () => {
+  const assets = normalizePronunciationAssets([
+    { region: 'us', src: 'audio/flower.mp3', source: '课程录音棚', storage: 'r2:course-audio' },
+    { region: 'uk', src: '/audio/flower.mp3', source: '课程录音棚', storage: 'r2:course-audio' },
+  ]);
+  assert.deepEqual(assets.map(asset => [asset.region, asset.availability]), [['us', 'ready'], ['uk', 'conflict']]);
+});
+
+test('an editor-declared pronunciation conflict remains unavailable', () => {
+  const [asset] = normalizePronunciationAssets([
+    { region: 'us', src: 'audio/flower-us.mp3', source: '课程录音棚', storage: 'r2:course-audio', availability: 'conflict' },
+  ]);
+  assert.equal(asset.availability, 'conflict');
+  assert.equal(isPronunciationReady(asset), false);
 });
 
 test('remote or unusable pronunciation locations are never treated as available', () => {
@@ -63,6 +81,14 @@ test('remote or unusable pronunciation locations are never treated as available'
   ]);
   assert.deepEqual(assets.map(asset => [asset.region, asset.availability]), [['us', 'missing'], ['uk', 'missing']]);
   assert.equal(assets.filter(isPronunciationReady).length, 0);
+});
+
+test('pronunciation assets without provenance or storage remain unavailable', () => {
+  const assets = normalizePronunciationAssets([
+    { region: 'us', src: 'audio/flower-us.mp3', storage: 'r2:course-audio' },
+    { region: 'uk', src: 'audio/flower-uk.mp3', source: '课程录音棚' },
+  ]);
+  assert.deepEqual(assets.map(asset => [asset.region, asset.availability]), [['us', 'missing'], ['uk', 'missing']]);
 });
 
 test('a Course Term inherits card media and overrides it with its own assets', () => {

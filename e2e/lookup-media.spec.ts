@@ -6,6 +6,7 @@ import { resolveAccentOptions } from '../lib/pronunciation/accents.ts';
 const lexeme = 'flower';
 const approvedIllustration = { src: 'day001-flower.png', alt: '花瓣正在慢慢展开的课程图示', source: 'course-illustration-library', review: 'approved' };
 const providerAudio = (region: string) => `https://ssl.gstatic.com/dictionary/static/sounds/${region}/flower.mp3`;
+const tinyPng = () => Buffer.from('iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAQAAAC1HAwCAAAAC0lEQVR42mNk+A8AAQUBAScY42YAAAAASUVORK5CYII=', 'base64');
 
 // A silent local WAV keeps browser playback deterministic and never touches a real audio provider.
 function silentWav(seconds = 8) {
@@ -48,6 +49,7 @@ function dictionaryFixture(options: {
 
 async function openLookup(page: Page, fixture: ReturnType<typeof dictionaryFixture>) {
   const audioRequests: string[] = [];
+  const imageRequests: string[] = [];
   const providerRequests: string[] = [];
   await page.addInitScript(() => {
     const spoken: Array<{ text: string; lang: string }> = [];
@@ -68,6 +70,10 @@ async function openLookup(page: Page, fixture: ReturnType<typeof dictionaryFixtu
   } }));
   await page.route('**/api/dictionary?**', route => route.fulfill({ json: fixture }));
   await page.route('https://ssl.gstatic.com/**', route => { providerRequests.push(route.request().url()); return route.abort(); });
+  await page.route('**/day001-flower.png', route => {
+    imageRequests.push(route.request().url());
+    return route.fulfill({ body: tinyPng(), headers: { 'content-type': 'image/png' } });
+  });
   await page.route('**/media/flower-*.wav', route => {
     audioRequests.push(route.request().url());
     return route.fulfill({ body: silentWav(), headers: { 'content-type': 'audio/wav' } });
@@ -76,7 +82,7 @@ async function openLookup(page: Page, fixture: ReturnType<typeof dictionaryFixtu
   await page.getByRole('button', { name: '查询 Flower', exact: true }).click();
   const dialog = page.getByRole('dialog', { name: '词典释义' });
   await expect(dialog.getByRole('heading', { name: lexeme })).toBeVisible();
-  return { dialog, audioRequests, providerRequests };
+  return { dialog, audioRequests, imageRequests, providerRequests };
 }
 
 test('两个口音都可用时学生看到独立控件，音频只经过本站，并且快速重复触发不会重叠播放', async ({ page }) => {
@@ -90,9 +96,12 @@ test('两个口音都可用时学生看到独立控件，音频只经过本站�
     proxied.push(route.request().url());
     return route.fulfill({ body: silentWav(), headers: { 'content-type': 'audio/mpeg' } });
   });
-  const { dialog, audioRequests, providerRequests } = await openLookup(page, fixture);
+  const { dialog, audioRequests, imageRequests, providerRequests } = await openLookup(page, fixture);
 
-  await expect(dialog.getByRole('img', { name: approvedIllustration.alt })).toBeVisible();
+  const image = dialog.getByRole('img', { name: approvedIllustration.alt });
+  await expect(image).toBeVisible();
+  await expect.poll(() => image.evaluate(element => (element as HTMLImageElement).naturalWidth)).toBe(1);
+  expect(imageRequests).toHaveLength(1);
   const american = dialog.getByRole('button', { name: '播放美音' });
   await american.click();
   await expect(dialog.getByRole('status')).toHaveText('美音 正在播放');

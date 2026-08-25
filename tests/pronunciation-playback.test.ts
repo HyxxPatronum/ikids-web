@@ -88,13 +88,17 @@ test('rapid repeat triggers on a playing accent never start overlapping playback
 
 test('switching accents stops the active recording and resets the previous control', async () => {
   const harness = createHarness();
-  void harness.player.play({ region: 'us', text: 'flower', audioUrl: '/us.mp3' });
+  const first = harness.player.play({ region: 'us', text: 'flower', audioUrl: '/us.mp3' });
   await tick();
   void harness.player.play({ region: 'uk', text: 'flower', audioUrl: '/uk.mp3' });
   await tick();
   assert.deepEqual(harness.stopped, ['audio:/us.mp3']);
   assert.deepEqual(harness.audioCalls, ['/us.mp3', '/uk.mp3']);
   assert.deepEqual(harness.states, ['us:starting', 'us:playing', 'us:idle', 'uk:starting', 'uk:playing']);
+  assert.equal(await Promise.race([
+    first.then(() => true),
+    new Promise<boolean>(resolve => setTimeout(() => resolve(false), 20)),
+  ]), true);
 });
 
 test('stopping the player silences active playback', async () => {

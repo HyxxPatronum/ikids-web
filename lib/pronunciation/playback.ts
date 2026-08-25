@@ -9,7 +9,7 @@ export type PronunciationPlaybackPort = {
 };
 export type PronunciationPlayRequest = { region: PronunciationAccent; text: string; audioUrl?: string };
 
-type Session = { region: PronunciationAccent; stop: (() => void) | null };
+type Session = { region: PronunciationAccent; stop: (() => void) | null; cancelled: Promise<void>; cancel(): void };
 
 // One player owns every accent control in a lookup, so a repeated tap on the playing accent is
 // ignored and switching accents silences the previous recording before the next one starts.
@@ -23,13 +23,20 @@ export function createPronunciationPlayer(port: PronunciationPlaybackPort, onSta
     const session = active;
     active = null;
     session.stop?.();
+    session.cancel();
     emit(session.region, 'idle');
   }
 
   async function play(request: PronunciationPlayRequest) {
     if (active?.region === request.region) return;
     stop();
-    const session: Session = { region: request.region, stop: null };
+    let cancel!: () => void;
+    const session: Session = {
+      region: request.region,
+      stop: null,
+      cancelled: new Promise<void>(resolve => { cancel = resolve; }),
+      cancel: () => cancel(),
+    };
     active = session;
     emit(session.region, 'starting');
     const audioUrl = String(request.audioUrl || '');
@@ -39,7 +46,8 @@ export function createPronunciationPlayer(port: PronunciationPlaybackPort, onSta
         if (active !== session) { playback.stop(); return; }
         session.stop = playback.stop;
         emit(session.region, 'playing');
-        await playback.finished;
+        await Promise.race([playback.finished, session.cancelled]);
+        if (active !== session) return;
         release(session);
         return;
       } catch {
@@ -51,7 +59,8 @@ export function createPronunciationPlayer(port: PronunciationPlaybackPort, onSta
       if (active !== session) { speech.stop(); return; }
       session.stop = speech.stop;
       emit(session.region, 'fallback');
-      await speech.finished;
+      await Promise.race([speech.finished, session.cancelled]);
+      if (active !== session) return;
       release(session);
     } catch {
       if (active !== session) return;
