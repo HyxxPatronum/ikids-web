@@ -36,7 +36,7 @@ export const dictionaryEntries = sqliteTable('dictionary_entries', {
 export const publishedVocabularyTerms = sqliteTable('published_vocabulary_terms', {
   cardId: text('card_id').notNull(), lexeme: text('lexeme').notNull(), surfaceForm: text('surface_form').notNull(),
   meaning: text('meaning').notNull().default(''), image: text('image').notNull().default(''),
-  membership: text('membership').notNull(), sourceSlug: text('source_slug').notNull(),
+  mediaJson: text('media_json').notNull().default('{}'), membership: text('membership').notNull(), sourceSlug: text('source_slug').notNull(),
   sourceTitle: text('source_title').notNull().default(''), sourceTheme: text('source_theme').notNull().default(''),
   sourceImage: text('source_image').notNull().default(''), updatedAt: text('updated_at').notNull(),
 }, table => [

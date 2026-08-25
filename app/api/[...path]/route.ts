@@ -88,10 +88,12 @@ async function ensureDatabase(db: D1Database) {
     db.prepare('CREATE TABLE IF NOT EXISTS recording_submissions (id TEXT PRIMARY KEY, user_id TEXT NOT NULL, card_id TEXT NOT NULL, target_sentence TEXT NOT NULL, mime TEXT, size INTEGER, status TEXT NOT NULL DEFAULT \'uploaded\', created_at TEXT NOT NULL)'),
     db.prepare('CREATE TABLE IF NOT EXISTS dictionary_cache (word TEXT PRIMARY KEY, payload_json TEXT, status TEXT NOT NULL, expires_at TEXT NOT NULL, updated_at TEXT NOT NULL)'),
     db.prepare('CREATE TABLE IF NOT EXISTS dictionary_entries (word TEXT PRIMARY KEY, phonetic TEXT NOT NULL DEFAULT \'\', translation TEXT NOT NULL, definition TEXT NOT NULL DEFAULT \'\', pos TEXT NOT NULL DEFAULT \'\', exchange TEXT NOT NULL DEFAULT \'\', source TEXT NOT NULL DEFAULT \'ECDICT\', updated_at TEXT NOT NULL)'),
-    db.prepare("CREATE TABLE IF NOT EXISTS published_vocabulary_terms (card_id TEXT NOT NULL, lexeme TEXT NOT NULL, surface_form TEXT NOT NULL, meaning TEXT NOT NULL DEFAULT '', image TEXT NOT NULL DEFAULT '', membership TEXT NOT NULL CHECK (membership IN ('level2','level3','science')), source_slug TEXT NOT NULL, source_title TEXT NOT NULL DEFAULT '', source_theme TEXT NOT NULL DEFAULT '', source_image TEXT NOT NULL DEFAULT '', updated_at TEXT NOT NULL, PRIMARY KEY (card_id,lexeme))"),
+    db.prepare("CREATE TABLE IF NOT EXISTS published_vocabulary_terms (card_id TEXT NOT NULL, lexeme TEXT NOT NULL, surface_form TEXT NOT NULL, meaning TEXT NOT NULL DEFAULT '', image TEXT NOT NULL DEFAULT '', media_json TEXT NOT NULL DEFAULT '{}', membership TEXT NOT NULL CHECK (membership IN ('level2','level3','science')), source_slug TEXT NOT NULL, source_title TEXT NOT NULL DEFAULT '', source_theme TEXT NOT NULL DEFAULT '', source_image TEXT NOT NULL DEFAULT '', updated_at TEXT NOT NULL, PRIMARY KEY (card_id,lexeme))"),
     db.prepare('CREATE INDEX IF NOT EXISTS idx_published_vocabulary_lexeme ON published_vocabulary_terms(lexeme)'),
     db.prepare('CREATE INDEX IF NOT EXISTS idx_published_vocabulary_membership ON published_vocabulary_terms(membership,lexeme)'),
   ]);
+  const publicationColumns=await db.prepare('PRAGMA table_info(published_vocabulary_terms)').all<{name:string}>();
+  if(!(publicationColumns.results||[]).some(column=>column.name==='media_json'))await db.prepare("ALTER TABLE published_vocabulary_terms ADD COLUMN media_json TEXT NOT NULL DEFAULT '{}'").run();
   const now=new Date().toISOString();
   await db.prepare('INSERT OR IGNORE INTO series (id,name,subtitle,description,sort_order,status,created_at,updated_at) VALUES (?,?,?,?,?,?,?,?)').bind('science-reading','Science Reading','Nature, life science, and science stories','Learn science English through reading, listening, and practice',10,'published',now,now).run();
   for(const raw of seedCards){const card:Card={...raw,articleStructure:canonicalStructure(raw.articleStructure||raw.structure),structure:canonicalStructure(raw.articleStructure||raw.structure)};await db.prepare('INSERT OR IGNORE INTO cards (id,slug,series_id,course_id,topic,theme,day,level,title,big_question,article_structure,image,content_json,status,updated_at) VALUES (?,?,?,?,?,?,?,?,?,?,?,?,?,?,?)').bind(card.cardId,slugFor(card),card.seriesId||card.courseId,card.courseId,card.topic,card.theme,card.day,card.level,card.title,card.bigQuestion||'',card.articleStructure,card.image_file||card.image,JSON.stringify(card),card.status||'published',now).run();}
@@ -124,10 +126,10 @@ async function handle(request:Request,context:RouteContext){
   if(path==='/health'&&method==='GET')return json({ok:true,service:'fluent-sites-api'});
   if(path==='/pronunciation'&&method==='GET'){
     const word=normalizeWord(url.searchParams.get('word'));const region=String(url.searchParams.get('region')||'');
-    if(!word||word.length>80||!['us','uk','other'].includes(region))return json({error:'请输入有效的发音词和口音'},400);
+    if(!word||word.length>80||!['us','uk'].includes(region))return json({error:'请输入有效的发音词和口音'},400);
     try{
-      const audio=await loadPronunciationAudio({word,region:region as 'us'|'uk'|'other',resolveEntry:fetchDictionary});
-      return new Response(audio.body,{headers:{'content-type':audio.contentType,'cache-control':'public, max-age=604800'}});
+      const audio=await loadPronunciationAudio({word,region:region as 'us'|'uk',resolveEntry:fetchDictionary});
+      return new Response(audio.body,{headers:{'content-type':audio.contentType,'cache-control':audio.cacheControl}});
     }catch(error){return error instanceof PronunciationProxyError?json({error:error.message},error.status):json({error:'发音服务暂时不可用'},502);}
   }
   if(path==='/auth/me'&&method==='GET'){const user=requestUser(request);if(!user)return json({error:'请先使用 ChatGPT 登录'},401);const rows=await db.prepare('SELECT payload_json,completed_percent,updated_at FROM learning_progress WHERE user_id=? ORDER BY updated_at DESC').bind(user.id).all();const recent=(rows.results||[]).map((row:any)=>({...JSON.parse(row.payload_json),completedPercent:row.completed_percent,updatedAt:row.updated_at}));const average=recent.length?Math.round(recent.reduce((sum:number,item:any)=>sum+Number(item.completedPercent||0),0)/recent.length):0;return json({user,summary:{started:recent.length,completed:recent.filter((item:any)=>item.completedPercent>=100).length,average,recent:recent.slice(0,5)}});}
@@ -169,9 +171,9 @@ async function handle(request:Request,context:RouteContext){
     if(!lookup||lookup.length>80||!/^[a-z]+(?:['-][a-z]+)*(?:\s+[a-z]+(?:['-][a-z]+)*)*$/.test(lookup))return json({error:'请输入有效的英文单词或短语'},400);
     if(surfaceForm.length>80||courseId.length>80||sentence.length>500||alternateScopes.length>16||alternateScopes.some(scope=>scope.length>80))return json({error:'查词范围、课程或句子上下文过长'},400);
     const indexed=(await publicationIndex.lookup(lookup,{courseId}))[0]||null;
-    const knownCategory=categoryFor(lookup);const base={word:indexed?.english||requested.toLowerCase(),category:knownCategory||indexed?.membership||'reference',meaning:indexed?.meaning||'',image:indexed?.image||'',sources:indexed?.sources||[]};
+    const knownCategory=categoryFor(lookup);const base={word:indexed?.english||requested.toLowerCase(),category:knownCategory||indexed?.membership||'reference',meaning:indexed?.meaning||'',image:indexed?.image||'',illustration:indexed?.illustration||null,pronunciations:indexed?.pronunciations||[],sources:indexed?.sources||[]};
     const unifiedService=createDictionaryService({
-      catalog:{categoryFor:word=>categoryFor(word)||((indexed&&indexed.lexeme===publicationLexeme(word))?indexed.membership:null),courseFor:word=>indexed&&indexed.lexeme===publicationLexeme(word)?{lexeme:indexed.lexeme,meaning:base.meaning,image:base.image,sources:base.sources}:null},
+      catalog:{categoryFor:word=>categoryFor(word)||((indexed&&indexed.lexeme===publicationLexeme(word))?indexed.membership:null),courseFor:word=>indexed&&indexed.lexeme===publicationLexeme(word)?{lexeme:indexed.lexeme,meaning:base.meaning,image:base.image,illustration:base.illustration,pronunciations:base.pronunciations,sources:base.sources}:null},
       provider:async word=>language==='zh'
         ? (localChineseDictionaryRow(await db.prepare('SELECT word,phonetic,translation,definition,pos,exchange,source FROM dictionary_entries WHERE word=?').bind(word).first()) || (base.meaning&&(!indexed||word===indexed.lexeme)?{meanings:[{partOfSpeech:'课程释义',definitions:[{definition:base.meaning,example:''}],synonyms:[],antonyms:[]}],provider:'本地课程词库',language:'zh'}:null))
         : fetchDictionaryOnce(word),

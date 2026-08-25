@@ -1,6 +1,8 @@
 import { catalogCategory, catalogIdentity, normalizeCatalogValue } from './catalog.ts';
 import type { CatalogCard, CatalogCategory } from './catalog.ts';
 import { resolveLexeme } from '../dictionary/service.ts';
+import { courseMediaFor } from '../media/course-media.ts';
+import type { IllustrationAsset, PronunciationAsset } from '../media/course-media.ts';
 import { isApprovedTerm } from '../vocabulary/approval.ts';
 
 export type PublicationSource = {
@@ -16,6 +18,8 @@ export type StoredPublicationTerm = {
   english: string;
   meaning: string;
   image: string;
+  illustration: IllustrationAsset | null;
+  pronunciations: PronunciationAsset[];
   membership: CatalogCategory;
   source: PublicationSource;
 };
@@ -96,6 +100,8 @@ function aggregate(rows: StoredPublicationTerm[]): PublishedVocabularyEntry[] {
     const current = entries.get(row.lexeme) || { ...row, sources: [] };
     if (!current.meaning && row.meaning) current.meaning = row.meaning;
     if (!current.image && row.image) current.image = row.image;
+    if (!current.illustration && row.illustration) current.illustration = row.illustration;
+    if (!current.pronunciations.length && row.pronunciations.length) current.pronunciations = row.pronunciations;
     if (!current.sources.some(source => source.cardId === row.source.cardId)) current.sources.push(row.source);
     entries.set(row.lexeme, current);
   }
@@ -108,11 +114,14 @@ export function createPublicationIndex(store: PublicationStore) {
     const lexeme = publicationLexeme(english);
     const membership = catalogCategory(lexeme) || catalogCategory(english) || 'science';
     const approved = isApprovedTerm(term);
+    const media = courseMediaFor(term as Record<string, unknown>, card as Record<string, unknown>);
     return {
       lexeme,
       english,
       meaning: term.chinese || term.meaning || '',
       image: term.image || card.image_file || card.image || '',
+      illustration: media.illustration,
+      pronunciations: media.pronunciations,
       membership,
       approved,
       studentVisible: card.status === 'published' && approved,
@@ -135,6 +144,8 @@ export function createPublicationIndex(store: PublicationStore) {
           ...current,
           meaning: current.meaning || term.meaning,
           image: current.image || term.image,
+          illustration: current.illustration || term.illustration,
+          pronunciations: current.pronunciations.length ? current.pronunciations : term.pronunciations,
         } : { ...term, source });
       }
       await store.replaceCourse(card.cardId, [...terms.values()]);
@@ -151,10 +162,16 @@ export function createPublicationIndex(store: PublicationStore) {
 
 export function createMemoryPublicationStore(): PublicationStore {
   const courses = new Map<string, StoredPublicationTerm[]>();
+  const clone = (term: StoredPublicationTerm): StoredPublicationTerm => ({
+    ...term,
+    illustration: term.illustration ? { ...term.illustration } : null,
+    pronunciations: term.pronunciations.map(asset => ({ ...asset })),
+    source: { ...term.source },
+  });
   return {
-    async replaceCourse(cardId, terms) { courses.set(cardId, terms.map(term => ({ ...term, source: { ...term.source } }))); },
+    async replaceCourse(cardId, terms) { courses.set(cardId, terms.map(clone)); },
     async removeCourse(cardId) { courses.delete(cardId); },
-    async list() { return [...courses.values()].flat().map(term => ({ ...term, source: { ...term.source } })); },
-    async find(lexeme) { return [...courses.values()].flat().filter(term => term.lexeme === lexeme).map(term => ({ ...term, source: { ...term.source } })); },
+    async list() { return [...courses.values()].flat().map(clone); },
+    async find(lexeme) { return [...courses.values()].flat().filter(term => term.lexeme === lexeme).map(clone); },
   };
 }

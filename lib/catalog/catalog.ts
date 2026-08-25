@@ -14,7 +14,8 @@ export type CatalogCard = {
   image?: string;
   image_file?: string;
   status?: string;
-  word_bank?: Array<{ english?: string; chinese?: string; meaning?: string; image?: string } & ApprovalFields>;
+  illustration?: unknown;
+  word_bank?: Array<{ english?: string; chinese?: string; meaning?: string; image?: string; illustration?: unknown; pronunciations?: unknown } & ApprovalFields>;
 };
 
 export type CatalogIndexEntry = {

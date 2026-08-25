@@ -1,4 +1,5 @@
 import type { PublicationStore, StoredPublicationTerm } from './publication-index.ts';
+import { normalizeIllustration, normalizePronunciationAssets } from '../media/course-media.ts';
 
 type PublicationRow = {
   card_id: string;
@@ -6,6 +7,7 @@ type PublicationRow = {
   surface_form: string;
   meaning: string;
   image: string;
+  media_json: string;
   membership: StoredPublicationTerm['membership'];
   source_slug: string;
   source_title: string;
@@ -13,11 +15,21 @@ type PublicationRow = {
   source_image: string;
 };
 
+const parseMedia = (value: unknown) => {
+  let media: Record<string, unknown> = {};
+  try { media = JSON.parse(String(value || '{}')) || {}; } catch { media = {}; }
+  return {
+    illustration: normalizeIllustration(media.illustration),
+    pronunciations: normalizePronunciationAssets(media.pronunciations ?? []),
+  };
+};
+
 const rowToTerm = (row: PublicationRow): StoredPublicationTerm => ({
   lexeme: row.lexeme,
   english: row.surface_form,
   meaning: row.meaning,
   image: row.image,
+  ...parseMedia(row.media_json),
   membership: row.membership,
   source: {
     cardId: row.card_id,
@@ -28,7 +40,7 @@ const rowToTerm = (row: PublicationRow): StoredPublicationTerm => ({
   },
 });
 
-const selectColumns = 'card_id,lexeme,surface_form,meaning,image,membership,source_slug,source_title,source_theme,source_image';
+const selectColumns = 'card_id,lexeme,surface_form,meaning,image,media_json,membership,source_slug,source_title,source_theme,source_image';
 
 export function createD1PublicationStore(db: D1Database): PublicationStore {
   return {
@@ -36,8 +48,10 @@ export function createD1PublicationStore(db: D1Database): PublicationStore {
       const now = new Date().toISOString();
       await db.batch([
         db.prepare('DELETE FROM published_vocabulary_terms WHERE card_id=?').bind(cardId),
-        ...terms.map(term => db.prepare('INSERT INTO published_vocabulary_terms (card_id,lexeme,surface_form,meaning,image,membership,source_slug,source_title,source_theme,source_image,updated_at) VALUES (?,?,?,?,?,?,?,?,?,?,?)').bind(
-          cardId, term.lexeme, term.english, term.meaning, term.image, term.membership, term.source.slug,
+        ...terms.map(term => db.prepare('INSERT INTO published_vocabulary_terms (card_id,lexeme,surface_form,meaning,image,media_json,membership,source_slug,source_title,source_theme,source_image,updated_at) VALUES (?,?,?,?,?,?,?,?,?,?,?,?)').bind(
+          cardId, term.lexeme, term.english, term.meaning, term.image,
+          JSON.stringify({ illustration: term.illustration, pronunciations: term.pronunciations }),
+          term.membership, term.source.slug,
           term.source.title || '', term.source.theme || '', term.source.image || '', now,
         )),
       ]);

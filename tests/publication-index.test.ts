@@ -141,3 +141,56 @@ test('content editors can correct or reject phrase candidates', () => {
   ]);
   assert.deepEqual(phraseCandidates(rejected), []);
 });
+
+test('editor preview carries illustration review state and per-accent pronunciation metadata', async () => {
+  const index = createPublicationIndex(createMemoryPublicationStore());
+  const card: PublicationCard = {
+    cardId: 'course-media', slug: 'course-media', status: 'published', image_file: 'day001-flower.png',
+    word_bank: [
+      {
+        english: 'petals', chinese: '花瓣', approved: true,
+        illustration: { src: 'media/petals.png', alt: '张开的花瓣', source: '课程插图库 2024', review: 'approved' },
+        pronunciations: [
+          { region: 'us', src: 'media/petals-us.mp3', source: '课程录音棚', storage: 'r2:course-audio' },
+          { region: 'uk', src: 'media/petals-uk.mp3', source: '课程录音棚', storage: 'r2:course-audio', availability: 'pending' },
+        ],
+      },
+      { english: 'soil', chinese: '土壤', approved: true, illustration: { src: 'media/soil.png', alt: '土壤剖面', source: '待审核素材' } },
+    ],
+  };
+
+  const preview = index.preview(card);
+  assert.deepEqual(preview.map(term => [term.english, term.illustration?.review]), [['petals', 'approved'], ['soil', 'pending']]);
+  assert.deepEqual(preview[0].pronunciations, [
+    { region: 'us', src: 'media/petals-us.mp3', source: '课程录音棚', storage: 'r2:course-audio', availability: 'ready' },
+    { region: 'uk', src: 'media/petals-uk.mp3', source: '课程录音棚', storage: 'r2:course-audio', availability: 'pending' },
+  ]);
+  assert.deepEqual(preview[1].pronunciations, []);
+
+  await index.synchronize(card);
+  const entries = await index.entries();
+  const petals = entries.find(entry => entry.lexeme === 'petal');
+  assert.deepEqual(petals?.illustration, { src: 'media/petals.png', alt: '张开的花瓣', source: '课程插图库 2024', review: 'approved' });
+  assert.deepEqual(petals?.pronunciations.map(asset => [asset.region, asset.availability]), [['us', 'ready'], ['uk', 'pending']]);
+  assert.equal(entries.find(entry => entry.lexeme === 'soil')?.illustration?.review, 'pending');
+});
+
+test('published media keeps the first usable asset when courses share a Lexeme', async () => {
+  const index = createPublicationIndex(createMemoryPublicationStore());
+  await index.synchronize({
+    cardId: 'course-a', slug: 'course-a', status: 'published',
+    word_bank: [{ english: 'flower', chinese: '花', approved: true }],
+  });
+  await index.synchronize({
+    cardId: 'course-b', slug: 'course-b', status: 'published',
+    word_bank: [{
+      english: 'flower', chinese: '花', approved: true,
+      illustration: { src: 'media/flower.png', alt: '一朵花', source: '课程插图库', review: 'approved' },
+      pronunciations: [{ region: 'uk', src: 'media/flower-uk.mp3', source: '课程录音棚', storage: 'r2:course-audio' }],
+    }],
+  });
+
+  const entry = (await index.lookup('flower'))[0];
+  assert.equal(entry?.illustration?.src, 'media/flower.png');
+  assert.deepEqual(entry?.pronunciations.map(asset => asset.region), ['uk']);
+});

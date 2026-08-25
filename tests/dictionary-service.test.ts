@@ -135,3 +135,78 @@ test('deduplicates concurrent provider requests and serves the positive cache', 
   assert.equal(calls, 1);
   assert.equal(cached.cacheStatus, 'hit');
 });
+
+const courseCatalog = (course: Record<string, unknown>) => ({
+  categoryFor: () => 'science' as const,
+  courseFor: () => course,
+});
+
+test('a prepared course recording is preferred over the proxied provider recording', async () => {
+  const service = createDictionaryService({
+    provider: createMemoryProvider({ flower: { provider: 'Fixture', pronunciations: [
+      { region: 'us', label: '美音', phonetic: '/ˈflaʊ.ɚ/', audio: 'https://api.dictionaryapi.dev/media/flower-us.mp3' },
+      { region: 'uk', label: '英音', phonetic: '/ˈflaʊ.ə/', audio: 'https://api.dictionaryapi.dev/media/flower-uk.mp3' },
+    ] } }),
+    catalog: courseCatalog({
+      meaning: '花朵',
+      pronunciations: [{ region: 'us', src: 'media/flower-us.mp3', source: '课程录音棚', storage: 'r2:course-audio', availability: 'ready' }],
+    }),
+  });
+
+  const result = await service.lookup('flower');
+  assert.deepEqual(result.accents.map(accent => [accent.region, accent.source, accent.audioUrl]), [
+    ['us', 'course', 'media/flower-us.mp3'],
+    ['uk', 'provider', '/api/pronunciation?word=flower&region=uk'],
+  ]);
+  assert.equal(result.accents[0].phonetic, '/ˈflaʊ.ɚ/');
+});
+
+test('an accent without any usable recording is offered as device speech only', async () => {
+  const service = createDictionaryService({
+    provider: createMemoryProvider({ flower: { provider: 'Fixture', pronunciations: [
+      { region: 'uk', label: '英音', phonetic: '/ˈflaʊ.ə/', audio: 'https://api.dictionaryapi.dev/media/flower-uk.mp3' },
+      { region: 'other', label: '词典音频', phonetic: '', audio: 'https://api.dictionaryapi.dev/media/flower.mp3' },
+    ] } }),
+    catalog: courseCatalog({
+      meaning: '花朵',
+      pronunciations: [{ region: 'us', src: 'media/flower-us.mp3', source: '课程录音棚', storage: 'r2:course-audio', availability: 'pending' }],
+    }),
+  });
+
+  const result = await service.lookup('flower');
+  assert.deepEqual(result.accents.map(accent => [accent.region, accent.source]), [['us', 'none'], ['uk', 'provider']]);
+});
+
+test('one provider recording is never published under both accent labels', async () => {
+  const service = createDictionaryService({
+    provider: createMemoryProvider({ flower: { provider: 'Fixture', pronunciations: [
+      { region: 'us', label: '美音', phonetic: '', audio: 'https://api.dictionaryapi.dev/media/flower.mp3' },
+      { region: 'uk', label: '英音', phonetic: '', audio: 'https://api.dictionaryapi.dev/media/flower.mp3' },
+    ] } }),
+  });
+
+  const result = await service.lookup('flower');
+  assert.deepEqual(result.accents.map(accent => [accent.region, accent.source]), [['us', 'provider'], ['uk', 'none']]);
+});
+
+test('only a reviewed illustration with alternative text reaches student lookup', async () => {
+  const approved = createDictionaryService({
+    provider: createMemoryProvider({ flower: { provider: 'Fixture' } }),
+    catalog: courseCatalog({
+      meaning: '花朵',
+      illustration: { src: 'media/flower.png', alt: '一朵正在开放的花', source: '课程插图库', review: 'approved' },
+    }),
+  });
+  assert.deepEqual((await approved.lookup('flower')).illustration, {
+    src: 'media/flower.png', alt: '一朵正在开放的花', source: '课程插图库',
+  });
+
+  const unreviewed = createDictionaryService({
+    provider: createMemoryProvider({ flower: { provider: 'Fixture' } }),
+    catalog: courseCatalog({
+      meaning: '花朵',
+      illustration: { src: 'media/flower.png', alt: '一朵正在开放的花', source: '课程插图库', review: 'pending' },
+    }),
+  });
+  assert.equal((await unreviewed.lookup('flower')).illustration, null);
+});

@@ -88,6 +88,7 @@ CREATE TABLE IF NOT EXISTS published_vocabulary_terms (
   surface_form TEXT NOT NULL,
   meaning TEXT NOT NULL DEFAULT '',
   image TEXT NOT NULL DEFAULT '',
+  media_json TEXT NOT NULL DEFAULT '{}',
   membership TEXT NOT NULL CHECK (membership IN ('level2','level3','science')),
   source_slug TEXT NOT NULL,
   source_title TEXT NOT NULL DEFAULT '',

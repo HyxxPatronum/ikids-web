@@ -1,3 +1,8 @@
+import { normalizeIllustration, normalizePronunciationAssets, studentIllustration } from '../media/course-media.ts';
+import type { StudentIllustration } from '../media/course-media.ts';
+import { resolveAccentOptions } from '../pronunciation/accents.ts';
+import type { AccentOption } from '../pronunciation/accents.ts';
+
 export type DictionaryLanguage = 'en' | 'zh';
 export type DictionaryCategory = 'level2' | 'level3' | 'science' | 'reference';
 export type CacheStatus = 'hit' | 'miss' | 'stale';
@@ -30,6 +35,8 @@ export type DictionaryResult = {
   catalogMembership: Exclude<DictionaryCategory, 'reference'> | null;
   meaning: string;
   image: string;
+  illustration: StudentIllustration | null;
+  accents: AccentOption[];
   sources: Array<Record<string, unknown>>;
   phonetic: string;
   audio: string;
@@ -51,7 +58,7 @@ export type DictionaryCache = {
 
 export type DictionaryCatalog = {
   categoryFor(lexeme: string, context?: DictionaryLookupContext): Exclude<DictionaryCategory, 'reference'> | null;
-  courseFor(lexeme: string, context?: DictionaryLookupContext): { lexeme?: string; meaning?: string; image?: string; sources?: Array<Record<string, unknown>> } | null;
+  courseFor(lexeme: string, context?: DictionaryLookupContext): { lexeme?: string; meaning?: string; image?: string; illustration?: unknown; pronunciations?: unknown; sources?: Array<Record<string, unknown>> } | null;
 };
 
 export type DictionaryServiceOptions = {
@@ -203,6 +210,8 @@ export function createDictionaryService(options: DictionaryServiceOptions) {
         surfaceForm, lexeme, selectedScope, alternateScopes: (request?.alternateScopes || []).map(normalizeLookup).filter(Boolean),
         word: String(course?.sources?.[0]?.word || selectedScope || lexeme), category: resolvedCategory, catalogMembership: resolvedCategory === 'reference' ? null : resolvedCategory,
         meaning: course?.meaning || '', image: course?.image || '', sources: course?.sources || [],
+        illustration: studentIllustration(normalizeIllustration(course?.illustration)),
+        accents: resolveAccentOptions({ lexeme, course: normalizePronunciationAssets(course?.pronunciations ?? []), provider: remote?.pronunciations }),
         phonetic: remote?.phonetic || '', audio: remote?.audio || '', pronunciations: remote?.pronunciations || [], meanings: dedupeMeanings(remote?.meanings || []), provider: remote?.provider || 'Local dictionary',
         language, lookupSource: remote ? (course || resolvedCategory !== 'reference' ? 'local+provider' : 'provider') : 'local',
         cacheStatus, sourceStatus: { course: course ? 'found' : 'not_found', provider: providerStatus },
