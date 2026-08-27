@@ -1,0 +1,43 @@
+{
+  "voice": "en-US-AvaMultilingualNeural",
+  "rate": "+0%",
+  "pitch": "+0Hz",
+  "sentences": [
+    {
+      "index": 1,
+      "text": "Water enters a dry seed.",
+      "file": "01.mp3"
+    },
+    {
+      "index": 2,
+      "text": "The seed coat grows soft.",
+      "file": "02.mp3"
+    },
+    {
+      "index": 3,
+      "text": "A tiny root pushes down.",
+      "file": "03.mp3"
+    },
+    {
+      "index": 4,
+      "text": "A small shoot grows up.",
+      "file": "04.mp3"
+    },
+    {
+      "index": 5,
+      "text": "Roots take in more water.",
+      "file": "05.mp3"
+    },
+    {
+      "index": 6,
+      "text": "The shoot opens its first leaves.",
+      "file": "06.mp3"
+    },
+    {
+      "index": 7,
+      "text": "The young plant now makes new food.",
+      "file": "07.mp3"
+    }
+  ],
+  "full": "full.mp3"
+}
