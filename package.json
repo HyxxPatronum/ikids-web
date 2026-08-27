@@ -15,7 +15,7 @@
     "start": "vinext start",
     "check": "node scripts/check-html.mjs && node --check shared.js",
     "dictionary:build": "node scripts/build-ecdict-index.mjs",
-    "initialize:local": "node --experimental-strip-types scripts/initialize-production.mjs --local --skip-application",
+    "initialize:local": "node --experimental-strip-types scripts/initialize-production.mjs --local --skip-application --persist-to=.wrangler/state",
     "initialize:production": "node --experimental-strip-types scripts/initialize-production.mjs --remote",
     "db:generate": "drizzle-kit generate",
     "db:document": "node -e \"console.log('Schema: db/schema.sql; development store: data/app-db.json')\""

@@ -64,16 +64,55 @@ export function nav(active) {
   </header>`;
 }
 
-export function speak(text, rate = 1, onend = null) {
+let bestEnglishVoice = null;
+let voiceScanStarted = false;
+
+function scoreVoice(voice) {
+  const name = voice.name.toLowerCase();
+  let score = 0;
+  if (/natural/.test(name)) score += 100;   // 在线自然声音（最接近真人）
+  if (/online/.test(name)) score += 80;
+  if (/neural/.test(name)) score += 70;     // 神经语音
+  if (/google/.test(name)) score += 40;     // Google 声音
+  if (/microsoft/.test(name)) score += 30;
+  if (/preview/.test(name)) score -= 25;    // 预览/旧版声音
+  if (/legacy|mobile|desktop/.test(name)) score -= 10;
+  return score;
+}
+
+function pickBestEnglishVoice() {
+  if (!('speechSynthesis' in window)) return null;
+  const voices = speechSynthesis.getVoices() || [];
+  if (!voices.length) return null;
+  const english = voices.filter(voice => /^en(-|_)/i.test(voice.lang || ''));
+  const pool = english.length ? english : voices;
+  return pool.slice().sort((a, b) => scoreVoice(b) - scoreVoice(a))[0];
+}
+
+function scanVoices() {
+  if (!('speechSynthesis' in window) || voiceScanStarted) return;
+  voiceScanStarted = true;
+  bestEnglishVoice = pickBestEnglishVoice();
+  speechSynthesis.getVoices();
+  // 部分浏览器（如 Edge）的在线自然声音加载较慢，加载完自动换用更好的声音
+  speechSynthesis.onvoiceschanged = () => { bestEnglishVoice = pickBestEnglishVoice(); };
+}
+
+export function speak(text, rate = 1, onend = null, onboundary = null) {
   if (!('speechSynthesis' in window)) {
     toast('当前浏览器不支持语音朗读');
     return false;
   }
+  scanVoices();
+  if (!bestEnglishVoice) bestEnglishVoice = pickBestEnglishVoice();
   speechSynthesis.cancel();
   const utterance = new SpeechSynthesisUtterance(text);
   utterance.lang = 'en-US';
+  if (bestEnglishVoice) utterance.voice = bestEnglishVoice;
   utterance.rate = rate;
+  utterance.pitch = 1.06; // 略调高音色，更活泼一点（可按需调整）
   utterance.onend = onend;
+  utterance.onboundary = onboundary;
   speechSynthesis.speak(utterance);
   return true;
 }

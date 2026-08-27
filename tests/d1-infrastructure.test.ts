@@ -67,6 +67,7 @@ test('D1 Catalog rebuild performs staging and student-visible replacement in one
   await store.replaceAll([]);
   assert.equal(batches.length, 1);
   assert.match(batches[0][0], /DELETE FROM published_vocabulary_terms_staging/);
-  assert.match(batches[0].at(-2) || '', /INSERT INTO published_vocabulary_terms SELECT/);
+  assert.match(batches[0].at(-2) || '', /INSERT INTO published_vocabulary_terms \(card_id,lexeme/);
+  assert.doesNotMatch(batches[0].at(-2) || '', /SELECT \*/);
   assert.match(batches[0].at(-1) || '', /infrastructure_state/);
 });

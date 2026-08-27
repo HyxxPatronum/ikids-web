@@ -42,7 +42,7 @@ export function createD1PublishedCatalogRebuildStore(db: D1Database): PublishedC
           term.source.slug, term.source.title || '', term.source.theme || '', term.source.image || '', now,
         )),
         db.prepare('DELETE FROM published_vocabulary_terms'),
-        db.prepare('INSERT INTO published_vocabulary_terms SELECT * FROM published_vocabulary_terms_staging'),
+        db.prepare('INSERT INTO published_vocabulary_terms (card_id,lexeme,surface_form,meaning,image,media_json,membership,source_slug,source_title,source_theme,source_image,updated_at) SELECT card_id,lexeme,surface_form,meaning,image,media_json,membership,source_slug,source_title,source_theme,source_image,updated_at FROM published_vocabulary_terms_staging'),
         db.prepare("INSERT INTO infrastructure_state (name,value,updated_at) VALUES ('catalog',?,?) ON CONFLICT(name) DO UPDATE SET value=excluded.value,updated_at=excluded.updated_at").bind(String(terms.length), now),
       ]);
     },

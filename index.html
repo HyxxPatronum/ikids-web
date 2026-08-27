@@ -14,199 +14,1268 @@
     .lesson-head { display: grid; grid-template-columns: 1fr auto; gap: 18px; align-items: end; padding: 22px 24px; margin-bottom: 12px; }
     .lesson-head h1 { margin: 0; font-size: clamp(27px,4vw,42px); line-height: 1.08; }
     .lesson-meta { display: flex; gap: 7px; flex-wrap: wrap; margin-bottom: 8px; }
-    .module-nav { position: sticky; top: 8px; z-index: 20; display: grid; grid-template-columns: repeat(6,1fr); gap: 6px; padding: 7px; margin-bottom: 14px; background: rgba(255,255,255,.94); backdrop-filter: blur(12px); }
+    .module-nav { position: sticky; top: 8px; z-index: 20; display: grid; grid-template-columns: repeat(4,1fr); gap: 6px; padding: 7px; margin-bottom: 14px; background: rgba(255,255,255,.94); backdrop-filter: blur(12px); }
     .module-tab { min-width: 0; border: 0; border-radius: 13px; padding: 10px 7px; background: transparent; color: var(--muted); cursor: pointer; font-size: 12px; font-weight: 850; }
     .module-tab span { display: block; margin: 0 auto 4px; width: 8px; height: 8px; border: 2px solid #a8b5c4; border-radius: 50%; }
     .module-tab.active { color: var(--blue); background: var(--blue-soft); }
     .module-tab.done span { border-color: var(--green); background: var(--green); }
+    .module-tab.locked { color: #c2ccd8; cursor: not-allowed; }
     .workspace { min-height: 620px; }
+    #app { user-select: none; -webkit-user-select: none; -webkit-touch-callout: none; }
     .module { display: none; }
     .module.active { display: block; }
     .split { display: grid; grid-template-columns: 1.02fr .98fr; gap: 16px; align-items: start; }
+    .lesson-card { display: grid; grid-template-columns: minmax(0, 52%) 1fr; overflow: hidden; }
+    .lesson-card-image { min-width: 0; background: #fff; display: grid; place-items: start center; padding: 22px 12px 12px; }
+    .lesson-card-image .cover { display: block; max-width: 100%; max-height: 100%; width: auto; height: auto; object-fit: contain; border-radius: 10px; }
+    .lesson-card .article-copy { min-width: 0; }
     .content-card { padding: 17px; }
-    .cover { display: block; width: 100%; max-height: 560px; object-fit: cover; object-position: top; border-radius: 15px; background: #eef2f6; }
+    .cover { display: block; width: 100%; height: auto; object-fit: contain; border-radius: 15px; background: #eef2f6; }
     .article-copy { padding: 22px; }
-    .article-copy p { margin: 0 0 14px; font-size: clamp(19px,2.3vw,25px); line-height: 1.8; font-weight: 750; }
-    .sentence { border: 0; padding: 0; background: transparent; color: inherit; font: inherit; text-align: left; border-radius: 9px; cursor: pointer; }
-    .sentence:hover, .sentence.current { background: #fff0e9; }
-    .listen-stage { padding: 26px; }
-    .big-question { margin: 12px 0 22px; padding: 18px; border-radius: 12px; background: var(--surface-warm); font-size: 22px; font-weight: 850; }
-    .player { display: grid; grid-template-columns: auto 1fr; gap: 16px; align-items: center; padding: 17px; border-radius: 17px; background: var(--ink); color: #fff; }
-    .play-round { width: 58px; height: 58px; border: 0; border-radius: 50%; background: var(--brand); color: #fff; font-weight: 900; cursor: pointer; }
-    .speed-row { display: flex; gap: 7px; flex-wrap: wrap; margin-top: 12px; }
-    .speed { border: 1px solid rgba(255,255,255,.35); border-radius: 999px; padding: 6px 10px; background: transparent; color: #fff; cursor: pointer; }
-    .speed.active { background: #fff; color: var(--ink); }
-    .transcript { display: grid; gap: 7px; margin-top: 16px; }
-    .transcript button { display: grid; grid-template-columns: 35px 1fr; gap: 8px; width: 100%; border: 1px solid var(--line); border-radius: 12px; padding: 10px; background: #fff; text-align: left; color: var(--ink); cursor: pointer; }
-    .transcript button.current { border-color: var(--brand); background: #fff3ee; }
-    .record-box { margin-top: 16px; padding: 18px; border: 1px solid var(--line); border-radius: 16px; }
-    .record-box blockquote { margin: 10px 0; font-size: 19px; font-weight: 800; }
+    .task-title { display: inline-flex; align-items: center; gap: 10px; padding: 7px 16px; border-radius: 999px; background: #f1f5fa; }
+    .task-title .task-tag { color: var(--blue); }
+    .task-title .task-divider { width: 2px; height: 15px; border-radius: 2px; background: var(--line); }
+    .task-title .task-name { color: var(--ink); }
+    .article-head { margin-bottom: 8px; }
+    .article-head .eyebrow { margin: 0 0 6px; font-size: 12px; }
+    .article-head .section-title { margin-bottom: 4px; }
+    .article-head .muted { margin: 3px 0 0; font-size: 16px; font-weight: 400; }
+    .article-copy p { margin: 0 0 16px; font-size: clamp(18px,2.2vw,24px); line-height: 1.85; font-weight: 800; letter-spacing: .01em; }
+    .combined-listening { margin: 10px 0 20px; scroll-margin-top: 110px; }
+    .practice-section { margin-top: 16px; scroll-margin-top: 110px; }
+    .module-complete { display:flex; align-items:center; justify-content:space-between; gap:16px; margin-top:16px; padding:16px 18px; border-radius:16px; background:var(--surface-warm); border:1px solid #f3dcc6; }
+    .module-complete strong { display:block; font-size:17px; font-weight:900; }
+    .module-complete small { display:block; margin-top:3px; color:var(--muted); font-size:13px; font-weight:650; }
+    .module-complete .btn { flex:0 0 auto; min-width:140px; }
+    .module-actions { display:flex; flex-wrap:wrap; gap:10px; align-items:center; flex:0 0 auto; }
+    .module-prev { display:grid; place-items:center; align-self:stretch; width:44px; flex:0 0 auto; margin:-16px 0 -16px -18px; border:0; border-right:1px solid #e5d3bf; border-radius:16px 0 0 16px; background:transparent; color:#8f6a42; cursor:pointer; }
+    .module-prev svg { width:18px; height:18px; }
+    .module-prev:hover { background:rgba(255,255,255,.6); color:#5f4527; }
+    .module-prev:disabled { opacity:.38; cursor:default; }
+    .module-prev:disabled:hover { background:transparent; color:#8f6a42; }
+    .error-banner { position:sticky; top:8px; z-index:60; display:flex; align-items:flex-start; gap:12px; margin-bottom:12px; padding:12px 14px; border:1px solid #f0c4be; border-radius:14px; background:#fff6f4; color:#7c3021; box-shadow:0 12px 28px rgba(201,77,77,.14); animation:error-banner-in .25s cubic-bezier(.2,.8,.2,1) both; }
+    .error-banner.hidden { display:none; }
+    .error-banner-copy { min-width:0; }
+    .error-banner-copy strong { display:block; font-size:14px; font-weight:900; }
+    .error-banner-copy p { margin:3px 0 0; font-size:13px; line-height:1.5; }
+    .error-banner-copy small { display:block; margin-top:4px; color:#a05a4d; font-size:11px; line-height:1.4; }
+    .error-banner-actions { display:flex; align-items:center; gap:8px; margin-left:auto; flex:0 0 auto; flex-wrap:wrap; justify-content:flex-end; }
+    @keyframes error-banner-in { from { opacity:0; transform:translateY(-10px); } to { opacity:1; transform:translateY(0); } }
+    .module-complete.done { background:var(--green-soft); border-color:#bfe3d2; }
+    .module-complete.done strong { color:#216b4f; }
+    .sentence { border: 0; padding: 5px 7px; background: transparent; color: inherit; font: inherit; text-align: left; border-radius: 9px; }
+    .sentence.current { background: #e7f0ff; color: #245a9e; }
+    .reading-sentence { display: block; margin: 0 0 13px; }
+    .sentence-line { display: grid; grid-template-columns: 34px minmax(0,1fr) auto; gap: 10px; align-items: start; }
+    .sentence-controls { display: contents; }
+    .sentence-content { min-width: 0; }
+    .reading-sentence .sentence { display: block; width: 100%; }
+    .sentence-speaker, .translation-toggle { display: inline-grid; place-items: center; align-self: start; flex: 0 0 auto; border: 0; border-radius: 8px; background: transparent; color: var(--blue); cursor: pointer; }
+    .sentence-speaker { width: 34px; height: 30px; margin-top: 12px; padding: 6px; }
+    .sentence-speaker:hover, .translation-toggle:hover { border-color: #9fbde8; background: var(--blue-soft); }
+    .sentence-speaker svg { width: 16px; height: 16px; fill: currentColor; }
+    .translation-row { display: contents; }
+    .translation-toggle { min-height: 28px; margin-top: 12px; padding: 4px 2px; color: var(--muted); font-size: 12px; font-weight: 800; white-space: nowrap; }
+    .translation-toggle[aria-expanded="true"] { color: var(--blue); }
+    .full-translate { grid-column: 1 / -1; padding: 12px 16px; border-top: 1px solid var(--line); }
+    .full-translate-panel { margin-top: 10px; padding: 12px 14px; border-radius: 12px; background: var(--surface-subtle); }
+    .ft-zh { margin: 0; color: var(--ink); font-size: 14px; line-height: 1.8; }
+    .lookup-word { cursor: pointer; border-radius: 6px; }
+    .lookup-word:hover { background: #cfe0fa; box-shadow: 0 0 0 3px #cfe0fa; }
+    .lookup-pop { position: fixed; z-index: 100; width: 240px; padding: 12px 14px; border-radius: 12px; background: #fff; border: 1px solid var(--line); box-shadow: 0 10px 30px rgba(25,54,88,.16); font-size: 14px; color: var(--ink); }
+    .lookup-pop strong { display: block; font-size: 16px; font-weight: 900; }
+    .lookup-pop em { display: block; margin-top: 2px; color: var(--muted); font-style: normal; font-size: 13px; }
+    .lookup-pop p { margin: 8px 0 0; line-height: 1.5; }
+    .lookup-pop .lookup-tag { display: inline-block; margin-top: 6px; padding: 2px 8px; border-radius: 999px; background: var(--blue-soft); color: var(--blue); font-size: 11px; font-weight: 800; }
+    .lookup-loading { color: var(--muted); font-size: 13px; }
+    .sentence-translation { display: block; margin-top: 4px; color: var(--muted); font-size: .62em; font-weight: 550; line-height: 1.45; }
+    .sentence-translation.is-hidden { visibility: hidden; }
+    .listen-stage { padding: 0; }
+    .listen-stage .section-title { margin-bottom: 10px; }
+    .player { display: grid; grid-template-columns: auto 1fr; gap: 14px; align-items: center; padding: 14px 16px; border: 1px solid var(--line); border-radius: 16px; background: var(--surface-subtle); color: var(--ink); }
+    .player-main { min-width: 0; }
+    .player-top { display: flex; align-items: center; justify-content: space-between; gap: 14px; }
+    .player-status { font-size: 15px; font-weight: 850; }
+    .play-round { display: grid; place-items: center; width: 54px; height: 54px; border: 0; border-radius: 50%; background: var(--blue); color: #fff; font-size: 22px; line-height: 1; font-weight: 900; cursor: pointer; box-shadow: 0 6px 16px rgba(57,121,216,.32); transition: background-color .16s ease, transform .16s ease, box-shadow .16s ease; }
+    .play-round:hover { background: #4d8ae0; transform: translateY(-1px); box-shadow: 0 8px 20px rgba(57,121,216,.38); }
+    .play-round:active { transform: translateY(0) scale(.95); }
+    .play-round svg { display: block; width: 22px; height: 22px; fill: currentColor; }
+    .play-round .pi-play { transform: translateX(-1px); }
+    .speed-control { display: flex; align-items: center; gap: 8px; }
+    .speed-control label { color: var(--muted); font-size: 12px; font-weight: 750; white-space: nowrap; }
+    .speed-slider { width: 108px; height: 4px; margin: 0; appearance: none; border-radius: 999px; outline: none; background: linear-gradient(to right,#3979d8 0%,#3979d8 var(--speed-fill,80%),#d8e2ec var(--speed-fill,80%),#d8e2ec 100%); cursor: pointer; }
+    .speed-slider::-webkit-slider-runnable-track { height: 4px; border-radius: 999px; background: transparent; }
+    .speed-slider::-webkit-slider-thumb { width: 14px; height: 14px; margin-top: -5px; border: 2px solid #fff; border-radius: 50%; background: #3979d8; box-shadow: 0 1px 4px rgba(25,54,88,.22); appearance: none; }
+    .speed-slider::-moz-range-track { height: 4px; border-radius: 999px; background: transparent; }
+    .speed-slider::-moz-range-progress { height: 4px; border-radius: 999px; background: #3979d8; }
+    .speed-slider::-moz-range-thumb { width: 10px; height: 10px; border: 2px solid #fff; border-radius: 50%; background: #3979d8; box-shadow: 0 1px 4px rgba(25,54,88,.22); }
+    .speed-slider:focus-visible { outline: 2px solid rgba(57,121,216,.5); outline-offset: 3px; }
+    .speed-value { min-width: 36px; color: var(--blue); font-size: 13px; font-weight: 850; text-align: right; }
+    .playback-seek { display: block; width: 100%; height: 6px; margin: 12px 0 0; appearance: none; border-radius: 999px; outline: none; background: linear-gradient(to right,#3979d8 0%,#3979d8 var(--seek-fill,0%),#e7edf3 var(--seek-fill,0%),#e7edf3 100%); cursor: pointer; }
+    .playback-seek::-webkit-slider-runnable-track { height: 6px; border-radius: 999px; background: transparent; }
+    .playback-seek::-webkit-slider-thumb { width: 14px; height: 14px; margin-top: -4px; border: 2px solid #fff; border-radius: 50%; background: #3979d8; box-shadow: 0 1px 4px rgba(25,54,88,.22); appearance: none; }
+    .playback-seek::-moz-range-track { height: 6px; border-radius: 999px; background: transparent; }
+    .playback-seek::-moz-range-progress { height: 6px; border-radius: 999px; background: #3979d8; }
+    .playback-seek::-moz-range-thumb { width: 10px; height: 10px; border: 2px solid #fff; border-radius: 50%; background: #3979d8; box-shadow: 0 1px 4px rgba(25,54,88,.22); }
+    .playback-seek:focus-visible { outline: 2px solid rgba(57,121,216,.5); outline-offset: 3px; }
+    .playback-meta { display: flex; justify-content: space-between; gap: 12px; margin-top: 6px; color: var(--muted); font-size: 12px; font-weight: 700; }
+    .practice-card-list { display: grid; grid-template-columns: repeat(auto-fit, minmax(340px, 1fr)); gap: 18px; align-items: start; }
+    .record-box { padding: 14px 16px; border: 0; border-radius: 16px; background: #fff; box-shadow: 0 4px 18px rgba(25,54,88,.07); }
+    .record-box.recording { border-color: var(--brand); background: #fff8f5; }
+    .record-box.complete { background: #fff; }
+    .practice-card-number { margin-bottom: 6px; color: var(--muted); font-size: 12px; font-weight: 850; }
+    .practice-sentence-row { display: flex; align-items: center; gap: 10px; }
+    .practice-sentence-controls { display: grid; gap: 12px; justify-items: end; }
+    .practice-sentence-actions { flex-wrap: nowrap; justify-content: flex-end; }
+    .practice-recording-result { margin-top: 12px; }
+    .record-box blockquote { flex: 1; min-width: 0; margin: 0; padding: 10px 12px; border-radius: 10px; background: #eef3f8; font-size: 19px; font-weight: 800; line-height: 1.55; }
+    .record-box audio { width: min(100%,320px); }
+    .score-result { position: relative; margin-top: 10px; padding: 10px 12px; border-radius: 14px; background: linear-gradient(160deg,#fff 55%,#fff7f2); border: 1px solid #f0dcd0; box-shadow: 0 6px 18px rgba(239,114,89,.08); overflow: hidden; }
+    .score-result.loading { display: flex; align-items: center; gap: 10px; color: var(--muted); font-size: 13px; font-weight: 750; }
+    .ai-thinking { font-size: 22px; animation: bounce .8s ease-in-out infinite; }
+    @keyframes bounce { 0%,100% { transform: translateY(0); } 50% { transform: translateY(-4px); } }
+    .dots { display: inline-flex; gap: 2px; margin-left: 2px; }
+    .dots i { width: 3px; height: 3px; border-radius: 50%; background: currentColor; animation: blink 1s infinite; }
+    .dots i:nth-child(2){ animation-delay: .2s; }
+    .dots i:nth-child(3){ animation-delay: .4s; }
+    @keyframes blink { 0%,80%,100% { opacity: .25; } 40% { opacity: 1; } }
+    .ai-details .score-top { display: flex; align-items: center; gap: 10px; flex-wrap: wrap; }
+    .ai-details .score-ring { position: relative; display: grid; place-items: center; width: 58px; height: 58px; flex: 0 0 auto; border-radius: 50%; background: conic-gradient(var(--green) calc(var(--score,0)*1%), #e7edf3 0); box-shadow: inset 0 0 0 1px rgba(255,255,255,.6); }
+    .ai-details .score-ring::before { content: ''; position: absolute; inset: 5px; border-radius: 50%; background: #fff; box-shadow: 0 2px 8px rgba(25,54,88,.08); }
+    .ai-details .score-ring span { position: relative; z-index: 1; font-size: 17px; font-weight: 900; color: var(--ink); }
+    .ai-details .score-ring span b { font-weight: 900; }
+    .ai-details .score-ring span i { font-style: normal; font-size: 10px; margin-left: 1px; color: var(--muted); }
+    .ai-details .score-copy { flex: 1; min-width: 0; }
+    .ai-details .score-stars { margin-bottom: 2px; font-size: 13px; letter-spacing: 2px; line-height: 1; color: #f2b64a; }
+    .ai-details .score-stars i { font-style: normal; display: inline-block; animation: star-pop .45s cubic-bezier(.2,.8,.2,1) both; }
+    .ai-details .score-stars i:nth-child(2){ animation-delay: .15s; }
+    .ai-details .score-stars i:nth-child(3){ animation-delay: .3s; }
+    .ai-details .score-stars i.star-dim { color: #e0e7ef; }
+    @keyframes star-pop { 0% { transform: scale(0) rotate(-30deg); } 70% { transform: scale(1.3) rotate(8deg); } 100% { transform: scale(1) rotate(0); } }
+    .ai-details .score-copy strong { display: block; font-size: 13px; font-weight: 850; }
+    .ai-details .score-words { display: flex; flex-wrap: wrap; gap: 6px; margin-top: 8px; }
+    .ai-details .word-chip { display: inline-flex; align-items: center; gap: 6px; padding: 4px 10px; border-radius: 999px; font-size: 12px; font-weight: 800; }
+    .ai-details .word-chip i { width: 7px; height: 7px; border-radius: 50%; background: currentColor; }
+    .ai-details .word-chip em { font-style: normal; font-size: 11px; opacity: .78; font-weight: 750; }
+    @keyframes chip-pop { from { opacity: 0; transform: translateY(6px) scale(.85); } to { opacity: 1; transform: translateY(0) scale(1); } }
+    .ai-details .word-chip.ok { background: var(--green-soft); color: #1e6b4c; }
+    .ai-details .word-chip.low { background: #fff5db; color: #946610; }
+    .ai-details .word-chip.wrong { background: var(--red-soft); color: #8e3030; }
+    .ai-details .word-chip.missing { background: #eef1f5; color: #687b92; }
+    .ai-details .ai-teacher { display: flex; gap: 8px; align-items: flex-start; margin-top: 8px; padding-top: 8px; border-top: 1px dashed var(--line); }
+    .ai-details .ai-avatar { display: grid; place-items: center; width: 28px; height: 28px; flex: 0 0 auto; border-radius: 50%; background: linear-gradient(140deg,#ffe3b8,#f6c46a); font-size: 15px; box-shadow: 0 4px 10px rgba(242,182,74,.3); animation: bounce 2.4s ease-in-out infinite; }
+    .ai-details .ai-bubble { min-width: 0; padding: 10px 12px; border-radius: 12px; background: #fffaf2; border: 1px solid #f3e2c8; }
+    .ai-details .ai-bubble strong { display: block; font-size: 11px; color: #b07f2a; letter-spacing: .04em; margin-bottom: 2px; }
+    .ai-details .ai-bubble span { display: block; color: var(--ink); font-size: 12px; font-weight: 650; line-height: 1.5; }
+    .ai-details .ai-advice { display: block; margin-top: 5px; color: var(--muted); font-size: 13px; font-weight: 650; line-height: 1.5; }
+    .ai-details .confetti { position: absolute; inset: 0; pointer-events: none; overflow: hidden; }
+    .ai-details .confetti i { position: absolute; top: -12px; width: 8px; height: 8px; border-radius: 2px; animation: confetti-fall 2.2s ease-in forwards; }
+    @keyframes confetti-fall { to { transform: translateY(130px) rotate(360deg); opacity: 0; } }
+    .record-eq { display: inline-flex; gap: 3px; align-items: flex-end; height: 16px; }
+    .record-eq span { width: 3px; height: 16px; border-radius: 2px; background: var(--brand); transform-origin: bottom; animation: eq .9s ease-in-out infinite; }
+    .record-eq span:nth-child(2){ animation-delay: .15s; }
+    .record-eq span:nth-child(3){ animation-delay: .3s; }
+    .record-eq span:nth-child(4){ animation-delay: .45s; }
+    @keyframes eq { 0%,100% { transform: scaleY(.3); } 50% { transform: scaleY(1); } }
+    .record-box.recording [data-record-sentence] { animation: pulse 1.2s ease-in-out infinite; }
+    @keyframes pulse { 0%,100% { box-shadow: 0 0 0 0 rgba(244,123,99,.4); } 50% { box-shadow: 0 0 0 9px rgba(244,123,99,0); } }
+    .voice-bar { display: flex; align-items: center; gap: 10px; margin-top: 10px; padding: 10px 14px; border-radius: 14px; background: linear-gradient(135deg,#5eb7ff,#3b8ef0); color: #fff; cursor: pointer; box-shadow: 0 6px 16px rgba(59,142,240,.28); min-height: 44px; transition: filter .16s ease; }
+    .voice-bar:hover { filter: brightness(1.06); }
+    .voice-bar.empty { background: linear-gradient(135deg,#e4f0ff,#cfe4ff); color: #2f6db3; box-shadow: none; }
+    .voice-bar .voice-mic { font-size: 16px; }
+    .voice-bar .voice-empty-text { font-weight: 750; font-size: 13px; }
+    .voice-play { display: grid; place-items: center; width: 32px; height: 32px; flex: 0 0 auto; border: 0; border-radius: 50%; background: rgba(255,255,255,.28); color: #fff; font-size: 13px; cursor: pointer; }
+    .voice-wave { display: flex; align-items: center; gap: 2px; flex: 1; min-width: 0; height: 22px; }
+    .voice-wave i { width: 3px; border-radius: 2px; background: rgba(255,255,255,.45); height: 5px; transition: background-color .1s ease; }
+    .voice-wave i.played { background: #fff; }
+    .voice-wave i.played { background: #fff; }
+    @keyframes wave { 0%,100% { transform: scaleY(.35); } 50% { transform: scaleY(1); } }
+    .voice-time { font-size: 12px; font-weight: 800; font-variant-numeric: tabular-nums; white-space: nowrap; }
+    .voice-score { padding: 3px 10px; border-radius: 999px; background: #fff; font-size: 13px; font-weight: 900; white-space: nowrap; box-shadow: 0 2px 6px rgba(0,0,0,.12); }
+    .voice-score i { font-style: normal; font-size: 10px; margin-left: 1px; }
+    .voice-score.high { color: #2f8b68; }
+    .voice-score.mid { color: #b07f2a; }
+    .voice-score.low { color: #c94d4d; }
+    .voice-bar.recording { background: linear-gradient(135deg,#6fc1ff,#3b8ef0); }
+    .rec-dot { width: 10px; height: 10px; flex: 0 0 auto; border-radius: 50%; background: #fff; }
+    .rec-timer { color: #fff; font-size: 14px; font-weight: 850; font-variant-numeric: tabular-nums; }
+    .rec-label { font-size: 11px; opacity: .85; font-weight: 700; white-space: nowrap; }
+    .voice-stop { flex: 0 0 auto; padding: 5px 12px; border-radius: 999px; background: #fff; color: #d64545; font-size: 12px; font-weight: 850; white-space: nowrap; box-shadow: 0 2px 6px rgba(0,0,0,.12); }
+    .voice-actions { margin-top: 10px; display: flex; justify-content: flex-end; }
+    .practice-sentence-row .btn { flex: 0 0 auto; white-space: nowrap; }
+    .practice-sentence-row .btn.demo { background: var(--blue-soft); color: var(--blue); border-color: transparent; }
+    .voice-rerecord { flex: 0 0 auto; border: 1px solid rgba(255,255,255,.7); border-radius: 999px; padding: 4px 12px; background: rgba(255,255,255,.18); color: #fff; font-size: 12px; font-weight: 850; cursor: pointer; }
+    .ai-details { position: relative; overflow: hidden; margin-top: 8px; border: 0; border-radius: 12px; background: var(--surface-subtle); }
+    .ai-details summary { display: flex; align-items: center; gap: 8px; padding: 10px 12px; cursor: pointer; font-size: 13px; font-weight: 850; color: var(--ink); list-style: none; user-select: none; }
+    .ai-details summary::-webkit-details-marker { display: none; }
+    .ai-details summary::after { content: '（点击收起）'; margin-left: auto; color: var(--muted); font-size: 11px; font-weight: 700; }
+    .ai-details:not([open]) summary::after { content: '（点击展开）'; }
+    .ai-details .ai-body { padding: 0 12px 12px; }
+    .ai-note { margin: 10px 0 0; }
+    .ai-note strong { display: block; font-size: 13px; font-weight: 850; }
+    .ai-note span { display: block; margin-top: 4px; color: var(--muted); font-size: 13px; line-height: 1.5; }
+    .ai-note.unrecognized { margin: 10px 0 0; color: var(--muted); font-size: 13px; }
+    .score-feedback { margin-top: 10px; }
+    .score-feedback .score-words { margin-top: 0; }
     .practice-shell { padding: 24px; }
-    .practice-intro { display: flex; justify-content: space-between; gap: 16px; align-items: flex-start; margin-bottom: 18px; }
+    .practice-intro { display: flex; justify-content: space-between; gap: 16px; align-items: flex-start; margin-bottom: 10px; }
+    .practice-intro .muted { margin: 3px 0 0; }
+    .word-bank-title { margin: 0 0 12px; font-size: 21px; }
+    #wordsModule .task-title { margin-bottom: 6px; }
+    .word-bank-head { display: flex; justify-content: space-between; gap: 16px; align-items: flex-start; }
+    .word-bank-head .link-btn { margin-top: 4px; }
+    .words-desc { margin: 0 0 16px; color: #687b92; font-size: 14px; line-height: 1.6; }
+    .words-guide { margin: 0 0 12px; }
+    .word-bank-box { display: grid; grid-template-columns: repeat(6,minmax(112px,1fr)); gap: 12px; padding: 16px; overflow-x: auto; border: 0; border-radius: 16px; background: var(--blue-soft); }
+    .word-bank-box[hidden] { display: none; }
+    .word-card { display: grid; grid-template-rows: auto 1fr; min-height: 184px; gap: 10px; padding: 10px; border: 0; border-radius: 13px; background: #fff; box-shadow: 0 2px 8px rgba(25,54,88,.05); text-align: center; }
+    .word-card-image { width: 100%; aspect-ratio: 4 / 3; border-radius: 10px; background: #eef2f6; }
+    .word-card-copy { display: flex; min-width: 0; flex-direction: column; align-items: center; justify-content: center; gap: 5px; }
+    .word-card strong { color: var(--ink); font-size: 18px; }
+    .word-card small { color: var(--muted); font-weight: 750; line-height: 1.35; }
+    .word-card.empty { background: rgba(255,255,255,.48); }
+    .match-results-box { display: flex; flex-direction: column; gap: 8px; padding: 12px 12px 14px; border: 1px solid #dbe6f2; border-radius: 16px; background: linear-gradient(180deg,#f4f9ff 0%,var(--surface-subtle) 100%); box-shadow: 0 4px 14px rgba(57,121,216,.08); margin-bottom: 14px; }
+    .match-results-title { display: flex; align-items: center; gap: 7px; margin-bottom: 2px; font-size: 12px; font-weight: 850; color: var(--blue); letter-spacing: .04em; }
+    .match-results-title svg { width: 14px; height: 14px; fill: none; stroke: currentColor; stroke-width: 2.2; stroke-linecap: round; stroke-linejoin: round; }
+    .match-result-chip { display: flex; align-items: center; gap: 10px; padding: 9px 13px; border: 1px solid var(--choice-border); border-radius: 12px; background: var(--choice-bg); box-shadow: 0 1px 4px rgba(25,54,88,.06); }
+    .match-result-chip.is-new { animation: match-chip-in .32s cubic-bezier(.2,.9,.3,1.2) both; }
+    @keyframes match-chip-in { from { opacity: 0; transform: translateY(8px) scale(.96); } to { opacity: 1; transform: translateY(0) scale(1); } }
+    .match-result-chip[data-tone="0"] { --choice-bg: #e9f7f0; --choice-border: #89c8ac; --choice-ink: #216b4f; }
+    .match-result-chip[data-tone="1"] { --choice-bg: #f2eadd; --choice-border: #c9b396; --choice-ink: #6d5130; }
+    .match-result-chip[data-tone="2"] { --choice-bg: #fff0ed; --choice-border: #efb3a5; --choice-ink: #7c3021; }
+    .match-result-chip[data-tone="3"] { --choice-bg: #fff6df; --choice-border: #edd095; --choice-ink: #7a5511; }
+    .match-result-chip[data-tone="4"] { --choice-bg: #f3efff; --choice-border: #c9bceb; --choice-ink: #594292; }
+    .match-result-chip[data-tone="5"] { --choice-bg: #eaf8f7; --choice-border: #a9d7d4; --choice-ink: #236b68; }
+    .match-result-chip strong { color: var(--choice-ink); font-size: 15px; flex-shrink: 0; }
+    .match-result-chip .match-arrow { color: var(--choice-ink); opacity: .6; font-weight: 900; font-size: 13px; flex-shrink: 0; }
+    .match-result-chip small { color: var(--choice-ink); opacity: .82; font-weight: 750; font-size: 13px; line-height: 1.35; min-width: 0; }
+    .match-board-empty { margin: 0; padding: 20px; text-align: center; color: var(--muted); font-size: 15px; }
+    .word-bank-actions { margin-top: 14px; justify-content: center; }
+    .intro-actions { display: flex; align-items: center; gap: 10px; }
+    .link-btn { border: 0; background: transparent; color: var(--blue); font-size: 13px; font-weight: 800; cursor: pointer; padding: 4px 8px; }
+    .link-btn:hover { text-decoration: underline; }
+    .words-practice { margin-top: 24px; padding-top: 22px; border-top: 1px dashed var(--line); }
     .match-board { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; }
     .match-column { display: grid; gap: 8px; }
-    .match-choice { width: 100%; min-height: 50px; border: 1px solid var(--line); border-radius: 12px; padding: 10px 12px; background: #fff; color: var(--ink); text-align: left; font-weight: 800; cursor: pointer; }
-    .match-choice.selected { border-color: var(--blue); background: var(--blue-soft); }
-    .match-choice.matched { border-color: #9fcdb8; background: var(--green-soft); color: var(--green); }
+    .match-choice { width: 100%; min-height: 50px; border: 1px solid var(--line); border-radius: 12px; padding: 10px 12px; background: #f4f6f8; color: var(--ink); text-align: left; font-weight: 800; cursor: pointer; }
+    .match-choice[data-tone="0"], .match-result-bar[data-tone="0"] { --choice-bg: #e9f7f0; --choice-border: #89c8ac; --choice-ink: #216b4f; }
+    .match-choice[data-tone="1"], .match-result-bar[data-tone="1"] { --choice-bg: #f2eadd; --choice-border: #c9b396; --choice-ink: #6d5130; }
+    .match-choice[data-tone="2"], .match-result-bar[data-tone="2"] { --choice-bg: #fff0ed; --choice-border: #efb3a5; --choice-ink: #7c3021; }
+    .match-choice[data-tone="3"], .match-result-bar[data-tone="3"] { --choice-bg: #fff6df; --choice-border: #edd095; --choice-ink: #7a5511; }
+    .match-choice[data-tone="4"], .match-result-bar[data-tone="4"] { --choice-bg: #f3efff; --choice-border: #c9bceb; --choice-ink: #594292; }
+    .match-choice[data-tone="5"], .match-result-bar[data-tone="5"] { --choice-bg: #eaf8f7; --choice-border: #a9d7d4; --choice-ink: #236b68; }
+    .match-choice.selected, .match-choice.matched { border-color: var(--choice-border); background: var(--choice-bg); color: var(--choice-ink); }
+    .match-choice.selected { box-shadow: 0 0 0 3px var(--blue-soft); }
+    .match-choice.matched { box-shadow: inset 0 0 0 1px var(--choice-border); }
+    .match-choice.wrong { border-color:#df8989; background:var(--red-soft); color:#8e3030; animation:match-shake .4s ease; }
+    .match-choice.correct { border-color: var(--choice-border); background: var(--choice-bg); color: var(--choice-ink); box-shadow: inset 0 0 0 1px var(--choice-border); }
+    @keyframes match-shake { 0%,100%{transform:translateX(0)} 25%{transform:translateX(-5px)} 50%{transform:translateX(5px)} 75%{transform:translateX(-3px)} }
+    .match-result { display:flex; flex-wrap:wrap; gap:8px; align-items:center; margin-bottom:14px; padding:10px; border-radius:12px; background:#f9fafb; border:1px dashed var(--line); }
+    .match-result-bar { display:inline-flex; align-items:center; gap:6px; padding:6px 14px; border-radius:999px; border:1px solid var(--choice-border); background:var(--choice-bg); color:var(--choice-ink); font-size:14px; animation:result-in .28s cubic-bezier(.16,1,.3,1) both; }
+    .match-result-bar strong { font-weight:900; }
+    .match-result-bar span { opacity:.75; }
+    .match-result-empty { margin:0; color:#9aa7b4; font-size:13px; }
+    @keyframes result-in { from { opacity:0; transform:translateY(6px) scale(.94); } to { opacity:1; transform:translateY(0) scale(1); } }
+        .word-tile-game { scroll-margin-top: 110px; }
+    .word-game-shell { position:relative; overflow:hidden; border-radius:20px; padding:30px 28px 26px; background:linear-gradient(180deg,var(--blue-soft) 0%,#e0ebf7 100%); color:var(--ink); box-shadow:0 8px 24px rgba(57,121,216,.1); transition:background-color .36s ease; }
+    .word-game-shell.complete { background:linear-gradient(180deg,var(--green-soft) 0%,#d8ece6 100%); }
+    .word-modal-overlay { position:absolute; inset:0; z-index:4; border-radius:20px; background:rgba(15,35,61,.32); cursor:default; }
+    .word-match-burst { position:absolute; top:51%; left:50%; z-index:5; display:grid; min-width:172px; place-items:center; border-radius:14px; padding:16px 22px; background:#fff; color:#123656; box-shadow:0 18px 40px rgba(3,18,34,.34); pointer-events:none; text-align:center; transform:translate(-50%,-50%); }
+    .word-match-burst.burst-in { animation:word-match-burst .3s cubic-bezier(.16,1,.3,1) both; }
+    .word-match-burst strong { font-size:clamp(25px,4vw,38px); line-height:1; letter-spacing:-.02em; }
+    .word-match-burst span { margin-top:6px; color:#526b80; font-size:12px; font-weight:850; }
+    .word-match-burst.match { background:#f5b544; color:#3f2b08; }
+    .word-match-burst.match span { color:#634710; }
+    .word-match-burst.eliminated { background:#fff; min-width:0; width:190px; padding:16px; border-radius:16px; box-shadow:0 20px 44px rgba(3,18,34,.28); }
+    .word-match-burst.eliminated .burst-card { display:grid; gap:10px; }
+    .word-match-burst.eliminated .burst-card .burst-media { display:grid; place-items:center; min-height:96px; padding:6px; border-radius:10px; background:rgba(57,121,216,.05); }
+    .word-match-burst.eliminated .burst-card .burst-media .word-tile-image { display:grid; place-items:center; width:100%; background:transparent; }
+    .word-match-burst.eliminated .burst-card .burst-media .word-tile-image svg { width:54px; height:54px; }
+    .word-match-burst.eliminated .burst-card .burst-media .word-tile-image img { width:100%; height:76px; object-fit:contain; }
+    .word-match-burst.eliminated .burst-card .burst-media .word-tile-caption { display:none; }
+    .word-match-burst.eliminated .burst-card strong { display:block; font-size:21px; font-weight:900; color:var(--ink); }
+    .word-match-burst.flying { animation:burst-fly .35s cubic-bezier(.16,1,.3,1) both; }
+    @keyframes burst-fly { from { opacity:1; transform:translate(-50%,-50%) scale(1); } to { opacity:0; transform:translate(calc(-50% + var(--fly-x,90px)), calc(-50% + var(--fly-y,-40px))) scale(.7); } }
+    .word-match-burst.continue { background:#fff; color:#245a9e; }
+    .word-match-burst.combo { min-width:205px; background:#f47b63; color:#fff; box-shadow:0 20px 44px rgba(244,123,99,.38); }
+    .word-match-burst.combo span { color:#fff2ee; font-size:13px; }
+    @keyframes word-match-burst { from { opacity:0; filter:blur(5px); transform:translate(-50%,-50%) scale(.72) rotate(-2deg); } to { opacity:1; filter:blur(0); transform:translate(-50%,-50%) scale(1) rotate(0); } }
+    .word-game-layout { display:grid; grid-template-columns:minmax(0,1fr) 300px; gap:16px; align-items:stretch; }
+    .word-side-panel { display:flex; flex-direction:column; gap:12px; padding:16px; border-radius:18px; background:var(--blue-soft); border:1px solid #dbe6f2; }
+    .word-side-panel-title { color:var(--blue); font-size:12px; font-weight:850; letter-spacing:.04em; }
+    .word-side-grid { display:grid; grid-template-columns:repeat(2,1fr); grid-template-rows:repeat(3,1fr); gap:10px; flex:1; }
+    .word-side-card { display:grid; grid-template-rows:auto 1fr; gap:6px; padding:8px; border-radius:12px; background:#fff; text-align:center; box-shadow:0 4px 12px rgba(57,121,216,.12); align-self:stretch; min-height:0; }
+    .word-side-card .word-side-media { display:grid; place-items:center; min-height:58px; padding:4px; border-radius:9px; background:rgba(57,121,216,.05); }
+    .word-side-card .word-side-media .word-tile-image { display:grid; place-items:center; width:100%; background:transparent; }
+    .word-side-card .word-side-media .word-tile-image svg { width:44px; height:44px; }
+    .word-side-card .word-side-media .word-tile-image img { width:100%; height:56px; object-fit:contain; }
+    .word-side-card .word-side-media .word-tile-caption { display:none; }
+    .word-side-card .word-side-word { font-size:12px; font-weight:900; color:var(--ink); overflow-wrap:anywhere; line-height:1.3; }
+    .word-side-card.empty { display:grid; place-items:center; border:1px dashed #b9c9dc; background:transparent; box-shadow:none; color:#a5b6c9; font-weight:800; font-size:16px; align-self:stretch; min-height:0; }
+    .word-side-card.new-in { animation:word-side-in .4s cubic-bezier(.2,.9,.3,1.2) both; }
+    @keyframes word-side-in { from { opacity:0; transform:scale(.8) translateY(8px); } to { opacity:1; transform:scale(1) translateY(0); } }
+    .word-game-hud { display:flex; align-items:center; justify-content:space-between; gap:18px; margin-bottom:16px; }
+    .word-game-title { display:flex; min-width:0; align-items:center; gap:12px; }
+    .word-game-mark { display:grid; width:42px; height:42px; flex:0 0 auto; place-items:center; border-radius:13px; background:#f47b63; color:#fff; box-shadow:0 8px 18px rgba(244,123,99,.28); }
+    .word-game-mark svg { width:23px; height:23px; fill:none; stroke:currentColor; stroke-width:2.3; stroke-linecap:round; stroke-linejoin:round; }
+    .word-game-title h2 { margin:0; color:#fff; font-size:clamp(20px,2.5vw,28px); line-height:1.1; }
+    .word-game-title p { margin:4px 0 0; color:#c9d9e8; font-size:12px; font-weight:700; }
+    .word-game-score { flex:0 0 auto; display:flex; align-items:baseline; gap:8px; }
+    .word-game-score strong { color:var(--blue); font-size:28px; line-height:1; font-variant-numeric:tabular-nums; }
+    .word-game-score span { color:var(--blue); font-size:28px; line-height:1; font-weight:900; white-space:nowrap; }
+    .word-game-progress { display:grid; grid-template-columns:repeat(6,1fr); gap:6px; margin-bottom:16px; }
+    .word-game-progress span { height:8px; border-radius:999px; background:rgba(57,121,216,.12); transition:background-color .24s ease, transform .24s cubic-bezier(.16,1,.3,1), box-shadow .24s ease; }
+    .word-game-progress span.done { background:linear-gradient(90deg,#74d2a8,#4cc39b); box-shadow:0 0 6px rgba(116,210,168,.5); transform:scaleY(1.35); }
+    .word-tile-board { display:grid; grid-template-columns:repeat(4,1fr); grid-template-rows:repeat(3,1fr); gap:10px; margin:0 auto; max-width:440px; height:340px; padding:4px; place-items:center; }
+    .word-tile { position:relative; display:grid; width:100px; aspect-ratio:1/1; place-items:center; overflow:hidden; border:0; border-radius:14px; padding:8px 6px; cursor:pointer; text-align:center; box-shadow:0 4px 12px rgba(57,121,216,.14), inset 0 1px 0 rgba(255,255,255,.6); transition:color .18s ease, box-shadow .18s ease, transform .2s cubic-bezier(.16,1,.3,1); }
+    .word-tile.word { background:linear-gradient(180deg,#4d8ae0 0%,#3979d8 100%); color:#fff; }
+    .word-tile.image { grid-template-rows:auto 1fr auto; gap:3px; padding:8px 6px 7px; background:linear-gradient(180deg,#ffffff,#f0f6fc); color:#245a9e; }
+    .word-tile:hover { transform:translateY(-3px) scale(1.02); box-shadow:0 10px 20px rgba(57,121,216,.2), inset 0 1px 0 rgba(255,255,255,.6); }
+    .word-tile:active { transform:translateY(0) scale(.97); }
+    .word-tile:focus-visible { outline:3px solid #fff; outline-offset:3px; }
+    .word-tile:disabled { cursor:default; }
+    .word-tile.selected { color:#fff; box-shadow:0 0 0 3px #2d62b0,0 12px 24px rgba(57,121,216,.22); transform:translateY(-4px) rotate(-1deg); }
+    .word-tile.word.selected { background:linear-gradient(180deg,#2d62b0,#1f4e91); }
+    .word-tile.image.selected { background:linear-gradient(180deg,#2d62b0,#1f4e91); }
+    .word-tile-kind { justify-self:start; align-self:start; display:inline-flex; align-items:center; gap:3px; padding:2px 8px 2px 7px; border-radius:999px; background:rgba(255,255,255,.32); color:currentColor; font-size:9px; font-weight:900; letter-spacing:.06em; }
+    .word-tile-kind::before { content:''; width:4px; height:4px; border-radius:50%; background:currentColor; opacity:.5; }
+    .word-tile.image .word-tile-kind { background:rgba(57,121,216,.1); color:#245a9e; }
+    .word-tile.selected .word-tile-kind { background:rgba(255,255,255,.2); color:#fff; }
+    .word-tile.word strong { max-width:100%; overflow-wrap:anywhere; font-size:clamp(15px,1.8vw,19px); line-height:1.2; position:relative; display:block; }
+    .word-tile.word strong::after { content:''; display:block; width:0; height:0; margin:0; border-radius:999px; background:currentColor; opacity:0; transition:width .3s ease; }
+    .word-tile.word:hover strong::after { width:0; }
+    .word-tile-image { display:grid; width:100%; min-height:0; place-items:center; border-radius:10px; background:rgba(0,0,0,.04); }
+    .word-tile.image .word-tile-image { background:rgba(57,121,216,.06); }
+    .word-tile-image svg { width:34px; height:34px; fill:none; stroke:currentColor; stroke-width:2.15; stroke-linecap:round; stroke-linejoin:round; }
+    .word-tile-image img { width:100%; height:36px; object-fit:contain; border-radius:8px; }
+    .word-tile-caption { color:#5a6d82; font-size:11px; font-weight:850; line-height:1.25; opacity:.85; }
+    .word-tile.selected .word-tile-caption { color:#fff; opacity:.95; }
+    .word-tile-pick { position:absolute; top:8px; right:8px; display:grid; width:22px; height:22px; place-items:center; border-radius:50%; background:#fff; color:#c64c37; box-shadow:0 4px 10px rgba(20,40,60,.18); }
+    .word-tile-pick svg { width:13px; height:13px; fill:none; stroke:currentColor; stroke-width:2.6; stroke-linecap:round; stroke-linejoin:round; }
+    .word-tile.clearing { pointer-events:none; animation:tile-clear .62s cubic-bezier(.16,1,.3,1) both; }
+    .word-tile.mismatch { background:#f8d9d4; color:#8e3030; animation:tile-mismatch .5s ease both; }
+    .word-tile.removed { pointer-events:none; opacity:0; animation:tile-cleared .35s cubic-bezier(.16,1,.3,1) both; }
+    .word-tile.removed small { display:none; }
+    .word-tile-empty { display:grid; place-items:center; width:100%; height:84px; color:var(--muted); font-size:14px; font-weight:800; letter-spacing:.02em; }
+    @keyframes tile-clear { 0% { opacity:1; transform:scale(1); } 40% { opacity:1; transform:scale(1.08) rotate(1deg); box-shadow:0 16px 30px rgba(116,210,168,.35); } 100% { opacity:0; transform:scale(.7); } }
+    @keyframes tile-cleared { from { opacity:0; transform:scale(.78); } to { opacity:1; transform:scale(1); } }
+    @keyframes tile-mismatch { 0%,100% { transform:translateX(0); } 28% { transform:translateX(-6px) rotate(-1deg); } 58% { transform:translateX(6px) rotate(1deg); } }
+    .word-tile-status { display:flex; min-height:48px; align-items:center; justify-content:space-between; gap:12px; margin-top:14px; padding:10px 10px 10px 13px; border-radius:12px; background:rgba(57,121,216,.06); }
+    .word-tile-status-copy { display:flex; min-width:0; align-items:center; gap:9px; }
+    .word-tile-status-icon { display:grid; width:26px; height:26px; flex:0 0 auto; place-items:center; border-radius:9px; background:var(--blue-soft); color:var(--blue); }
+    .word-tile-status-icon svg { width:15px; height:15px; fill:none; stroke:currentColor; stroke-width:2.3; stroke-linecap:round; stroke-linejoin:round; }
+    .word-tile-status p { margin:0; color:var(--muted); font-size:13px; font-weight:750; }
+    .word-tile-status .success-copy { color:#1e6b4c; }
+    .word-game-reset { min-height:36px; border:0; border-radius:10px; padding:8px 12px; background:#fff; color:var(--ink); cursor:pointer; font-weight:850; white-space:nowrap; }
+    .word-game-reset:hover { background:var(--blue-soft); }
+.context-practice { display: grid; gap: 14px; }
+    .context-head { display: flex; justify-content: space-between; gap: 16px; align-items: flex-start; }
+    .context-head .link-btn { margin-top: 4px; }
+    .context-word-bank { display: flex; min-height: 64px; flex-wrap: wrap; gap: 9px; align-items: center; padding: 12px; border: 1px solid #dbe6f2; border-radius: 14px; background: var(--blue-soft); }
+    .context-word { border: 1px solid #adc9eb; border-radius: 11px; padding: 8px 13px; background: #edf5ff; color: #245a9e; font-weight: 850; cursor: grab; transition: transform .16s cubic-bezier(.16,1,.3,1), box-shadow .16s ease, background-color .16s ease; }
+    .context-word:hover { transform: translateY(-1px); }
+    .context-word:active { cursor: grabbing; }
+    .context-word.selected { border-color: var(--blue); background: #dcecff; outline: 3px solid rgba(57,121,216,.14); outline-offset: 1px; }
+    .context-word.returned { animation: context-return .36s cubic-bezier(.16,1,.3,1) both; }
+    @keyframes context-return { from { opacity: 0; transform: translateY(18px) scale(.94); } to { opacity: 1; transform: translateY(0) scale(1); } }
+    .context-sentences { display: grid; gap: 12px; }
+    .context-sentence { display: flex; flex-direction: column; gap: 10px; padding: 14px; border: 1px solid var(--line); border-radius: 15px; background: #fff; transition: border-color .16s ease, background-color .16s ease, color .16s ease; }
+    .context-sentence-copy { display: flex; align-items: center; justify-content: flex-start; gap: 10px; flex-wrap: wrap; font-size: 18px; font-weight: 750; line-height: 1.7; }
+    .context-sentence-text { text-align: left; }
+    .context-drop { display: inline-flex; min-width: 116px; min-height: 34px; align-items: center; justify-content: center; margin: 0 6px; border: 2px dashed #9eb2c9; border-radius: 7px; padding: 1px 10px; background: rgba(248,250,252,.72); color: #788ba1; vertical-align: baseline; cursor: pointer; font-weight: 750; transition: border-color .16s ease, background-color .16s ease, color .16s ease, transform .16s ease; }
+    .context-drop.filled { border-style: solid; border-color: #adc9eb; background: #edf5ff; color: #245a9e; }
+    .context-drop.wrong { border-color: #df8989; background: var(--red-soft); color: #8e3030; }
+    .context-drop.drag-over { border-color: var(--brand); background: #fff3ee; transform: translateY(-1px); }
+    .context-image-frame { flex: 0 0 auto; width: 96px; height: 64px; border: 0; border-radius: 6px; background: rgba(57,121,216,.05); display: flex; align-items: center; justify-content: center; overflow: hidden; color: #788ba1; font-size: 11px; font-weight: 800; }
+    .context-image-frame img { width: 100%; height: 100%; object-fit: contain; border-radius: 4px; }
+    .context-sentence.correct { position: relative; border-color: #82b99f; background: var(--green-soft); color: #216b4f; }
+    .context-sentence.correct::after { content: '✓'; position: absolute; top: 8px; right: 10px; width: 22px; height: 22px; display: grid; place-items: center; border-radius: 50%; background: #2f8b68; color: #fff; font-size: 13px; font-weight: 900; box-shadow: 0 2px 6px rgba(47,139,104,.35); }
+    .context-sentence.correct .context-drop { border-color: #82b99f; background: #fff; color: #216b4f; font-weight: 900; }
+    .context-sentence.correct-in { animation: context-correct-pop .5s cubic-bezier(.2,.9,.3,1.4) both; }
+    @keyframes context-correct-pop { 0% { transform: scale(.95); } 60% { transform: scale(1.03); } 100% { transform: scale(1); } }
+    .context-sentence.wrong { border-color: #df8989; background: var(--red-soft); color: #8e3030; }
+    .context-sentence.wrong-shake { animation:context-shake .4s ease; }
+    @keyframes context-shake { 0%,100%{transform:translateX(0)} 25%{transform:translateX(-5px)} 50%{transform:translateX(5px)} 75%{transform:translateX(-3px)} }
+    @keyframes context-wrong { 0%,100% { border-color: var(--line); background: #fff; color: var(--ink); } 10%,82% { border-color: #df8989; background: var(--red-soft); color: #8e3030; } }
+    .context-check-row { display: flex; justify-content: flex-end; gap: 10px; align-items: center; }
+    .context-hint { color: #1e6b4c; font-size: 13px; font-weight: 800; }
     .subsection { margin-top: 24px; padding-top: 22px; border-top: 1px dashed var(--line); }
-    .question { margin: 11px 0; padding: 16px; border: 1px solid var(--line); border-radius: 15px; background: #fff; }
+    .question { position: relative; margin: 0 0 18px; padding: 16px; border-radius: 15px; background: #fff; box-shadow: 0 4px 14px rgba(25,54,88,.08); transition: background-color .16s ease, box-shadow .16s ease; }
     .question h3 { margin: 5px 0 12px; font-size: 18px; }
     .options { display: grid; gap: 8px; }
-    .option { width: 100%; border: 1px solid var(--line); border-radius: 11px; padding: 11px 12px; background: #f9fbfd; color: var(--ink); text-align: left; cursor: pointer; font-weight: 750; }
-    .option.selected { border-color: var(--blue); background: var(--blue-soft); }
-    .option.correct { border-color: #82b99f; background: var(--green-soft); }
-    .option.wrong { border-color: #e0a4a4; background: var(--red-soft); }
+    .option { width: 100%; border: 0; border-radius: 11px; padding: 11px 12px; background: #f4f6f8; color: var(--ink); text-align: left; cursor: pointer; font-weight: 750; }
+    .option.selected { background: var(--blue-soft); color: var(--blue); }
+    .option.correct { background: #d5f0e2; color: #1e6b4c; }
+    .option.wrong { background: #ffddd8; color: #a43232; }
+    .question-correct { background: var(--green-soft); }
+    .question-wrong { background: #ffe9e6; }
+    .correct-pop { animation: comp-correct-pop .5s cubic-bezier(.2,.9,.3,1.4) both; }
+    @keyframes comp-correct-pop { 0% { transform: scale(.95); } 60% { transform: scale(1.03); } 100% { transform: scale(1); } }
+    .wrong-pop { animation: comp-wrong-shake .4s ease; }
+    @keyframes comp-wrong-shake { 0%,100% { transform: translateX(0); } 25% { transform: translateX(-5px); } 50% { transform: translateX(5px); } 75% { transform: translateX(-3px); } }
     .feedback { margin-top: 8px; font-size: 13px; font-weight: 800; }
     .rebuild-list { display: grid; gap: 8px; margin: 14px 0; }
     .rebuild-item { display: grid; grid-template-columns: 36px 1fr auto; gap: 9px; align-items: center; padding: 10px; border: 1px solid var(--line); border-radius: 12px; background: #fff; }
     .rebuild-index { display: grid; place-items: center; width: 30px; height: 30px; border-radius: 9px; background: var(--blue-soft); color: var(--blue); font-weight: 900; }
     .move-buttons { display: flex; gap: 4px; }
     .move-buttons button { width: 34px; height: 34px; border: 1px solid var(--line); border-radius: 9px; background: #fff; cursor: pointer; }
-    .result-grid { display: grid; grid-template-columns: .75fr 1.25fr; gap: 16px; }
-    .score-card { padding: 26px; text-align: center; background: linear-gradient(145deg,var(--ink),#2a5688); color: #fff; }
-    .score-ring { display: grid; place-items: center; width: 160px; height: 160px; margin: 20px auto; border-radius: 50%; background: conic-gradient(var(--yellow) var(--score),rgba(255,255,255,.15) 0); }
-    .score-ring div { display: grid; place-items: center; width: 126px; height: 126px; border-radius: 50%; background: var(--ink); }
-    .score-ring strong { font-size: 38px; }
-    .result-list { display: grid; gap: 9px; padding: 20px; }
-    .result-row { display: grid; grid-template-columns: 1fr auto; gap: 12px; align-items: center; padding: 13px; border: 1px solid var(--line); border-radius: 13px; }
-    .result-row strong, .result-row small { display: block; }
-    .result-row small { color: var(--muted); }
-    @media(max-width:820px){.split,.result-grid{grid-template-columns:1fr}.module-nav{overflow-x:auto;grid-template-columns:repeat(6,minmax(105px,1fr))}.lesson-head{grid-template-columns:1fr}.workspace{min-height:0}}
-    @media(max-width:560px){.lesson-head,.practice-shell,.listen-stage,.article-copy{padding:16px}.match-board{grid-template-columns:1fr}.cover{max-height:440px}.practice-intro{display:block}.result-row{grid-template-columns:1fr}.module-nav{top:0}}
+    .rebuild-workspace { display:grid; grid-template-columns:minmax(0,1.3fr) minmax(220px,.7fr); gap:16px; margin:16px 0; }
+    .rebuild-canvas,.rebuild-bank { min-width:0; padding:14px; border:0; border-radius:14px; background:linear-gradient(180deg,var(--blue-soft) 0%,#e3edf9 100%); box-shadow:0 10px 26px rgba(57,121,216,.10); }
+    .rebuild-canvas.correct,.rebuild-bank.correct,.rebuild-choice-bank.correct,.rebuild-table-wrap.correct { background:linear-gradient(180deg,var(--green-soft) 0%,#eef9f4 100%); box-shadow:0 12px 28px rgba(47,139,104,.14); }
+    .rebuild-canvas.wrong,.rebuild-bank.wrong,.rebuild-choice-bank.wrong,.rebuild-table-wrap.wrong { background:linear-gradient(180deg,var(--red-soft) 0%,#fff6f4 100%); box-shadow:0 12px 28px rgba(201,77,77,.12); }
+    .rebuild-panel-title { margin:0 0 10px; color:var(--muted); font-size:12px; font-weight:850; letter-spacing:.03em; }
+    .rebuild-diagram { display:grid; gap:0; justify-items:stretch; }
+    .rebuild-diagram.cycle { display:flex; flex-wrap:wrap; justify-content:center; align-items:center; gap:8px; min-height:270px; padding:24px; border:2px dashed #aec5df; border-radius:50%; background:rgba(255,255,255,.45); }
+    .rebuild-slot { position:relative; display:grid; grid-template-columns:28px minmax(0,1fr) auto; gap:8px; align-items:center; min-height:58px; padding:8px; border:1px dashed #9eb2c9; border-radius:11px; background:#fff; transition:border-color .16s ease,background-color .16s ease,transform .16s ease; }
+    .rebuild-slot.empty { color:var(--muted); background:rgba(255,255,255,.5); }
+    .rebuild-slot.drag-over { border-color:var(--brand); background:#fff3ee; transform:translateY(-1px); }
+    .rebuild-slot.correct { border-color:#82b99f; background:var(--green-soft); color:#216b4f; }
+    .rebuild-slot.wrong { border-color:#df8989; background:var(--red-soft); color:#8e3030; }
+    .rebuild-slot strong { min-width:0; overflow-wrap:anywhere; font-size:14px; }
+    .rebuild-slot-number { display:grid; place-items:center; width:26px; height:26px; border-radius:8px; background:var(--blue-soft); color:var(--blue); font-size:12px; font-weight:900; }
+    .rebuild-connector { display:grid; place-items:center; min-height:26px; color:var(--blue); font-size:22px; font-weight:900; line-height:1; }
+    .rebuild-diagram.cycle .rebuild-connector { min-height:0; }
+    .rebuild-bank-list { display:grid; gap:8px; }
+    .rebuild-option { display:flex; align-items:center; gap:8px; min-height:48px; padding:10px; border:1px solid var(--line); border-radius:10px; background:#fff; cursor:grab; font-size:13px; font-weight:750; }
+    .rebuild-option:active { cursor:grabbing; }
+    .rebuild-option.selected { border-color:var(--blue); background:var(--blue-soft); color:var(--blue); box-shadow:0 0 0 3px rgba(57,121,216,.12); }
+    .rebuild-option.dragging { opacity:.45; }
+    .rebuild-option small { margin-left:auto; color:var(--muted); font-size:11px; font-weight:700; white-space:nowrap; }
+    .rebuild-option-empty { padding:12px; border:1px dashed var(--line); border-radius:10px; color:var(--muted); font-size:12px; text-align:center; }
+    .rebuild-drop-hint { margin:10px 0 0; color:var(--muted); font-size:12px; }
+    .rebuild-table-wrap { margin:16px 0; overflow-x:auto; border:0; border-radius:14px; background:#fff; box-shadow:0 10px 26px rgba(57,121,216,.10); transition:box-shadow .2s ease,background .2s ease; }
+    .rebuild-table { width:100%; min-width:560px; border-collapse:collapse; table-layout:fixed; }
+    .rebuild-table th { padding:13px 14px; background:var(--blue-soft); color:var(--blue); font-size:13px; text-align:left; }
+    .rebuild-table th.connector,.rebuild-table td.connector { width:48px; padding-inline:6px; text-align:center; }
+    .rebuild-table td { padding:12px 14px; border-top:1px solid var(--line); vertical-align:middle; }
+    .rebuild-table td.connector { color:var(--blue); font-size:20px; font-weight:900; }
+    .rebuild-choice-bank { margin:16px 0 12px; padding:14px; border:0; border-radius:14px; background:linear-gradient(180deg,var(--blue-soft) 0%,#e3edf9 100%); box-shadow:0 10px 26px rgba(57,121,216,.10); transition:box-shadow .2s ease,background .2s ease; }
+    .rebuild-choice-bank-title { margin:0 0 10px; color:var(--muted); font-size:12px; font-weight:850; }
+    .rebuild-choice-list { display:flex; flex-wrap:wrap; gap:8px; }
+    .rebuild-table-option { display:flex; min-height:42px; align-items:center; gap:8px; border:1px solid #adc9eb; border-radius:10px; padding:8px 11px; background:#edf5ff; color:#245a9e; cursor:grab; font:inherit; font-size:13px; font-weight:800; text-align:left; transition:transform .16s cubic-bezier(.16,1,.3,1),box-shadow .16s ease,background-color .16s ease; }
+    .rebuild-table-option:hover { transform:translateY(-1px); }
+    .rebuild-table-option:active { cursor:grabbing; }
+    .rebuild-table-option.selected { background:#dcecff; box-shadow:0 0 0 3px rgba(57,121,216,.15); }
+    .rebuild-table-option.used { border-color:#b8c7d8; background:#f2f5f8; color:#64788e; }
+    .rebuild-table-option small { margin-inline-start:auto; font-size:10px; white-space:nowrap; }
+    .rebuild-table-value { display:flex; min-height:50px; align-items:center; border-radius:10px; padding:10px 12px; overflow-wrap:anywhere; font-size:14px; font-weight:750; line-height:1.4; }
+    .rebuild-table-value.given { background:#edf5ff; color:#245a9e; }
+    .rebuild-table-value.drop { justify-content:center; border:2px dashed #9eb2c9; background:#f9fbfd; color:#6f8297; cursor:pointer; text-align:center; }
+    .rebuild-table-value.drop.filled { justify-content:flex-start; border-style:solid; border-color:#adc9eb; background:#fff; color:var(--ink); text-align:left; }
+    .rebuild-table-value.drop.drag-over,.rebuild-table-value.drop.selected { border-color:var(--brand); background:#fff3ee; color:#7c3021; }
+    .rebuild-table-value.drop.correct { border-color:#82b99f; background:var(--green-soft); color:#216b4f; }
+    .rebuild-table-value.drop.wrong { border-color:#df8989; background:var(--red-soft); color:#8e3030; }
+    .rebuild-table-value.drop:focus-visible,.rebuild-table-option:focus-visible { outline:3px solid rgba(57,121,216,.22); outline-offset:2px; }
+    .rebuild-table-feedback { margin:-4px 0 16px; color:var(--muted); font-size:13px; font-weight:750; }
+    @media(prefers-reduced-motion:reduce){.word-match-burst,.word-tile.clearing,.word-tile.mismatch,.word-tile.removed{animation-duration:.01ms;filter:none}.word-tile,.word-game-progress span{transition-duration:.01ms}}
+    @media(max-width:820px){.split,.rebuild-workspace,.lesson-card{grid-template-columns:1fr}.lesson-card-image{border-right:0}.module-nav{overflow-x:auto;grid-template-columns:repeat(4,minmax(116px,1fr))}.lesson-head{grid-template-columns:1fr}.workspace{min-height:0}.word-bank-box{grid-template-columns:repeat(6,minmax(112px,1fr))}.word-game-layout{grid-template-columns:1fr}}
+    @media(max-width:560px){.lesson-head,.practice-shell,.article-copy{padding:16px}.match-board{grid-template-columns:1fr}.practice-intro{display:block}.practice-sentence-row{grid-template-columns:1fr}.practice-sentence-controls{justify-items:start}.practice-sentence-actions{justify-content:flex-start}.module-nav{top:0}.context-sentence{grid-template-columns:1fr}.context-image-frame{min-height:90px}.context-drop{min-width:96px}.word-game-shell{padding:13px}.word-game-hud{align-items:flex-start}.word-game-mark{width:38px;height:38px}.word-game-title p{max-width:180px}.word-game-score strong,.word-game-score span{font-size:22px}.word-tile-board{gap:7px}.word-tile{width:74px;aspect-ratio:1/1;padding:8px;border-radius:12px}.word-tile-kind{padding:2px 4px;font-size:7px}.word-tile.word strong{font-size:15px}.word-tile-image{min-height:42px}.word-tile-image svg{width:36px;height:36px}.word-tile-image img{height:36px}.word-tile-caption{font-size:9px}.word-tile-pick{top:5px;right:5px;width:19px;height:19px}.word-tile.removed small{font-size:11px}.word-tile-status{align-items:stretch;flex-direction:column}.word-game-reset{width:100%}.rebuild-table{min-width:500px}.rebuild-table th,.rebuild-table td{padding:10px}.rebuild-slot{grid-template-columns:26px minmax(0,1fr) auto}.rebuild-option{width:100%;text-align:left}}
+      @media(max-width:760px){.practice-card-list{grid-template-columns:1fr}}
+    @media(max-width:560px){.module-complete{flex-direction:column;align-items:stretch;text-align:center}.module-complete .btn{width:100%}.module-actions{width:100%}.module-prev{width:auto;height:44px;margin:-16px -18px 12px;border-right:0;border-bottom:1px solid #e5d3bf;border-radius:16px 16px 0 0}}
+    @media(max-width:560px){.error-banner{flex-direction:column}.error-banner-actions{margin-left:0;width:100%}}
+    @media(max-width:560px){.player{padding:13px 14px}.player-top{flex-direction:column;align-items:flex-start;gap:10px}.speed-control{width:100%}.speed-slider{flex:1;width:auto}}
   </style>
 </head>
 <body>
   <div class="shell">
     <div id="nav"></div>
+    <div id="errorBanner" class="error-banner hidden" role="alert" aria-live="assertive"></div>
     <section id="loading" class="panel state-box"><strong>正在准备学习卡片…</strong>图片、正文和练习很快就好。</section>
     <div id="app" class="hidden">
       <section class="panel lesson-head">
         <div><div class="lesson-meta" id="meta"></div><h1 id="title"></h1><p id="bigQuestionLabel" class="muted"></p></div>
-        <div><div class="muted" id="progressLabel">0 / 6 模块完成</div><div class="progress" style="width:190px;margin-top:7px"><span id="topProgress"></span></div></div>
+        <div><div class="muted" id="progressLabel">0 / 4 模块完成</div><div class="progress" style="width:190px;margin-top:7px"><span id="topProgress"></span></div></div>
       </section>
       <nav class="panel module-nav" id="moduleNav" aria-label="学习模块"></nav>
       <main class="workspace">
         <section class="module" data-module="reading" id="readingModule"></section>
-        <section class="module" data-module="listening" id="listeningModule"></section>
         <section class="module" data-module="words" id="wordsModule"></section>
         <section class="module" data-module="comprehension" id="comprehensionModule"></section>
         <section class="module" data-module="rebuild" id="rebuildModule"></section>
-        <section class="module" data-module="result" id="resultModule"></section>
       </main>
     </div>
-    <section id="fatal" class="panel state-box hidden"><strong>这张学习卡片暂时打不开</strong><span id="fatalMessage"></span><br><a class="btn" href="/syllabus.html">返回课程目录</a></section>
   </div>
   <script type="module">
     import { $, $$, api, currentUserId, escapeHtml, nav, speak, toast, formatDate } from '/shared.js';
     $('#nav').innerHTML = nav();
+    const lessonApp=$('#app');if(lessonApp){lessonApp.addEventListener('contextmenu',e=>e.preventDefault());}
     const modules = [
-      ['reading','Reading','阅读'],['listening','Listen & Read','听读'],['words','Words','核心词'],
-      ['comprehension','3Q','理解'],['rebuild','Rebuild','重建'],['result','Result','结果']
+      ['reading','Listen and Read','阅读与练习',['reading','listening']],['words','Words','核心词'],
+      ['comprehension','Comprehension',''],['rebuild','Rebuild','重建']
     ];
-    const state = { card:null, active:'reading', rate:1, current:-1, practiceCurrent:-1, playing:false, selectedWord:null, selectedMeaning:null, matched:[], context:{}, comprehension:{}, comprehensionChecked:false, rebuild:[], rebuildChecked:false, moduleStatus:{}, recording:null, recordingUrl:null };
-    const slug = location.pathname.startsWith('/lesson/') ? decodeURIComponent(location.pathname.split('/').filter(Boolean).pop()) : new URLSearchParams(location.search).get('lesson') || 'day001-flower';
+    const state = { card:null, active:'reading', rate:1, current:-1, playbackProgress:0, speechToken:0, singlePlaying:false, previewIndex:null, dragWasPlaying:false, resumePosition:null, practiceCurrent:-1, playing:false, wordBankReviewed:false, selectedWord:null, selectedMeaning:null, selectedMeaningAnswer:null, matched:[], matchWrong:[], matchWrongTimer:null, matchSuccess:[], matchSuccessTimer:null, newMatchWord:null, matchAnimationWord:null, wordTileOrder:[], wordTileSelected:null, wordTileMatched:[], wordTileSide:[], wordTileFeedback:[], wordTileLocked:false, wordTileTimer:null, wordTileCombo:0, wordTileCelebration:null, wordTileBurstShown:false, wordTileSequence:0, wordTileNewSide:null, context:{}, contextSelected:null, contextChecked:false, contextWrong:[], contextReturned:[], contextFeedbackTimer:null, autoCheckTimer:null, contextJustCorrect:null, contextShake:false, translationsVisible:{}, fullTranslateOpen:false, comprehension:{}, comprehensionChecked:false, compCheckTimer:null, compFeedbackAnim:false, rebuild:[], rebuildSelected:null, rebuildBankOrder:[], rebuildChecked:false, rebuildCheckTimer:null, rebuildFeedbackAnim:false, moduleStatus:{}, previousLesson:null, nextLesson:null, recording:null, recordingIndex:-1, recordingStartedAt:null, recordingTimer:null, recordingUrls:{}, recordingDataUrls:{}, recordingBlobs:{}, submittedPractice:[],scoring:{},scores:{},unrecognized:{} };
+    let wordTileAudioContext=null;
+    const SCORE_ENDPOINT=(location.hostname==='localhost'||location.hostname==='127.0.0.1')?'http://127.0.0.1:8787/score':'/api/score';
+    const slug = location.pathname.startsWith('/lesson/') ? decodeURIComponent(location.pathname.split('/').filter(Boolean).pop()) : new URLSearchParams(location.search).get('lesson') || 'day001-seed';
+    const ERROR_LOG_LIMIT=60;
+    const lastErrorShown={};
+    function readErrorLog(){try{const raw=localStorage.getItem(`fsr:error-log:${currentUserId()}`);const value=raw?JSON.parse(raw):[];return Array.isArray(value)?value:[];}catch{return [];}}
+    function appendErrorLog(entry){const log=readErrorLog();log.push({time:new Date().toISOString(),...entry});const trimmed=log.slice(-ERROR_LOG_LIMIT);try{localStorage.setItem(`fsr:error-log:${currentUserId()}`,JSON.stringify(trimmed));}catch{}return trimmed;}
+    function errorText(entry){return `[${entry.time}] ${entry.source||'页面'}｜${entry.title||'错误'}：${entry.message||''}${entry.detail?`（${entry.detail}）`:''}`;}
+    function showError({title='操作失败',message='请稍后再试。',detail='',source='页面',retry=null}={}){
+      const normalized=String(message||'').trim()||'请稍后再试。';
+      const log=appendErrorLog({title,message:normalized,detail,source});
+      const now=Date.now(),key=`${source}|${title}`;if(lastErrorShown[key]&&now-lastErrorShown[key]<5000)return;lastErrorShown[key]=now;
+      const banner=$('#errorBanner');if(!banner)return;
+      const copyText=log.slice(-5).map(errorText).join('\n');
+      banner.innerHTML=`<div class="error-banner-copy"><strong>${escapeHtml(title)}</strong><p>${escapeHtml(normalized)}</p><small>${escapeHtml(detail||`来源：${source} · 已记录到本地错误日记`)}</small></div><div class="error-banner-actions">${retry?`<button class="btn" id="errorRetry" type="button">重试</button>`:''}<button class="link-btn" id="errorCopy" type="button">复制错误信息</button><button class="link-btn" id="errorClose" type="button">关闭</button></div>`;
+      banner.classList.remove('hidden');
+      const close=$('#errorClose');if(close)close.onclick=()=>banner.classList.add('hidden');
+      const copy=$('#errorCopy');if(copy)copy.onclick=async()=>{try{await navigator.clipboard.writeText(copyText);copy.textContent='已复制';setTimeout(()=>copy.textContent='复制错误信息',1800);}catch{const ta=document.createElement('textarea');ta.value=copyText;document.body.append(ta);ta.select();document.execCommand('copy');ta.remove();copy.textContent='已复制';}};
+      const retryBtn=$('#errorRetry');if(retryBtn)retryBtn.onclick=()=>{banner.classList.add('hidden');retry();};
+    }
+    window.addEventListener('unhandledrejection',event=>showError({title:'运行错误',message:event.reason?.message||'页面出现未处理的错误。',detail:event.reason?.stack||'',source:'运行'}));
     const sentences = () => (state.card.paragraphs || []).flatMap(p => typeof p === 'string' ? (p.match(/[^.!?]+[.!?]+/g) || [p]) : (p.sentences || []).map(s => s.text || s));
     const practiceSentences = () => state.card.listenRead?.sentences?.length ? state.card.listenRead.sentences : sentences().slice(0,2).map((sentence,index)=>({sentence,role:index?'Structure':'Science Core'}));
+    const practiceDemoIndex = item => {
+      const text = String(typeof item === 'string' ? item : item?.sentence || '').replace(/\s+/g, ' ').trim();
+      const all = sentences();
+      for (let i = 0; i < all.length; i++) {
+        if (String(all[i]).replace(/\s+/g, ' ').trim() === text) return i;
+      }
+      return -1;
+    };
     const words = () => state.card.word_bank || [];
     const contextQuestions = () => state.card.wordModule?.contextQuestions || [];
     const compQuestions = () => state.card.comprehension?.questions || [];
     const rebuildSteps = () => state.card.rebuild?.steps || [];
     const isDone = name => Boolean(typeof state.moduleStatus[name] === 'object' ? state.moduleStatus[name].completed : state.moduleStatus[name]);
     const scoreOf = name => Number(typeof state.moduleStatus[name] === 'object' ? state.moduleStatus[name].score || 0 : 0);
-    const completedCount = () => ['reading','listening','words','comprehension','rebuild','result'].filter(isDone).length;
+    const completedCount = () => modules.filter(([id,,,members=[id]]) => members.every(isDone)).length;
 
-    function highlightSentence(text, index) {
-      return `<button type="button" class="sentence ${state.current === index ? 'current' : ''}" data-sentence="${index}" aria-label="播放句子 ${index+1}">${escapeHtml(text)}</button>`;
+    function highlightSentence(text, index, translation) {
+      const visible = Boolean(state.translationsVisible[index]);
+      const words = String(text).split(/(\s+)/).map(part => {
+        if (!part.trim()) return escapeHtml(part);
+        const word = part.replace(/[^A-Za-z'-]/g, '').toLowerCase();
+        return `<span class="lookup-word" data-word="${escapeHtml(word)}" data-sentence-index="${index}">${escapeHtml(part)}</span>`;
+      }).join('');
+      return `<span class="sentence-line"><span class="sentence-controls"><button type="button" class="sentence-speaker" data-sentence="${index}" aria-label="播放句子 ${index+1}"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M4 9v6h4l5 4V5L8 9H4Zm11.5-.5a1 1 0 0 0-1.4 1.4A4.97 4.97 0 0 1 15.5 12c0 .83-.2 1.6-.55 2.1a1 1 0 1 0 1.4 1.4A6.96 6.96 0 0 0 17.5 12c0-1.34-.38-2.58-1-3.5Zm2.8-2.3a1 1 0 0 0-1.4 1.4A7.97 7.97 0 0 0 18.5 12c0 1.67-.5 3.2-1.35 4.4a1 1 0 1 0 1.4 1.4A9.97 9.97 0 0 0 20.5 12c0-2.1-.65-4.05-1.8-5.8Z"/></svg></button></span><span class="sentence-content"><span class="sentence ${(state.previewIndex ?? state.current) === index ? 'current' : ''}" data-sentence-index="${index}">${words}</span><small class="sentence-translation ${visible?'':'is-hidden'}" aria-label="中文翻译">${escapeHtml(translation || '暂无中文翻译')}</small></span><span class="translation-row"><button type="button" class="translation-toggle" data-translation="${index}">${visible?'收起':'翻译'}</button></span></span>`;
+    }
+
+    function sentenceTranslation(paragraph, sentence, sentenceIndex, globalIndex) {
+      if (typeof paragraph === 'object') {
+        const item = paragraph.sentences?.[sentenceIndex];
+        if (item && typeof item === 'object') return item.translation || item.chinese || item.zh || '';
+        return paragraph.translations?.[sentenceIndex] || '';
+      }
+      const translations = state.card.translations || state.card.paragraphTranslations;
+      return translations?.[globalIndex] || ({
+        'A flower starts as a tight bud.':'花朵从一个紧实的花蕾开始。',
+        'Roots take in water from the soil.':'根从土壤中吸收水分。',
+        'Warm sunlight helps the stem and petals grow.':'温暖的阳光帮助茎和花瓣生长。',
+        'The petals slowly unfold and open.':'花瓣慢慢展开并开放。',
+        'Now the bloom can catch light and welcome bees.':'现在花朵可以接收阳光并迎来蜜蜂。',
+        'A cactus lives in a hot, dry desert.':'仙人掌生活在炎热干燥的沙漠中。',
+        'Its thick stem stores water for a long time.':'它粗厚的茎能长时间储存水分。',
+        'A waxy skin keeps water from escaping.':'蜡质表皮防止水分流失。',
+        'Tiny spines protect the plant from hungry animals.':'细小的刺保护植物免受饥饿动物的伤害。',
+        'These features help the cactus survive with very little rain.':'这些特征帮助仙人掌在少雨的环境中生存。'
+      })[sentence] || '';
     }
 
     function renderNav() {
-      $('#moduleNav').innerHTML = modules.map(([id,en,zh]) => `<button type="button" class="module-tab ${state.active===id?'active':''} ${isDone(id)?'done':''}" data-open="${id}" aria-selected="${state.active===id}"><span></span>${en}<small>${zh}</small></button>`).join('');
+      $('#moduleNav').innerHTML = modules.map(([id,en,zh,members=[id]],idx) => {
+        const unlocked = modules.slice(0,idx).every(entry => (entry[3] || [entry[0]]).every(isDone));
+        const done = members.every(isDone);
+        const active = members.includes(state.active);
+        return `<button type="button" class="module-tab ${active?'active':''} ${done?'done':''} ${unlocked?'':'locked'}" data-open="${id}" ${unlocked?'':'disabled'} aria-selected="${active}"><span></span>${en}</button>`;
+      }).join('');
       $$('[data-open]').forEach(button => button.onclick = () => openModule(button.dataset.open));
       const done = completedCount();
-      $('#progressLabel').textContent = `${done} / 6 模块完成`;
-      $('#topProgress').style.width = `${Math.round(done/6*100)}%`;
+      $('#progressLabel').textContent = `${done} / ${modules.length} 模块完成`;
+      $('#topProgress').style.width = `${Math.round(done/modules.length*100)}%`;
     }
 
     function openModule(name, save = true) {
+      if (name === 'listening') name = 'reading';
       state.active = name;
       $$('.module').forEach(node => node.classList.toggle('active', node.dataset.module === name));
       renderNav();
-      if (name === 'result') renderResult();
       if (save) saveProgress();
       window.scrollTo({top:0,behavior:'smooth'});
     }
 
+    function closeLookup(){
+      const pop=document.querySelector('.lookup-pop');
+      if(pop)pop.remove();
+      window.removeEventListener('scroll',closeLookup);
+    }
+    function showLookup(el,html){
+      closeLookup();
+      const pop=document.createElement('div');
+      pop.className='lookup-pop';
+      pop.innerHTML=html;
+      document.body.appendChild(pop);
+      const r=el.getBoundingClientRect();
+      pop.style.left=Math.max(8,Math.min(r.left,window.innerWidth-260))+'px';
+      pop.style.top=(r.bottom+6)+'px';
+      window.addEventListener('scroll',closeLookup,{once:true});
+      setTimeout(()=>{document.addEventListener('click',closeLookup,{once:true});},0);
+      return pop;
+    }
+    async function lookupWord(word,el){
+      if(!word)return;
+      const card=state.card;
+      const params=new URLSearchParams({word});
+      if(card){params.set('courseId',String(card.courseId||card.cardId||''));const sIndex=Number(el.dataset.sentenceIndex||-1);if(sIndex>=0){const s=sentences()[sIndex];if(s)params.set('sentence',s);}}
+      const pop=showLookup(el,'<span class="lookup-loading">正在查词…</span>');
+      try{
+        const res=await fetch(`/api/dictionary?${params}`);
+        const data=res.ok?await res.json():{};
+        const bank=(card?.word_bank||[]).find(b=>{
+          const forms=[b.english,b.paragraph_form].filter(Boolean).map(v=>String(v).toLowerCase());
+          return forms.includes(word)||forms.includes(word.replace(/s$/,''));
+        });
+        const meaning=data.meaning||(bank&&bank.chinese)||'';
+        const phonetic=data.phonetic||data.accents?.[0]?.phonetic||'';
+        const category=data.category||'';
+        pop.innerHTML=`<strong>${escapeHtml(word)}</strong>${phonetic?`<em>${escapeHtml(phonetic)}</em>`:''}${category?`<span class="lookup-tag">${escapeHtml(category)}</span>`:''}${meaning?`<p>${escapeHtml(meaning)}</p>`:'<p class="muted">暂无释义</p>'}`;
+      }catch(error){
+        pop.innerHTML=`<strong>${escapeHtml(word)}</strong><p class="muted">查词失败，请稍后再试</p>`;
+        showError({title:'查词失败',message:'词典服务暂时不可用，请稍后再试。',detail:error?.message||'',source:'词典',retry:()=>lookupWord(word,el)});
+      }
+    }
     function renderReading() {
       let cursor = 0;
+      const translationTexts = {};
       const paragraphs = (state.card.paragraphs || []).map(paragraph => {
         const ss = typeof paragraph === 'string' ? (paragraph.match(/[^.!?]+[.!?]+/g) || [paragraph]) : (paragraph.sentences || []).map(s => s.text || s);
-        const html = ss.map(text => highlightSentence(text, cursor++)).join(' ');
+        const html = ss.map((text, sentenceIndex) => { const index = cursor++; const translation = sentenceTranslation(paragraph, text, sentenceIndex, index); translationTexts[index] = translation || ''; return `<span class="reading-sentence">${highlightSentence(text, index, translation)}</span>`; }).join('');
         return `<p>${html}</p>`;
       }).join('');
-      $('#readingModule').innerHTML = `<div class="split"><div class="panel content-card"><img class="cover" src="/${escapeHtml(state.card.image_file || state.card.image || 'day001-flower.png')}" alt="${escapeHtml(state.card.title)} 科普阅读卡片"></div><article class="panel article-copy"><p class="eyebrow">Read the science story</p><h2 class="section-title">图文阅读</h2><div style="margin:18px 0">${paragraphs}</div><div class="btn-row"><button class="btn primary" id="finishReading" type="button">${isDone('reading')?'已完成阅读':'完成阅读'}</button><button class="btn" id="readAll" type="button">朗读全文</button><button class="btn ghost" data-next="listening" type="button">下一步：听读</button></div></article></div>`;
-      $$('[data-sentence]').forEach(node => { node.onclick = () => { state.current = Number(node.dataset.sentence); renderReading(); speak(sentences()[state.current], state.rate); }; });
-      $('#finishReading').onclick = () => complete('reading',100,'阅读模块已完成');
-      $('#readAll').onclick = () => playAll(() => complete('reading',100,'全文朗读完成'));
+      const image = state.card.image_file || state.card.image || 'day001-flower.png';
+      const imageSrc = /^(?:https?:|data:|\/)/i.test(image) ? image : `/${image}`;
+      $('#readingModule').innerHTML = `<div class="panel lesson-card"><div class="lesson-card-image"><img class="cover" src="${escapeHtml(imageSrc)}" alt="${escapeHtml(state.card.title)} 科普阅读卡片" draggable="false"></div><div class="article-copy"><div class="article-head"><h2 class="section-title task-title"><span class="task-tag">Task 1</span><span class="task-divider" aria-hidden="true"></span><span class="task-name">Listen</span></h2><p class="muted">点击"▶"播放，听音跟读</p></div><section class="combined-listening" id="listenReadSection"></section><div style="margin:18px 0">${paragraphs}</div></div><div class="full-translate"><button class="btn" data-full-translate type="button">${state.fullTranslateOpen?'收起全文翻译':'全文翻译'}</button><div class="full-translate-panel" data-full-translate-panel ${state.fullTranslateOpen?'':'hidden'}><p class="ft-zh">${escapeHtml(sentences().map((s,i)=>translationTexts[i]||'').filter(Boolean).join('')||'暂无中文翻译')}</p></div></div></div><section class="practice-section" id="practiceSection"></section>${moduleCompleteBox('reading')}`;
+      $$('.sentence-speaker').forEach(node => { node.onclick = () => playSingleSentence(Number(node.dataset.sentence)); });
+      $$('.lookup-word').forEach(node => { node.onclick = e => { e.stopPropagation(); lookupWord(node.dataset.word, node); }; });
+      $$('[data-translation]').forEach(node => { node.onclick = () => { const index = Number(node.dataset.translation); state.translationsVisible[index] = !state.translationsVisible[index]; renderReading(); }; });
+      const ftBtn=document.querySelector('[data-full-translate]');if(ftBtn)ftBtn.onclick=()=>{state.fullTranslateOpen=!state.fullTranslateOpen;renderReading();};
+      renderListenBar();
+      renderListeningPractice();
       bindNext();
     }
 
-    function playAll(onfinish) {
-      if (state.playing) { speechSynthesis.cancel(); state.playing=false; renderListening(); return; }
-      state.playing=true; let i=0;
-      const next=()=>{ if(!state.playing||i>=sentences().length){state.playing=false;state.current=-1;renderListening();onfinish?.();return;} state.current=i; renderListening(); speak(sentences()[i++],state.rate,next); };
+    function playSingleSentence(index) {
+      const text = sentences()[index];
+      if (!text) return;
+      if (audioEnabled()) { playAudioSentence(index); return; }
+      if (state.playing) pausePlayback();   // 全文朗读在播：先停在当前位置
+      speechSynthesis.cancel();
+      const token = ++state.speechToken;
+      state.playing = false;
+      state.singlePlaying = true;
+      state.previewIndex = index;           // 仅试听，进度条不动
+      renderReading();
+      speak(text, state.rate, () => {
+        if (token !== state.speechToken) return;
+        state.singlePlaying = false;
+        state.previewIndex = null;
+        renderReading();
+      });
+    }
+
+    let playbackOnfinish = null;
+    function startPlayback(startIndex) {
+      speechSynthesis.cancel();
+      const token = ++state.speechToken;
+      state.singlePlaying = false;
+      state.playing = true;
+      state.previewIndex = null;
+      let i = startIndex;
+      const total = sentences().length;
+      const next=()=>{ if(token!==state.speechToken)return; if(!state.playing||i>=total){state.playing=false;state.current=-1;state.playbackProgress=100;state.resumePosition=null;renderReading();const done=playbackOnfinish;playbackOnfinish=null;done?.();return;} state.current=i; state.playbackProgress=Math.round((i/Math.max(total,1))*100); renderReading(); const sentenceIndex=i++; speak(sentences()[sentenceIndex],state.rate,()=>{if(token===state.speechToken)setTimeout(()=>{if(token===state.speechToken)next();},600);},event=>{if(token!==state.speechToken||event.name!=='word')return;const ratio=(event.charIndex||0)/Math.max(sentences()[sentenceIndex].length,1);state.playbackProgress=Math.min(99,Math.round(((sentenceIndex+ratio)/Math.max(total,1))*100));const seek=$('#playbackSeek');if(seek){seek.value=Math.round(state.playbackProgress*10);seek.style.setProperty('--seek-fill',`${state.playbackProgress}%`);}const meta=$('.playback-meta span:last-child');if(meta)meta.textContent=`${state.playbackProgress}%`;}); };
       next();
     }
-
-    function renderListening() {
-      const practice=practiceSentences(); const core=state.card.listenRead?.coreSentence || practice[0]?.sentence || '';
-      $('#listeningModule').innerHTML=`<div class="panel listen-stage"><p class="eyebrow">Listen · notice · speak</p><h2 class="section-title">Listen & Read</h2><div class="big-question">${escapeHtml(state.card.bigQuestion||'Listen to the story, then read it aloud.')}</div><div class="player"><button id="playAll" class="play-round" type="button">${state.playing?'停止':'播放'}</button><div><strong>${state.playing?`正在播放第 ${state.current+1} 句`:'全文朗读'}</strong><div class="speed-row">${[.8,1,1.2,1.5].map(rate=>`<button type="button" class="speed ${state.rate===rate?'active':''}" data-rate="${rate}">${rate.toFixed(1)}x</button>`).join('')}</div></div></div><div class="transcript">${practice.map((item,i)=>`<button type="button" class="${!state.playing&&state.practiceCurrent===i?'current':''}" data-listen-sentence="${i}"><span>${String(i+1).padStart(2,'0')}</span><span><small class="eyebrow">${escapeHtml(item.role||'Read aloud')}</small>${escapeHtml(item.sentence)}</span></button>`).join('')}</div><div class="record-box"><p class="eyebrow">Core sentence</p><blockquote>“${escapeHtml(core)}”</blockquote><p class="muted">先听示范，再录下你的朗读。录音提交后会显示“待评分”。</p><div class="btn-row"><button class="btn" id="demoCore" type="button">听示范</button><button class="btn primary" id="record" type="button">${state.recording?'停止录音':'开始录音'}</button>${state.recordingUrl?'<audio id="recordPreview" controls></audio><button class="btn blue" id="submitRecord" type="button">提交录音</button>':''}<button class="btn ghost" data-next="words" type="button">下一步：核心词</button></div></div></div>`;
-      $('#playAll').onclick=()=>playAll(()=>complete('listening',100,'听读模块已完成'));
-      $$('.speed').forEach(button=>button.onclick=()=>{state.rate=Number(button.dataset.rate);renderListening();});
-      $$('[data-listen-sentence]').forEach(button=>button.onclick=()=>{state.practiceCurrent=Number(button.dataset.listenSentence);renderListening();speak(practice[state.practiceCurrent].sentence,state.rate);});
-      $('#demoCore').onclick=()=>speak(core,state.rate);
-      $('#record').onclick=toggleRecording;
-      if(state.recordingUrl){const audio=$('#recordPreview');audio.src=state.recordingUrl;$('#submitRecord').onclick=()=>submitRecording(core);}
-      bindNext();
+    function pausePlayback() {
+      ++state.speechToken;
+      speechSynthesis.cancel();
+      state.playing = false;
+      state.singlePlaying = false;
+      state.previewIndex = null;
+      playbackOnfinish = null;
+      if (state.current >= 0) {
+        state.resumePosition = (state.current / Math.max(sentences().length, 1)) * 100;
+        state.playbackProgress = Math.round(state.resumePosition);
+      }
+      renderReading();
+    }
+    function playAll(onfinish) {
+      if (state.playing) { if (audioEnabled()) pauseAudioPlayback(); else pausePlayback(); return; }
+      playbackOnfinish = onfinish || null;
+      const total = sentences().length;
+      const done = state.playbackProgress >= 100;
+      const position = done ? 0 : ((state.resumePosition ?? state.playbackProgress) / 100) * total;
+      const start = Math.min(total - 1, Math.floor(position));
+      const fraction = done ? 0 : position - start;
+      state.resumePosition = null;
+      if (audioEnabled()) startAudioPlayback(start, fraction);
+      else startPlayback(start);
+    }
+    function seekTo(ratio) {
+      const total = sentences().length; if (!total) return;
+      const position = Math.max(0, Math.min(1, ratio)) * total;
+      const index = Math.min(total - 1, Math.floor(position));
+      const wasPlaying = state.dragWasPlaying;
+      state.dragWasPlaying = false;
+      if (wasPlaying) {
+        startPlayback(index);
+      } else {
+        ++state.speechToken;
+        speechSynthesis.cancel();
+        state.playing = false;
+        state.singlePlaying = false;
+        state.current = index;
+        state.resumePosition = Math.max(0, Math.min(1, ratio)) * 100;
+        state.playbackProgress = Math.round(state.resumePosition);
+        renderReading();
+      }
+    }
+    function updatePlaybackUI(index, total, ratio) {
+      $$('.sentence[data-sentence-index]').forEach(node => node.classList.toggle('current', Number(node.dataset.sentenceIndex) === index));
+      const first = $('.playback-meta span:first-child'); if (first) first.textContent = index >= 0 ? `第 ${index + 1} / ${total} 句` : '准备播放';
+      const last = $('.playback-meta span:last-child'); if (last) last.textContent = `${Math.round(ratio * 100)}%`;
+      const seek = $('#playbackSeek'); if (seek) { seek.value = Math.round(ratio * 1000); seek.style.setProperty('--seek-fill', `${Math.round(ratio * 100)}%`); }
+    }
+    let audioManifest = null;
+    let currentAudio = null;
+    const audioPool = {};
+    const audioEnabled = () => audioManifest && Array.isArray(audioManifest.sentences) && audioManifest.sentences.length === sentences().length;
+    const audioFileFor = index => (audioManifest?.sentences?.[index]?.file) || `${String(index + 1).padStart(2, '0')}.mp3`;
+    const audioUrlFor = index => `/audio/${encodeURIComponent(slug)}/${audioFileFor(index)}`;
+    const audioFor = index => {
+      if (!audioPool[index]) {
+        const audio = new Audio();
+        audio.preload = 'auto';
+        audio.src = audioUrlFor(index);
+        audioPool[index] = audio;
+      }
+      return audioPool[index];
+    };
+    function stopAllAudio() {
+      Object.values(audioPool).forEach(audio => { try { audio.pause(); } catch {} });
+      currentAudio = null;
+    }
+    async function loadAudioManifest() {
+      try {
+        const res = await fetch(`/audio/${encodeURIComponent(slug)}/manifest.json`);
+        if (!res.ok) return;
+        audioManifest = await res.json();
+      } catch { audioManifest = null; }
+    }
+    function updateAudioProgress(index, total, audio) {
+      const duration = audio.duration || 0;
+      const fraction = duration ? Math.min(1, audio.currentTime / duration) : 0;
+      state.playbackProgress = Math.min(Math.round(((index + fraction) / total) * 100), 99);
+      const seek = $('#playbackSeek');
+      if (seek) { seek.value = Math.round(state.playbackProgress * 10); seek.style.setProperty('--seek-fill', `${state.playbackProgress}%`); }
+      const last = $('.playback-meta span:last-child');
+      if (last) last.textContent = `${state.playbackProgress}%`;
+    }
+    function startAudioPlayback(startIndex, fraction = 0) {
+      stopAllAudio();
+      const token = ++state.speechToken;
+      state.singlePlaying = false;
+      state.playing = true;
+      state.previewIndex = null;
+      const total = sentences().length;
+      const playSequence = index => {
+        if (token !== state.speechToken || !state.playing) return;
+        if (index >= total) {
+          state.playing = false;
+          state.current = -1;
+          state.playbackProgress = 100;
+          state.resumePosition = null;
+          renderReading();
+          const done = playbackOnfinish; playbackOnfinish = null; done?.();
+          return;
+        }
+        state.current = index;
+        state.playbackProgress = (index === startIndex && fraction > 0)
+          ? Math.round((index + fraction) / total * 100)
+          : Math.round(index / total * 100);
+        renderReading();
+        const audio = audioFor(index);
+        currentAudio = audio;
+        audio.playbackRate = state.rate;
+        audio.currentTime = 0;
+        if (index === startIndex && fraction > 0) {
+          const seekToFraction = () => { if (token === state.speechToken && audio.duration) audio.currentTime = Math.min(fraction * audio.duration, audio.duration - 0.05); };
+          if (audio.readyState >= 1 && audio.duration) seekToFraction();
+          else audio.onloadedmetadata = seekToFraction;
+        }
+        audio.ontimeupdate = () => { if (token === state.speechToken && state.playing) updateAudioProgress(index, total, audio); };
+        audio.onended = () => { if (token !== state.speechToken || !state.playing) return; setTimeout(() => { if (token === state.speechToken && state.playing) playSequence(index + 1); }, 600); };
+        audio.play().catch(() => { if (token === state.speechToken) playSequence(index + 1); });
+      };
+      playSequence(startIndex);
+    }
+    function playAudioSentence(index) {
+      if (state.playing) pauseAudioPlayback();   // 全文朗读在播：先停在当前位置
+      const token = ++state.speechToken;
+      state.playing = false;
+      state.singlePlaying = true;
+      state.previewIndex = index;               // 仅试听，进度条不动
+      renderReading();
+      const audio = audioFor(index);
+      currentAudio = audio;
+      audio.playbackRate = state.rate;
+      audio.currentTime = 0;
+      audio.ontimeupdate = null;
+      audio.onended = () => {
+        if (token !== state.speechToken) return;
+        state.singlePlaying = false;
+        state.previewIndex = null;
+        renderReading();
+      };
+      audio.play().catch(() => { state.singlePlaying = false; state.previewIndex = null; renderReading(); });
+    }
+    function pauseAudioPlayback() {
+      const audio = currentAudio;
+      const total = sentences().length;
+      ++state.speechToken;
+      if (audio && state.playing && total) {
+        const duration = audio.duration || 0;
+        const fraction = duration ? Math.min(1, audio.currentTime / duration) : 0;
+        state.resumePosition = ((state.current + fraction) / total) * 100;
+        state.playbackProgress = Math.round(state.resumePosition);
+      }
+      stopAllAudio();
+      state.playing = false;
+      state.singlePlaying = false;
+      state.previewIndex = null;
+      playbackOnfinish = null;
+      renderReading();
+    }
+    function seekAudio(ratio) {
+      const total = sentences().length; if (!total) return;
+      const position = Math.max(0, Math.min(1, ratio)) * total;
+      const index = Math.min(total - 1, Math.floor(position));
+      const fraction = position - index;
+      const wasPlaying = state.dragWasPlaying;
+      state.dragWasPlaying = false;
+      if (wasPlaying) {
+        startAudioPlayback(index, fraction);
+      } else {
+        // 暂停状态下拖动：只移动位置，不自动播放
+        ++state.speechToken;
+        stopAllAudio();
+        state.playing = false;
+        state.singlePlaying = false;
+        state.current = index;
+        state.resumePosition = Math.max(0, Math.min(1, ratio)) * 100;
+        state.playbackProgress = Math.round(state.resumePosition);
+        renderReading();
+      }
     }
 
-    async function toggleRecording(){
-      if(state.recording){state.recording.stop();return;}
-      if(!navigator.mediaDevices?.getUserMedia||!window.MediaRecorder){toast('当前浏览器不支持录音，可通过全文朗读完成本模块');return;}
-      try{const stream=await navigator.mediaDevices.getUserMedia({audio:true});const chunks=[];const recorder=new MediaRecorder(stream);state.recording=recorder;recorder.ondataavailable=e=>chunks.push(e.data);recorder.onstop=()=>{stream.getTracks().forEach(track=>track.stop());const blob=new Blob(chunks,{type:recorder.mimeType||'audio/webm'});if(state.recordingUrl)URL.revokeObjectURL(state.recordingUrl);state.recordingUrl=URL.createObjectURL(blob);state.recordingBlob=blob;state.recording=null;renderListening();};recorder.start();renderListening();}catch{toast('没有获得麦克风权限，请在浏览器设置中允许录音');}
+    function renderListenBar() {
+      const target=$('#listenReadSection');
+      if(!target)return;
+      const total=sentences().length; const progress=state.playing||state.playbackProgress>0?state.playbackProgress:0;
+      const rate=Math.min(1.1,Math.max(0.6,state.rate)); const rateFill=((rate-0.6)/0.5)*100;
+      const playbackStatus=state.previewIndex!=null?`试听 · 第 ${state.previewIndex+1} 句`:state.playing?`正在播放第 ${state.current+1} 句`:state.singlePlaying?`单句播放 · 第 ${state.current+1} 句`:state.playbackProgress>=100?'已读完':state.current>=0?`已暂停 · 第 ${state.current+1} 句`:'全文朗读';
+      target.innerHTML=`<div class="listen-stage"><div class="player" aria-label="全文朗读播放控制"><button id="playAll" class="play-round" type="button" aria-label="${state.playing?'暂停全文朗读':(state.current>=0&&state.playbackProgress<100?'继续播放全文朗读':'播放全文朗读')}" title="${state.playing?'暂停':(state.current>=0&&state.playbackProgress<100?'继续播放':'播放全文朗读')}">${state.playing?'<svg class="pi pi-pause" viewBox="0 0 24 24" aria-hidden="true"><path d="M7 5h3v14H7zM14 5h3v14h-3z"/></svg>':'<svg class="pi pi-play" viewBox="0 0 24 24" aria-hidden="true"><path d="M8 5v14l11-7z"/></svg>'}</button><div class="player-main"><div class="player-top"><strong class="player-status">${playbackStatus}</strong><div class="speed-control"><label for="speedSlider">语速</label><input id="speedSlider" class="speed-slider" style="--speed-fill:${rateFill}%" type="range" min="0.6" max="1.1" step="0.1" value="${rate}" aria-label="调整朗读倍速"><span class="speed-value" id="speedValue">${rate.toFixed(1)}x</span></div></div><input id="playbackSeek" class="playback-seek" type="range" min="0" max="1000" step="1" value="${Math.round(progress*10)}" style="--seek-fill:${progress}%" aria-label="朗读进度，可拖动跳转"><div class="playback-meta"><span>${state.current>=0?`第 ${state.current+1} / ${total} 句`:'准备播放'}</span><span>${progress}%</span></div></div></div></div>`;
+      $('#playAll').onclick=()=>playAll(()=>complete('reading',100,'全文朗读完成'));
+      $('#speedSlider').oninput=event=>{state.rate=Number(event.target.value);event.target.style.setProperty('--speed-fill',`${((state.rate-0.6)/0.5)*100}%`);$('#speedValue').textContent=`${state.rate.toFixed(1)}x`;if(currentAudio)currentAudio.playbackRate=state.rate;};
+      const seekBar=$('#playbackSeek');
+      if(seekBar){
+        seekBar.addEventListener('pointerdown',()=>{ state.dragWasPlaying = state.playing; });
+        seekBar.addEventListener('keydown',()=>{ state.dragWasPlaying = state.playing; });
+        seekBar.addEventListener('input',()=>{
+          const ratio=Number(seekBar.value)/1000;
+          const total=sentences().length; if(!total)return;
+          const position=Math.max(0,Math.min(1,ratio))*total;
+          const index=Math.min(total-1,Math.floor(position));
+          const fraction=position-index;
+          ++state.speechToken; speechSynthesis.cancel();
+          state.singlePlaying=true; state.playing=false;
+          state.current=index; state.playbackProgress=Math.round(ratio*100);
+          if(audioEnabled()){
+            stopAllAudio();
+            const audio=audioFor(index);
+            currentAudio=audio;
+            audio.ontimeupdate=null; audio.onended=null;
+            const startPreview=()=>{ audio.playbackRate=state.rate; audio.currentTime=0; if(audio.duration&&fraction>0)audio.currentTime=Math.min(fraction*audio.duration,audio.duration-0.05); audio.play().catch(()=>{}); };
+            if(audio.readyState>=1)startPreview(); else audio.onloadedmetadata=startPreview;
+          }else{
+            speak(sentences()[index],state.rate);
+          }
+          updatePlaybackUI(index,total,ratio);
+        });
+        seekBar.addEventListener('change',()=>{
+          const ratio=Number(seekBar.value)/1000;
+          if(audioEnabled())seekAudio(ratio); else seekTo(ratio);
+        });
+      }
     }
-    async function submitRecording(core){try{await api(`/api/recordings/${encodeURIComponent(currentUserId())}`,{method:'POST',headers:{'content-type':'application/json'},body:JSON.stringify({cardId:state.card.cardId,targetSentence:core,mime:state.recordingBlob?.type,size:state.recordingBlob?.size})});complete('listening',100,'录音已提交，等待评分');}catch(error){toast(error.message);}}
+
+    function scoreFeedbackHtml(result){
+      const praise=result.overall>=85?'发音很标准，太棒了！':result.overall>=70?'大部分词都读对了，继续加油！':'别灰心，多听几遍示范再试一次！';
+      const chips=result.words.map(w=>{
+        const label=({ok:'读得好',low:'需改进',wrong:'读错',missing:'漏读'})[w.status]||'';
+        const title=w.status==='wrong'?` title="读成了 ${escapeHtml(w.heard||'？')}"`:'';
+        return `<span class="word-chip ${w.status}"${title}><i aria-hidden="true"></i>${escapeHtml(w.word)}<em>${label}</em></span>`;
+      }).join('');
+      return `<details class="ai-details" open><summary>AI 评价</summary><div class="ai-body"><div class="score-words">${chips}</div><p class="ai-note"><strong>${praise}</strong><span>${buildAdvice(result)}</span></p></div></details>`;
+    }
+    function buildAdvice(result){
+      const okCount=result.words.filter(w=>w.status==='ok').length;
+      const total=result.words.length;
+      const items=[];
+      for(const w of result.words){
+        if(w.status==='wrong')items.push(`「${w.word}」可能读成了${w.heard?`「${w.heard}」`:'别的词'}`);
+        else if(w.status==='low')items.push(`「${w.word}」发音可能还不够清楚`);
+        else if(w.status==='missing')items.push(`「${w.word}」好像没有读出来`);
+      }
+      if(!items.length)return '每个词都读得很棒，继续保持！';
+      const sentence=items.join('，');
+      if(okCount===0)return `${sentence}。也可能只是识别没听清，跟着示范再读一遍试试吧！`;
+      if(okCount/total>=0.6)return `${sentence}。其它词听起来都很棒！`;
+      return `${sentence}。再听几遍示范，读慢一点可能会更清楚！`;
+    }
+    function confettiHtml(){
+      const colors=['#f47b63','#f2b64a','#2f8b68','#3979d8','#c94d4d'];
+      let bits='';
+      for(let i=0;i<14;i++){
+        bits+=`<i style="left:${(i*7+3)%95}%;background:${colors[i%colors.length]};animation-delay:${(i%4)*0.12}s"></i>`;
+      }
+      return `<span class="confetti" aria-hidden="true">${bits}</span>`;
+    }
+    function waveBars(){
+      let out='';
+      for(let k=1;k<=16;k++)out+=`<i data-pct="${Math.round(k/16*100)}"></i>`;
+      return out;
+    }
+    function fmtTime(secs){
+      const s=Math.max(0,Math.floor(secs||0));
+      return `${Math.floor(s/60)}:${String(s%60).padStart(2,'0')}`;
+    }
+    function scoreBand(score){return score>=85?'high':score>=70?'mid':'low';}
+    function voiceBarHtml(i,isRecording){
+      if(isRecording){
+        const secs=state.recordingStartedAt?Math.floor((Date.now()-state.recordingStartedAt)/1000):0;
+        return `<div class="voice-bar recording" data-voice-bar="${i}"><span class="rec-dot" aria-hidden="true"></span><div class="voice-wave playing" aria-hidden="true">${waveBars()}</div><b class="rec-timer" data-rec-timer>${fmtTime(secs)}</b><span class="rec-label">录音中</span><span class="voice-stop">■ 停止</span></div>`;
+      }
+      if(!state.recordingUrls[i]&&!state.scores[i]){
+        return `<div class="voice-bar empty" data-voice-bar="${i}" role="button" tabindex="0"><span class="voice-empty-text">0:00 / 0:00 · 点击开始录音哦~</span></div>`;
+      }
+      const score=state.scores[i]?state.scores[i].overall:null;
+      const badge=score!=null?`<span class="voice-score ${scoreBand(score)}">${score}<i>分</i></span>`:'';
+      const rerecord=`<button class="voice-rerecord" data-voice-rerecord="${i}" type="button">重录</button>`;
+      return `<div class="voice-bar" data-voice-bar="${i}" role="button" tabindex="0"><button class="voice-play" data-voice-play="${i}" type="button" aria-label="播放">▶</button><div class="voice-wave" data-voice-wave="${i}" aria-hidden="true">${waveBars()}</div><span class="voice-time" data-voice-time="${i}">0:00 / 0:00</span>${rerecord}${badge}<audio data-record-audio="${i}" hidden preload="auto"></audio></div>`;
+    }
+    function toggleRecordPlay(i){
+      const audio=document.querySelector(`[data-record-audio="${i}"]`);
+      if(!audio||!state.recordingUrls[i])return;
+      if(audio.src!==state.recordingUrls[i])audio.src=state.recordingUrls[i];
+      if(audio.paused){audio.play().catch(()=>{});}else{audio.pause();}
+    }
+    function updateVoiceWave(i,audio,reset){
+      const wave=document.querySelector(`[data-voice-wave="${i}"]`);
+      const time=document.querySelector(`[data-voice-time="${i}"]`);
+      const dur=audio.duration||0;
+      const cur=reset?0:audio.currentTime||0;
+      const pct=dur?Math.min(1,cur/dur):0;
+      if(wave){
+        wave.querySelectorAll('i').forEach(bar=>{
+          bar.classList.toggle('played',Number(bar.dataset.pct)<=pct*100);
+        });
+      }
+      if(time)time.textContent=`${fmtTime(cur)} / ${fmtTime(dur)}`;
+    }
+    function saveRecordingState(){
+      try{
+        if(!state.card)return;
+        const data={};
+        practiceSentences().forEach((_,i)=>{
+          const audio=state.recordingDataUrls[i]||null;
+          if(state.scores[i]||audio)data[i]={score:state.scores[i]||null,audio};
+        });
+        localStorage.setItem('fsr:rec:'+state.card.cardId,JSON.stringify(data));
+      }catch{}
+    }
+    function loadRecordingState(){
+      try{
+        if(!state.card)return;
+        const raw=localStorage.getItem('fsr:rec:'+state.card.cardId);
+        if(!raw)return;
+        const data=JSON.parse(raw);
+        for(const k in data){
+          const i=Number(k);
+          if(data[i].audio){state.recordingUrls[i]=data[i].audio;state.recordingDataUrls[i]=data[i].audio;}
+          if(data[i].score){state.scores[i]=data[i].score;state.scoring[i]=false;}
+          if(data[i].score&&!state.submittedPractice.includes(i))state.submittedPractice.push(i);
+        }
+      }catch{}
+    }
+    function animateScoreRings(){
+      $$('.score-ring[data-score]').forEach(el=>{
+        const target=Number(el.dataset.score)||0;
+        const num=el.querySelector('b');
+        const start=performance.now();
+        const dur=900;
+        const step=now=>{
+          const t=Math.min(1,(now-start)/dur);
+          const val=Math.round(target*(1-Math.pow(1-t,3)));
+          el.style.setProperty('--score',String(val));
+          if(num)num.textContent=String(val);
+          if(t<1)requestAnimationFrame(step);
+        };
+        requestAnimationFrame(step);
+      });
+    }
+    function renderListeningPractice() {
+      const practice=practiceSentences();
+      const target=$('#practiceSection');
+      if(!target)return;
+      const completedCount=state.submittedPractice.length;
+      target.innerHTML=`<div class="panel practice-shell"><div class="practice-intro"><div><h2 class="section-title task-title"><span class="task-tag">Task 2</span><span class="task-divider" aria-hidden="true"></span><span class="task-name">Read</span></h2><p class="muted">点击“听示范”熟悉语音，再开始录音。</p></div><span class="badge ${isDone('listening')?'success':''}">${isDone('listening')?'已完成':`${completedCount} / ${practice.length} 已提交`}</span></div><div class="practice-card-list">${practice.map((item,i)=>{const isRecording=Boolean(state.recording)&&state.recordingIndex===i;const isSubmitted=state.submittedPractice.includes(i)||isDone('listening');return `<article class="record-box ${isRecording?'recording':''} ${isSubmitted?'complete':''}"><div class="practice-card-number">第 ${i+1} / ${practice.length} 句${isSubmitted?' · 已评分':''}</div><div class="practice-sentence-row"><blockquote>${escapeHtml(item.sentence)}</blockquote><button class="btn demo" data-demo-sentence="${i}" type="button">听示范</button></div>${voiceBarHtml(i,isRecording)}${state.unrecognized[i]?`<p class="ai-note unrecognized">好像没有听清你的声音，请点击「重录」再试一次。</p>`:''}${state.scoring[i]?`<div class="score-result loading">正在评分…</div>`:''}${state.scores[i]?scoreFeedbackHtml(state.scores[i]):''}</article>`;}).join('')}</div></div>`;
+      $$('[data-demo-sentence]').forEach(button=>button.onclick=()=>{const index=Number(button.dataset.demoSentence);state.practiceCurrent=index;const item=practice[index];if(audioEnabled()){const demoIndex=practiceDemoIndex(item);if(demoIndex>=0){if(state.playing)pauseAudioPlayback();else if(state.singlePlaying){++state.speechToken;state.singlePlaying=false;state.previewIndex=null;stopAllAudio();renderReading();}const audio=audioFor(demoIndex);currentAudio=audio;audio.currentTime=0;audio.playbackRate=state.rate;audio.ontimeupdate=null;audio.onended=null;audio.play().catch(()=>{});return;}}speak(practice[index].sentence,state.rate);});
+      $$('[data-voice-rerecord]').forEach(btn=>btn.onclick=e=>{e.stopPropagation();toggleRecording(Number(btn.dataset.voiceRerecord));});
+      $$('[data-voice-bar]').forEach(el=>{
+        const index=Number(el.dataset.voiceBar);
+        const act=()=>{
+          if(state.recording&&state.recordingIndex===index){toggleRecording(index);return;}
+          if(!state.recordingUrls[index]&&!state.scores[index]){toggleRecording(index);return;}
+          toggleRecordPlay(index);
+        };
+        el.onclick=act;
+        el.onkeydown=e=>{if(e.key==='Enter'||e.key===' '){e.preventDefault();act();}};
+      });
+      $$('[data-voice-play]').forEach(btn=>btn.onclick=e=>{e.stopPropagation();toggleRecordPlay(Number(btn.dataset.voicePlay));});
+      $$('[data-record-audio]').forEach(audio=>{
+        const index=Number(audio.dataset.recordAudio);
+        audio.src=state.recordingUrls[index]||'';
+        audio.ontimeupdate=()=>updateVoiceWave(index,audio);
+        audio.onloadedmetadata=()=>updateVoiceWave(index,audio,true);
+        audio.onplay=()=>{const b=document.querySelector(`[data-voice-play="${index}"]`);if(b)b.textContent='⏸';document.querySelector(`[data-voice-wave="${index}"]`)?.classList.add('playing');};
+        audio.onpause=()=>{const b=document.querySelector(`[data-voice-play="${index}"]`);if(b)b.textContent='▶';document.querySelector(`[data-voice-wave="${index}"]`)?.classList.remove('playing');};
+        audio.onended=()=>{const b=document.querySelector(`[data-voice-play="${index}"]`);if(b)b.textContent='▶';updateVoiceWave(index,audio,true);document.querySelector(`[data-voice-wave="${index}"]`)?.classList.remove('playing');};
+      });
+    }
+
+    async function toggleRecording(index){
+      if(state.recording){if(state.recordingIndex===index)state.recording.stop();return;}
+      if(!navigator.mediaDevices?.getUserMedia||!window.MediaRecorder){showError({title:'录音不可用',message:'当前浏览器不支持录音，可通过全文朗读完成本模块。',source:'录音'});return;}
+      try{const stream=await navigator.mediaDevices.getUserMedia({audio:true});const chunks=[];const recorder=new MediaRecorder(stream);state.recording=recorder;state.recordingIndex=index;state.recordingStartedAt=Date.now();state.recordingTimer=setInterval(()=>{$$('[data-rec-timer]').forEach(el=>{el.textContent=fmtTime((Date.now()-state.recordingStartedAt)/1000);});},250);recorder.ondataavailable=e=>chunks.push(e.data);recorder.onstop=()=>{clearInterval(state.recordingTimer);state.recordingTimer=null;state.recordingStartedAt=null;stream.getTracks().forEach(track=>track.stop());const blob=new Blob(chunks,{type:recorder.mimeType||'audio/webm'});if(state.recordingUrls[index])URL.revokeObjectURL(state.recordingUrls[index]);state.recordingUrls[index]=URL.createObjectURL(blob);state.recordingBlobs[index]=blob;delete state.scores[index];delete state.scoring[index];delete state.unrecognized[index];state.submittedPractice=state.submittedPractice.filter(x=>x!==index);state.recording=null;state.recordingIndex=-1;const reader=new FileReader();reader.onload=()=>{state.recordingDataUrls[index]=reader.result;saveRecordingState();};reader.readAsDataURL(blob);renderListeningPractice();saveRecordingState();const pItem=practiceSentences()[index];submitRecording(typeof pItem==='string'?pItem:(pItem&&pItem.sentence)||'',index,practiceSentences().length);};recorder.start();renderListeningPractice();}catch{state.recordingIndex=-1;showError({title:'无法开始录音',message:'没有获得麦克风权限，请在浏览器设置中允许录音。',detail:'请在浏览器地址栏的权限设置中允许麦克风后重试。',source:'录音',retry:()=>toggleRecording(index)});}
+    }
+    async function submitRecording(sentence,index,total){try{const blob=state.recordingBlobs[index];if(!blob)return;state.scoring[index]=true;state.scores[index]=null;renderListeningPractice();const form=new FormData();form.append('audio',blob,`rec-${index}.webm`);form.append('text',sentence);const res=await fetch(SCORE_ENDPOINT,{method:'POST',body:form});if(!res.ok)throw new Error('评分服务暂时不可用，请稍后再试');const result=await res.json();state.scoring[index]=false;if(result.recognized===false){state.scores[index]=null;state.unrecognized[index]=true;}else{state.scores[index]=result;state.unrecognized[index]=false;if(!state.submittedPractice.includes(index))state.submittedPractice.push(index);if(state.submittedPractice.length===total)complete('listening',100,'全部跟读录音已评分');}renderListeningPractice();saveProgress();saveRecordingState();}catch(error){state.scoring[index]=false;renderListeningPractice();showError({title:'录音评分失败',message:error?.message||'评分服务暂时不可用，请稍后再试。',detail:'录音已保存在本机，可点击重试重新评分。',source:'评分',retry:()=>submitRecording(sentence,index,total)});}}
+
+    function shuffled(items){const result=[...items];for(let index=result.length-1;index>0;index--){const swap=Math.floor(Math.random()*(index+1));[result[index],result[swap]]=[result[swap],result[index]];}return result;}
+    function wordTileWords(){return words().slice(0,6).map((word,index)=>({index:String(index),word,english:String(word.english||word.word||''),meaning:String(word.chinese||word.meaning||'')}));}
+    function ensureWordTileOrder(items){const expected=items.flatMap(item=>[`${item.index}:word`,`${item.index}:image`]);if(state.wordTileOrder.length!==expected.length||state.wordTileOrder.some(id=>!expected.includes(id))){if(!state.wordTileMatched.length){clearTimeout(state.wordTileTimer);state.wordTileSequence+=1;state.wordTileCombo=0;state.wordTileCelebration=null;state.wordTileLocked=false;}state.wordTileOrder=shuffled(expected);}}
+    function wordTileImageSource(word){const value=word.image_file||word.image||word.illustration||'';return value?(/^(?:https?:|data:|\/)/i.test(value)?value:`/${value}`):'';}
+    function wordTileIllustration(item){
+      const image=wordTileImageSource(item.word);
+      if(image)return `<span class="word-tile-image"><img src="${escapeHtml(image)}" alt="${escapeHtml(item.meaning||item.english)}"></span><span class="word-tile-caption">图片卡</span>`;
+      const key=item.english.toLowerCase();
+      const illustrations={
+        bud:['花蕾','<path d="M32 54V35"/><path d="M32 37c-10-5-13-15-7-22 5 1 8 4 9 9 2-5 5-8 10-9 6 8 2 17-8 22"/><path d="M32 45c-7 0-12 4-14 9"/>'],
+        roots:['根','<path d="M32 10v19"/><path d="M18 25c7 3 21 3 28 0"/><path d="M32 29v25"/><path d="M32 38 22 49"/><path d="M32 42 43 54"/><path d="m26 45-7 9"/><path d="m39 47 5 7"/>'],
+        soil:['土壤','<path d="M10 22c8-5 15 5 23 0s15 5 21 0"/><path d="M9 31h46"/><path d="M12 41h40"/><path d="M16 50h32"/><circle cx="20" cy="36" r="1.5"/><circle cx="42" cy="45" r="1.5"/>'],
+        sunlight:['阳光','<circle cx="32" cy="32" r="11"/><path d="M32 8v9M32 47v9M8 32h9M47 32h9M15 15l6 6M43 43l6 6M49 15l-6 6M21 43l-6 6"/>'],
+        petals:['花瓣','<circle cx="32" cy="32" r="5"/><path d="M32 27c-8-5-8-15 0-19 8 4 8 14 0 19ZM37 31c3-9 13-11 19-4-2 9-11 12-19 4ZM35 36c9 1 13 11 7 18-9 0-14-9-7-18ZM29 36c6 7 1 17-8 18-6-7-2-17 8-18ZM27 31c-8 8-17 4-19-4 6-7 16-5 19 4Z"/>'],
+        unfold:['展开','<path d="M32 52V33"/><path d="M32 36c-12 0-19-8-18-18 10-1 18 5 18 18ZM32 36c12 0 19-8 18-18-10-1-18 5-18 18Z"/><path d="M32 30c-5-8-4-16 0-22 5 6 5 14 0 22Z"/>']
+      };
+      const [label,drawing]=illustrations[key]||['图片占位','<rect x="11" y="13" width="42" height="38" rx="6"/><circle cx="24" cy="26" r="4"/><path d="m16 44 11-10 8 7 6-5 7 8"/>'];
+      const caption=illustrations[key]?label:(item.meaning||item.english);
+      return `<span class="word-tile-image"><svg viewBox="0 0 64 64" aria-hidden="true">${drawing}</svg></span><span class="word-tile-caption">${escapeHtml(caption)}</span>`;
+    }
+    function wordTileIsClearing(){return state.wordTileFeedback.some(value=>value.startsWith('clear:'));}
+    function wordTileStatus(items){if(!items.length)return '暂无可配对的核心词';if(state.wordTileMatched.length===items.length)return '点击"洗牌"，重新开始吧！';if(wordTileIsClearing())return '匹配成功，正在消除这组卡片';if(state.wordTileFeedback.length)return '差一点，这两张不是搭档，再看仔细些';if(state.wordTileSelected)return '已经锁定一张，现在找出它的搭档';return '先选一张卡，再找出对应的单词或图片';}
+    function wordTileStatusIcon(complete){if(complete||wordTileIsClearing())return '<svg viewBox="0 0 24 24" aria-hidden="true"><path d="m6 12 4 4 8-9"/></svg>';if(state.wordTileFeedback.length)return '<svg viewBox="0 0 24 24" aria-hidden="true"><path d="M12 8v5"/><path d="M12 17h.01"/><circle cx="12" cy="12" r="9"/></svg>';return '<svg viewBox="0 0 24 24" aria-hidden="true"><circle cx="10.5" cy="10.5" r="6.5"/><path d="m15.5 15.5 4 4"/></svg>';}
+    function wordTileSideHtml(item){return `<div class="word-side-card${state.wordTileNewSide===item.index?' new-in':''}" data-side-card role="button" tabindex="0" aria-label="${escapeHtml(item.english)}"><div class="word-side-media">${wordTileIllustration(item)}</div><strong class="word-side-word">${escapeHtml(item.english)}</strong></div>`;}
+    function playWordTileSound(kind){
+      try{
+        const AudioContextClass=window.AudioContext||window.webkitAudioContext;
+        if(!AudioContextClass)return;
+        wordTileAudioContext??=new AudioContextClass();
+        if(wordTileAudioContext.state==='suspended')wordTileAudioContext.resume().catch(()=>{});
+        const now=wordTileAudioContext.currentTime+.01;
+        const tone=(frequency,delay,duration,endFrequency=frequency,type='sine',volume=.055)=>{const oscillator=wordTileAudioContext.createOscillator();const gain=wordTileAudioContext.createGain();const start=now+delay;oscillator.type=type;oscillator.frequency.setValueAtTime(frequency,start);oscillator.frequency.exponentialRampToValueAtTime(Math.max(endFrequency,1),start+duration);gain.gain.setValueAtTime(.0001,start);gain.gain.exponentialRampToValueAtTime(volume,start+.012);gain.gain.exponentialRampToValueAtTime(.0001,start+duration);oscillator.connect(gain).connect(wordTileAudioContext.destination);oscillator.start(start);oscillator.stop(start+duration+.02);};
+        if(kind==='match'){tone(740,0,.09,1040,'sine',.06);tone(1120,.065,.085,1320,'sine',.045);}
+        if(kind==='eliminated')tone(460,0,.1,150,'triangle',.065);
+        if(kind==='combo'){tone(660,0,.12,720,'triangle',.05);tone(880,.09,.12,960,'triangle',.055);tone(1175,.18,.16,1320,'sine',.06);}
+      }catch{}
+    }
+    function wordTileCelebrationHtml(){const feedback=state.wordTileCelebration;if(!feedback)return '';if(feedback.stage==='flying')return '<div class="word-match-burst flying" role="status" aria-live="assertive"><div class="burst-card"><div class="burst-media">'+wordTileIllustration(feedback.item)+'</div><strong>'+escapeHtml(feedback.item.english)+'</strong></div></div>';const animated=!state.wordTileBurstShown;state.wordTileBurstShown=true;return '<div class="word-match-burst eliminated'+(animated?' burst-in':'')+'" role="status" aria-live="assertive"><div class="burst-card"><div class="burst-media">'+wordTileIllustration(feedback.item)+'</div><strong>'+escapeHtml(feedback.item.english)+'</strong></div></div>';}
+    function renderWordTileGame(items){
+      ensureWordTileOrder(items);
+      const cards=state.wordTileOrder.map(id=>{const [pair,kind]=id.split(':');const item=items.find(entry=>entry.index===pair);if(!item)return '';if(state.wordTileMatched.includes(pair))return '<span class="word-tile-slot" aria-hidden="true"></span>';const selected=state.wordTileSelected===id;const feedback=state.wordTileFeedback.includes(id);const clearing=state.wordTileFeedback.includes(`clear:${id}`);const label=kind==='word'?`单词卡：${item.english}`:`图片卡：${item.meaning||item.english}`;return `<button type="button" class="word-tile ${kind} ${selected?'selected':''} ${feedback?'mismatch':''} ${clearing?'clearing':''}" data-word-tile="${id}" aria-pressed="${selected}" aria-label="${escapeHtml(label)}" ${state.wordTileLocked?'disabled':''}>${kind==='word'?`<strong class="word-tile-text">${escapeHtml(item.english)}</strong>`:`${wordTileIllustration(item)}`}${selected?'<span class="word-tile-pick" aria-hidden="true"><svg viewBox="0 0 20 20"><path d="m4 10 4 4 8-9"/></svg></span>':''}</button>`;}).join('');
+      const remaining=items.length-state.wordTileMatched.length;
+      const complete=items.length>0&&state.wordTileMatched.length===items.length;
+      const progress=items.map((_,index)=>`<span class="${index<state.wordTileMatched.length?'done':''}"></span>`).join('');
+      return `<section class="subsection word-tile-game" aria-labelledby="wordTileTitle"><div class="practice-intro"><div><p class="eyebrow">Word Match</p><h2 class="section-title" id="wordTileTitle">消消乐</h2></div></div><p class="muted words-desc">从卡片中选出单词与图片的配对。先点击一张卡片，再点击其对应的另一张，配对成功则两张卡片同时消除。</p><div class="word-game-layout"><div class="word-game-shell ${complete?'complete':''}">${wordTileCelebrationHtml()}${state.wordTileCelebration?'<div class="word-modal-overlay"></div>':''}<div class="word-game-hud"><div class="word-game-score"><span>已消除</span><strong>${state.wordTileMatched.length} / ${items.length}</strong></div></div><div class="word-game-progress" style="grid-template-columns:repeat(${Math.max(items.length,1)},1fr)" aria-hidden="true">${progress}</div><div class="word-tile-board" role="group" aria-label="单词与图片配对棋盘，剩余 ${remaining} 张卡">${cards||'<span class="word-tile-empty">全部消除！</span>'}</div><div class="word-tile-status" aria-live="polite"><div class="word-tile-status-copy"><span class="word-tile-status-icon">${wordTileStatusIcon(complete)}</span><p class="${complete?'success-copy':''}">${wordTileStatus(items)}</p></div><button class="word-game-reset" id="resetWordTiles" type="button">洗牌</button></div></div><aside class="word-side-panel" aria-label="已配对的单词"><div class="word-side-panel-title">已配对</div><div class="word-side-grid">${items.map(item=>state.wordTileSide.includes(item.index)?wordTileSideHtml(item):'<div class="word-side-card empty" aria-hidden="true"><span>?</span></div>').join('')}</div></aside></div></section>`;
+    }
+    function handleWordTile(id){
+      if(state.wordTileLocked)return;
+      if(state.wordTileCelebration){state.wordTileSequence+=1;clearTimeout(state.wordTileTimer);state.wordTileCelebration=null;}
+      const [pair,kind]=id.split(':');
+      if(state.wordTileMatched.includes(pair))return;
+      if(state.wordTileSelected===id){state.wordTileSelected=null;renderWords();return;}
+      if(!state.wordTileSelected){state.wordTileSelected=id;renderWords();return;}
+      const first=state.wordTileSelected;
+      const [firstPair,firstKind]=first.split(':');
+      state.wordTileLocked=true;
+      clearTimeout(state.wordTileTimer);
+      if(firstPair===pair&&firstKind!==kind){
+        const combo=state.wordTileCombo+1;
+        const sequence=++state.wordTileSequence;
+        state.wordTileCombo=combo;
+        const item=wordTileWords().find(entry=>entry.index===pair);
+        state.wordTileFeedback=[`clear:${first}`,`clear:${id}`];
+        state.wordTileCelebration={stage:'show',item};
+        playWordTileSound('eliminated');
+        renderWords();
+        state.wordTileTimer=setTimeout(()=>{
+          if(sequence!==state.wordTileSequence)return;
+          if(!state.wordTileMatched.includes(pair))state.wordTileMatched.push(pair);
+          state.wordTileSelected=null;
+          state.wordTileFeedback=[];
+          state.wordTileLocked=false;
+          state.wordTileCelebration={stage:'flying',item};
+          renderWords();
+          saveProgress();
+          const burst=document.querySelector('.word-match-burst.flying');
+          const panel=document.querySelector('.word-side-panel');
+          const shell=document.querySelector('.word-game-shell');
+          if(burst&&panel&&shell){
+            const sr=shell.getBoundingClientRect();
+            const pr=panel.getBoundingClientRect();
+            burst.style.setProperty('--fly-x',`${pr.left+pr.width/2-(sr.left+sr.width/2)}px`);
+            burst.style.setProperty('--fly-y',`${pr.top+pr.height/2-(sr.top+sr.height/2)}px`);
+          }
+          let flyDone=false;
+          const finishFly=()=>{
+            if(flyDone)return;
+            flyDone=true;
+            if(sequence!==state.wordTileSequence)return;
+            state.wordTileNewSide=pair;
+            if(!state.wordTileSide.includes(pair))state.wordTileSide.push(pair);
+            state.wordTileCelebration=null;
+            renderWords();
+            state.wordTileNewSide=null;
+            completeWordsIfReady();
+            saveProgress();
+          };
+          if(burst)burst.addEventListener('animationend',finishFly,{once:true});
+          setTimeout(finishFly,450);
+        },350);
+      }else{
+        state.wordTileSequence+=1;
+        state.wordTileCombo=0;
+        state.wordTileCelebration=null;
+        state.wordTileFeedback=[first,id];
+        renderWords();
+        state.wordTileTimer=setTimeout(()=>{state.wordTileSelected=null;state.wordTileFeedback=[];state.wordTileLocked=false;renderWords();},650);
+      }
+    }
+    function resetWordTiles(){clearTimeout(state.wordTileTimer);state.wordTileSequence+=1;state.wordTileOrder=[];state.wordTileSelected=null;state.wordTileMatched=[];state.wordTileSide=[];state.wordTileFeedback=[];state.wordTileLocked=false;state.wordTileCombo=0;state.wordTileCelebration=null;state.wordTileNewSide=null;state.moduleStatus.words={completed:false,score:0};renderWords();saveProgress();}
+    function contextPracticeIsCorrect(){const qs=contextQuestions();return !qs.length||(state.contextChecked&&!state.contextWrong.length&&qs.every((q,index)=>state.context[index]===contextAnswer(q)));}
+    function completeWordsIfReady(){const pairs=state.card.wordModule?.matchPairs||words();const tiles=wordTileWords();if(state.matched.length===pairs.length&&state.wordTileMatched.length===tiles.length&&contextPracticeIsCorrect()){complete('words',100,'词汇练习全部正确！');return true;}return false;}
 
     function renderWords(){
       const pairs=state.card.wordModule?.matchPairs||words().map(word=>({word:word.english,meaning:word.chinese||word.meaning}));
+      const tileWords=wordTileWords();
+
       const meanings=[...pairs].sort((a,b)=>a.meaning.localeCompare(b.meaning));
-      $('#wordsModule').innerHTML=`<div class="panel practice-shell"><div class="practice-intro"><div><p class="eyebrow">Word Match</p><h2 class="section-title">把核心词和含义连起来</h2><p class="muted">先选左边的单词，再选右边的含义。正确配对会被锁定。</p></div><span class="badge ${state.matched.length===pairs.length?'success':''}">${state.matched.length} / ${pairs.length} 已配对</span></div><div class="match-board"><div class="match-column">${pairs.map(pair=>`<button type="button" class="match-choice ${state.selectedWord===pair.word?'selected':''} ${state.matched.includes(pair.word)?'matched':''}" data-match-word="${escapeHtml(pair.word)}" ${state.matched.includes(pair.word)?'disabled':''}>${escapeHtml(pair.word)}</button>`).join('')}</div><div class="match-column">${meanings.map(pair=>`<button type="button" class="match-choice ${state.selectedMeaning===pair.meaning?'selected':''} ${state.matched.includes(pair.word)?'matched':''}" data-match-meaning="${escapeHtml(pair.meaning)}" data-match-answer="${escapeHtml(pair.word)}" ${state.matched.includes(pair.word)?'disabled':''}>${escapeHtml(pair.meaning)}</button>`).join('')}</div></div><div class="btn-row" style="margin-top:12px"><button class="btn" id="resetMatch" type="button">重置配对</button></div><div class="subsection"><p class="eyebrow">Word in context</p><h2 class="section-title">在句子里选择正确单词</h2><div id="contextQuestions">${renderQuestions(contextQuestions(),state.context,'context')}</div><div class="btn-row"><button class="btn primary" id="checkWords" type="button">检查词汇练习</button><button class="btn ghost" data-next="comprehension" type="button">下一步：3Q 理解</button></div></div></div>`;
+      const bankSlots=Array.from({length:6},(_,index)=>words()[index]||null);
+      const toneFor=word=>(state.matched.includes(word)?state.matched.indexOf(word):state.matched.length)%6;
+      // 结果栏：已匹配的词->含义，样式同词卡 box
+      const matchedResults=state.matched.map(word=>{const pair=pairs.find(p=>p.word===word);const tone=toneFor(word);const isNew=state.newMatchWord===word?' is-new':'';return pair?`<article class="match-result-chip${isNew}" data-tone="${tone}"><strong>${escapeHtml(pair.word)}</strong><span class="match-arrow">→</span><small>${escapeHtml(pair.meaning)}</small></article>`:'';}).join('');
+      const resultsBox=matchedResults?`<div class="match-results-box" aria-label="已匹配结果"><p class="match-results-title"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="m4 12 5 5 11-11"/></svg>已配对 · ${state.matched.length} / ${pairs.length}</p>${matchedResults}</div>`:'';
+      state.newMatchWord=null;
+      // 匹配板：过滤掉已匹配项
+      const remainingPairs=pairs.filter(pair=>!state.matched.includes(pair.word));
+      const remainingMeanings=meanings.filter(pair=>!state.matched.includes(pair.word));
+      const matchBoard=remainingPairs.length?`<div class="match-board"><div class="match-column">${remainingPairs.map(pair=>{const done=state.matched.includes(pair.word);return `<button type="button" class="match-choice ${state.selectedWord===pair.word?'selected':''} ${done?'matched':''} ${state.matchWrong&&state.matchWrong.includes(pair.word)?'wrong':''} ${state.matchSuccess&&state.matchSuccess.includes(pair.word)?'correct':''}" data-tone="${toneFor(pair.word)}" data-match-word="${escapeHtml(pair.word)}" ${done||(state.matchSuccess&&state.matchSuccess.includes(pair.word))?'disabled':''}>${escapeHtml(pair.word)}${state.selectedWord===pair.word?'<span class="match-check"> ✓</span>':''}</button>`;}).join('')}</div><div class="match-column">${remainingMeanings.map(pair=>{const done=state.matched.includes(pair.word);return `<button type="button" class="match-choice ${state.selectedMeaning===pair.meaning?'selected':''} ${done?'matched':''} ${state.matchWrong&&state.matchWrong.includes(pair.meaning)?'wrong':''} ${state.matchSuccess&&state.matchSuccess.includes(pair.meaning)?'correct':''}" data-tone="${toneFor(pair.word)}" data-match-meaning="${escapeHtml(pair.meaning)}" data-match-answer="${escapeHtml(pair.word)}" ${done||(state.matchSuccess&&state.matchSuccess.includes(pair.meaning))?'disabled':''}>${escapeHtml(pair.meaning)}${state.selectedMeaning===pair.meaning?'<span class="match-check"> ✓</span>':''}</button>`;}).join('')}</div></div>`:'';
+
+      $('#wordsModule').innerHTML=`<div class="panel practice-shell"><section aria-labelledby="wordBankTitle"><div class="word-bank-head"><h2 class="section-title task-title" id="wordBankTitle"><span class="task-tag">Task 3</span><span class="task-divider" aria-hidden="true"></span><span class="task-name">Words</span></h2>${state.wordBankReviewed?`<button class="link-btn" id="toggleWordBank" type="button">回看单词</button>`:''}</div><p class="muted words-guide">${state.wordBankReviewed?'练习时点右上角「回看单词」可回到词卡复习。':'先记住这些单词，再开始配对练习。'}</p><div class="word-bank-box" id="wordBankBox" ${state.wordBankReviewed?'hidden':''}>${bankSlots.map(word=>word?`<article class="word-card"><span class="word-card-image" aria-hidden="true"></span><span class="word-card-copy"><strong>${escapeHtml(word.english||word.word||'')}</strong><small>${escapeHtml(word.chinese||word.meaning||'')}</small></span></article>`:'<span class="word-card empty" aria-hidden="true"></span>').join('')}</div><div class="btn-row word-bank-actions">${state.wordBankReviewed?'':`<button class="btn primary" id="toggleWordBank" type="button">开始配对 →</button>`}</div></section><div class="words-practice" id="wordsPractice" ${state.wordBankReviewed?'':'hidden'}><div class="practice-intro"><div><p class="eyebrow">Meaning Match</p><h2 class="section-title">词义配对</h2></div><div class="intro-actions"><span class="badge ${state.matched.length===pairs.length?'success':''}">${state.matched.length} / ${pairs.length} 已配对</span><button class="link-btn" id="resetMatch" type="button">重置配对</button></div></div><p class="muted words-desc">将核心词与其对应的中文含义连线配对。先点击左侧的单词，再点击右侧的含义，配对正确即被锁定。</p>${resultsBox}${matchBoard}${renderWordTileGame(tileWords)}<section class="subsection" id="contextPractice"></section></div></div>${moduleCompleteBox('words')}`;
+      $('#toggleWordBank').onclick=()=>{state.wordBankReviewed=!state.wordBankReviewed;renderWords();saveProgress();};
       $$('[data-match-word]').forEach(button=>button.onclick=()=>{state.selectedWord=button.dataset.matchWord;tryMatch();renderWords();});
       $$('[data-match-meaning]').forEach(button=>button.onclick=()=>{state.selectedMeaning=button.dataset.matchMeaning;state.selectedMeaningAnswer=button.dataset.matchAnswer;tryMatch();renderWords();});
-      $('#resetMatch').onclick=()=>{state.matched=[];state.selectedWord=null;state.selectedMeaning=null;renderWords();saveProgress();};
-      bindQuestionOptions('context',state.context,contextQuestions(),renderWords);
-      $('#checkWords').onclick=()=>{const qs=contextQuestions();const correct=qs.filter((q,i)=>state.context[i]===answerKey(q)).length;const completeMatch=state.matched.length===pairs.length;if(!completeMatch||Object.keys(state.context).length<qs.length){toast('请先完成全部配对和语境题');return;}complete('words',Math.round((correct+state.matched.length)/(qs.length+pairs.length)*100),`词汇练习完成：${correct}/${qs.length} 道语境题正确`);renderWords();};
+      $('#resetMatch').onclick=()=>{state.matched=[];state.selectedWord=null;state.selectedMeaning=null;clearTimeout(state.matchWrongTimer);state.matchWrong=[];clearTimeout(state.matchSuccessTimer);state.matchSuccess=[];renderWords();saveProgress();};
+      $$('[data-word-tile]').forEach(button=>button.onclick=()=>handleWordTile(button.dataset.wordTile));
+      $('#resetWordTiles').onclick=resetWordTiles;
+      renderContextPractice();
       bindNext();
     }
-    function tryMatch(){if(!state.selectedWord||!state.selectedMeaning)return;if(state.selectedWord===state.selectedMeaningAnswer){state.matched.push(state.selectedWord);toast('配对正确');}else toast('还不匹配，再想一想');state.selectedWord=null;state.selectedMeaning=null;state.selectedMeaningAnswer=null;saveProgress();}
+    function contextAnswer(q){const options=normalizeOptions(q);return options[q.answer]||q.answer;}
+    function contextWordPool(){return [...new Set(contextQuestions().map(q=>String(contextAnswer(q))))];}
+    function contextQuestionImage(q){const image=q.image_file||q.image||'';return image?(/^(?:https?:|data:|\/)/i.test(image)?image:`/${image}`):'';}
+    function contextDropHtml(index){const wrong=state.contextChecked&&state.contextWrong.includes(index);return `<span class="context-drop ${state.context[index]?'filled':''} ${wrong?'wrong':''}" data-context-drop="${index}" role="button" tabindex="0" aria-label="第 ${index+1} 题填空">${state.context[index]?escapeHtml(state.context[index]):'________'}</span>`;}
+    function contextSentenceText(q,index){const raw=String(q.sentence||q.prompt||q.text||'').trim();const drop=contextDropHtml(index);const escaped=escapeHtml(raw);if(/_{2,}|…{2,}|□/.test(raw))return escaped.replace(/_{2,}|…{2,}|□/,drop);const answer=escapeHtml(contextAnswer(q));if(answer){const tokenPattern=new RegExp(answer.replace(/[.*+?^${}()|[\]\\]/g,'\\$&'),'i');if(tokenPattern.test(escaped))return escaped.replace(tokenPattern,drop);}const describes=raw.match(/^Which word describes (.+)\?$/i);if(describes)return `${escapeHtml(describes[1])} is ${drop}.`;const punctuation=raw.match(/^(.+?)([.!?])$/);if(punctuation)return `${escapeHtml(punctuation[1])} ${drop}${punctuation[2]}`;return `${escaped} ${drop}`;}
+    function renderContextPractice(){
+      const qs=contextQuestions();
+      const pool=contextWordPool();
+      Object.values(state.context).forEach(word=>{const index=pool.indexOf(String(word));if(index>=0)pool.splice(index,1);});
+      const section=$('#contextPractice');
+      if(!section)return;
+      section.innerHTML=`<div class="context-practice"><div class="context-head"><div><p class="eyebrow">Fill the Gap</p><h2 class="section-title">填空挑战</h2><p class="muted">从上方备选词中拖动或点击单词，放入句子的空格。</p></div><button class="link-btn" id="resetContext" type="button">重新填空</button></div><div class="context-word-bank" id="contextWordBank" aria-label="备选词">${pool.length?pool.map(word=>`<button type="button" class="context-word ${state.contextSelected===word?'selected':''} ${state.contextReturned.includes(word)?'returned':''}" draggable="true" data-context-word="${escapeHtml(word)}">${escapeHtml(word)}</button>`).join(''):'<span class="muted">所有备选词都已放入句子。</span>'}</div><div class="context-sentences">${qs.map((q,i)=>{const image=contextQuestionImage(q);const wrong=state.contextChecked&&state.contextWrong.includes(i);const shake=wrong&&state.contextShake;const correct=state.contextChecked&&state.context[i]===contextAnswer(q);return `<article class="context-sentence ${correct?'correct':''} ${wrong?'wrong':''} ${shake?'wrong-shake':''}" data-context-sentence="${i}"><div class="context-sentence-copy"><span class="context-sentence-text">${contextSentenceText(q,i)}</span><span class="context-image-frame">${image?`<img src="${escapeHtml(image)}" alt="第 ${i+1} 题配图">`:'图片框'}</span></div></article>`;}).join('')}</div></div>`;
+      bindContextPractice();
+    }
+    function bindContextPractice(){
+      $$('[data-context-word]').forEach(word=>{word.addEventListener('dragstart',event=>{event.dataTransfer?.setData('text/plain',word.dataset.contextWord);state.contextSelected=word.dataset.contextWord;});word.onclick=()=>{state.contextSelected=state.contextSelected===word.dataset.contextWord?null:word.dataset.contextWord;renderContextPractice();};});
+      $$('[data-context-drop]').forEach(drop=>{drop.addEventListener('dragover',event=>{event.preventDefault();drop.classList.add('drag-over');});drop.addEventListener('dragleave',()=>drop.classList.remove('drag-over'));drop.addEventListener('drop',event=>{event.preventDefault();drop.classList.remove('drag-over');const word=event.dataTransfer?.getData('text/plain')||state.contextSelected;if(word)fillContextDrop(Number(drop.dataset.contextDrop),word);});drop.onclick=()=>{const index=Number(drop.dataset.contextDrop);if(state.contextSelected)fillContextDrop(index,state.contextSelected);else if(state.context[index])returnContextWord(index);};drop.onkeydown=event=>{if(event.key!=='Enter'&&event.key!==' ')return;event.preventDefault();const index=Number(drop.dataset.contextDrop);if(state.contextSelected)fillContextDrop(index,state.contextSelected);else if(state.context[index])returnContextWord(index);};});
+      const checkBtn=$('#checkContext');if(checkBtn)checkBtn.onclick=checkContext;
+      const resetBtn=$('#resetContext');if(resetBtn)resetBtn.onclick=()=>{state.context={};state.contextSelected=null;state.contextChecked=false;state.contextWrong=[];state.contextReturned=[];clearTimeout(state.autoCheckTimer);state.contextJustCorrect=null;state.contextShake=false;renderContextPractice();saveProgress();};
+    }
+    function fillContextDrop(index,word){const previous=state.context[index];if(previous===word)return;if(previous)state.contextReturned.push(previous);state.context[index]=word;state.contextSelected=null;state.contextChecked=false;state.contextWrong=[];state.contextReturned=[...new Set(state.contextReturned.filter(value=>value!==word))];renderContextPractice();state.contextReturned=[];saveProgress();const qs=contextQuestions();if(qs.length&&Object.keys(state.context).length>=qs.length){clearTimeout(state.autoCheckTimer);state.autoCheckTimer=setTimeout(checkContext,400);}}
+    function returnContextWord(index){const word=state.context[index];if(!word)return;delete state.context[index];state.contextReturned=[word];state.contextChecked=false;renderContextPractice();state.contextReturned=[];saveProgress();}
+    function checkContext(){const qs=contextQuestions();if(Object.keys(state.context).length<qs.length){toast('请先填完所有句子的空格');return;}const wrong=qs.map((q,i)=>state.context[i]===contextAnswer(q)?-1:i).filter(index=>index>=0);state.contextChecked=true;state.contextWrong=wrong;wrong.forEach(index=>{const word=state.context[index];if(word)state.contextReturned.push(word);delete state.context[index];});state.contextReturned=[...new Set(state.contextReturned)];state.contextShake=wrong.length>0;renderContextPractice();state.contextReturned=[];state.contextShake=false;if(!wrong.length)completeWordsIfReady();else{clearTimeout(state.contextFeedbackTimer);state.contextFeedbackTimer=setTimeout(()=>{state.contextWrong=[];renderContextPractice();},2000);}saveProgress();}
+    function tryMatch(){if(!state.selectedWord||!state.selectedMeaning)return;if(state.selectedWord===state.selectedMeaningAnswer){const word=state.selectedWord;const meaning=state.selectedMeaning;state.matchSuccess=[word,meaning];state.selectedWord=null;state.selectedMeaning=null;state.selectedMeaningAnswer=null;renderWords();clearTimeout(state.matchSuccessTimer);state.matchSuccessTimer=setTimeout(()=>{state.matched.push(word);state.newMatchWord=word;state.matchSuccess=[];renderWords();setTimeout(completeWordsIfReady,0);saveProgress();},450);}else{state.matchWrong=[state.selectedWord,state.selectedMeaning];state.selectedWord=null;state.selectedMeaning=null;state.selectedMeaningAnswer=null;renderWords();clearTimeout(state.matchWrongTimer);state.matchWrongTimer=setTimeout(()=>{state.matchWrong=[];renderWords();},1000);saveProgress();}}
 
     function normalizeOptions(q){return Array.isArray(q.options)?Object.fromEntries(q.options.map((value,i)=>[String.fromCharCode(65+i),value])):q.options||{};}
     function answerKey(q){if(['A','B','C'].includes(q.answer))return q.answer;return Object.entries(normalizeOptions(q)).find(([,value])=>value===q.answer)?.[0]||q.answer;}
-    function renderQuestions(qs,answers,prefix,checked=false){return qs.map((q,i)=>{const correctKey=answerKey(q);return `<article class="question"><p class="eyebrow">${escapeHtml(q.type||`Question ${i+1}`)}</p><h3>${escapeHtml(q.prompt)}</h3><div class="options">${Object.entries(normalizeOptions(q)).map(([key,value])=>{const selected=answers[i]===key;const result=checked&&selected?(key===correctKey?'correct':'wrong'):checked&&key===correctKey?'correct':'';return `<button type="button" class="option ${selected?'selected':''} ${result}" data-answer-group="${prefix}" data-question="${i}" data-answer="${key}"><strong>${key}.</strong> ${escapeHtml(value)}</button>`;}).join('')}</div>${checked?`<div class="feedback">${answers[i]===correctKey?'✓ 回答正确':`需要复习，正确答案是 ${correctKey}`}</div>`:''}</article>`}).join('');}
+    function renderQuestions(qs,answers,prefix,checked=false){return qs.map((q,i)=>{const correctKey=answerKey(q);const answer=answers[i];const isWrong=checked&&answer&&answer!==correctKey;const isRight=checked&&answer===correctKey;const anim=state.compFeedbackAnim;const locked=isRight;return `<article class="question ${isWrong?'question-wrong':''} ${isRight?'question-correct':''} ${anim&&isRight?'correct-pop':''} ${anim&&isWrong?'wrong-pop':''}"><h3>${i+1}、${escapeHtml(q.prompt)}</h3><div class="options">${Object.entries(normalizeOptions(q)).map(([key,value])=>{const selected=answers[i]===key;const result=checked&&selected?(key===correctKey?'correct':'wrong'):'';return `<button type="button" class="option ${selected?'selected':''} ${result}" ${locked?'disabled':''} data-answer-group="${prefix}" data-question="${i}" data-answer="${key}">${escapeHtml(value)}</button>`;}).join('')}</div></article>`}).join('');}
     function bindQuestionOptions(prefix,answers,qs,rerender){$$(`[data-answer-group="${prefix}"]`).forEach(button=>button.onclick=()=>{answers[button.dataset.question]=button.dataset.answer;rerender();saveProgress();});}
 
-    function renderComprehension(){const qs=compQuestions();$('#comprehensionModule').innerHTML=`<div class="panel practice-shell"><div class="practice-intro"><div><p class="eyebrow">3Q Understanding System</p><h2 class="section-title">从全文到新情境</h2><p class="muted">Whole 看整体，Connection 找关系，Transfer 把知识用到新情境。</p></div><span class="badge">${Object.keys(state.comprehension).length} / 3 已作答</span></div>${renderQuestions(qs,state.comprehension,'comp',state.comprehensionChecked)}<div class="btn-row"><button class="btn primary" id="checkComp" type="button">${state.comprehensionChecked?'重新检查':'检查答案'}</button><button class="btn" id="retryComp" type="button">再试一次</button><button class="btn ghost" data-next="rebuild" type="button">下一步：结构重建</button></div></div>`;bindQuestionOptions('comp',state.comprehension,qs,()=>{state.comprehensionChecked=false;renderComprehension();});$('#checkComp').onclick=()=>{if(Object.keys(state.comprehension).length<qs.length){toast('请先回答全部三道题');return;}state.comprehensionChecked=true;const correct=qs.filter((q,i)=>state.comprehension[i]===answerKey(q)).length;complete('comprehension',Math.round(correct/qs.length*100),`3Q 完成：${correct}/3 正确`);renderComprehension();};$('#retryComp').onclick=()=>{state.comprehension={};state.comprehensionChecked=false;state.moduleStatus.comprehension={completed:false,score:0};renderComprehension();saveProgress();};bindNext();}
+    function renderComprehension(){const qs=compQuestions();$('#comprehensionModule').innerHTML=`<div class="panel practice-shell"><div class="practice-intro"><div><h2 class="section-title task-title"><span class="task-tag">Task 4</span><span class="task-divider" aria-hidden="true"></span><span class="task-name">Comprehension</span></h2><p class="muted">阅读问题，选择最恰当的答案。</p></div><div class="intro-actions"><span class="badge">${Object.keys(state.comprehension).length} / ${qs.length} 已作答</span><button class="link-btn" id="retryComp" type="button">再试一次</button></div></div>${renderQuestions(qs,state.comprehension,'comp',state.comprehensionChecked)}</div>${moduleCompleteBox('comprehension')}`;$$('[data-answer-group="comp"]').forEach(button=>button.onclick=()=>{const index=button.dataset.question;const answer=button.dataset.answer;state.comprehension[index]=answer;if(state.comprehensionChecked){updateCompAnswer(index,answer);return;}state.comprehensionChecked=false;renderComprehension();saveProgress();if(qs.length&&Object.keys(state.comprehension).length>=qs.length){clearTimeout(state.compCheckTimer);state.compCheckTimer=setTimeout(checkComp,400);}});const retryBtn=$('#retryComp');if(retryBtn)retryBtn.onclick=()=>{state.comprehension={};state.comprehensionChecked=false;state.moduleStatus.comprehension={completed:false,score:0};renderComprehension();saveProgress();};bindNext();}
+    function updateCompAnswer(index,answer){const qs=compQuestions();const question=Number(index);const correctKey=answerKey(qs[question]);const correct=answer===correctKey;const article=document.querySelector(`[data-answer-group="comp"][data-question="${index}"]`)?.closest('.question');if(article){article.classList.toggle('question-correct',correct);article.classList.toggle('question-wrong',!correct);article.classList.remove('correct-pop','wrong-pop');void article.offsetWidth;article.classList.add(correct?'correct-pop':'wrong-pop');article.querySelectorAll('.option').forEach(button=>{const selected=button.dataset.answer===answer;button.classList.toggle('selected',selected);button.classList.toggle('correct',selected&&correct);button.classList.toggle('wrong',selected&&!correct);button.disabled=correct;});}const total=qs.filter((q,i)=>state.comprehension[i]===answerKey(q)).length;if(total===qs.length&&qs.length){if(!isDone('comprehension'))state.moduleStatus.comprehension={completed:true,score:100,completedAt:new Date().toISOString()};}else{state.moduleStatus.comprehension={completed:false,score:0};}renderNav();const box=document.querySelector('[data-module-complete="comprehension"]');if(box)box.outerHTML=moduleCompleteBox('comprehension');bindNext();saveProgress();}
+    function checkComp(){const qs=compQuestions();if(!qs.length||Object.keys(state.comprehension).length<qs.length)return;state.comprehensionChecked=true;state.compFeedbackAnim=true;const correct=qs.filter((q,i)=>state.comprehension[i]===answerKey(q)).length;if(correct===qs.length){complete('comprehension',100,'阅读理解全部正确！');}else{state.moduleStatus.comprehension={completed:false,score:0};}renderComprehension();state.compFeedbackAnim=false;saveProgress();}
 
-    function renderRebuild(){const steps=rebuildSteps();if(!state.rebuild.length)state.rebuild=[...steps.keys()].sort(()=>Math.random()-.5);$('#rebuildModule').innerHTML=`<div class="panel practice-shell"><div class="practice-intro"><div><p class="eyebrow">${escapeHtml(state.card.articleStructure||state.card.structure||'Article Structure')}</p><h2 class="section-title">重建文章的科学结构</h2><p class="muted">用上下按钮调整顺序，让信息重新组成清晰的科学关系。</p></div><span class="badge ${isDone('rebuild')?'success':''}">${isDone('rebuild')?'已提交':'等待检查'}</span></div><div class="rebuild-list">${state.rebuild.map((stepIndex,pos)=>`<div class="rebuild-item"><span class="rebuild-index">${pos+1}</span><strong>${escapeHtml(steps[stepIndex])}</strong><span class="move-buttons"><button type="button" data-move="${pos}" data-dir="-1" aria-label="向上移动" ${pos===0?'disabled':''}>↑</button><button type="button" data-move="${pos}" data-dir="1" aria-label="向下移动" ${pos===steps.length-1?'disabled':''}>↓</button></span></div>`).join('')}</div>${state.rebuildChecked?`<div class="alert ${scoreOf('rebuild')===100?'success':'error'}">${scoreOf('rebuild')===100?'结构正确！你已经抓住了文章关系。':'顺序还需要调整。看看信息是怎样一步步发生或相互作用的。'}</div>`:''}<div class="btn-row" style="margin-top:14px"><button class="btn primary" id="checkRebuild" type="button">检查结构</button><button class="btn" id="resetRebuild" type="button">重新打乱</button><button class="btn ghost" data-next="result" type="button">查看学习结果</button></div></div>`;$$('[data-move]').forEach(button=>button.onclick=()=>{const from=Number(button.dataset.move),to=from+Number(button.dataset.dir);[state.rebuild[from],state.rebuild[to]]=[state.rebuild[to],state.rebuild[from]];state.rebuildChecked=false;renderRebuild();saveProgress();});$('#checkRebuild').onclick=()=>{const expected=[...steps.keys()];const correct=state.rebuild.filter((value,i)=>value===expected[i]).length;state.rebuildChecked=true;complete('rebuild',Math.round(correct/steps.length*100),correct===steps.length?'结构重建正确':'已保存本次结构答案');renderRebuild();};$('#resetRebuild').onclick=()=>{state.rebuild=[...steps.keys()].sort(()=>Math.random()-.5);state.rebuildChecked=false;renderRebuild();saveProgress();};bindNext();}
+    function rebuildKind(){const value=String(state.card.rebuild?.type||state.card.articleStructure||state.card.structure||'').toLowerCase().replace(/[–—]/g,'-').replace(/\s+/g,' ');if(value.includes('feature')&&value.includes('function'))return 'feature-function';if(value.includes('fact')&&value.includes('explanation'))return 'fact-explanation';if(value.includes('cause')&&value.includes('effect'))return 'cause-effect';if(value.includes('compare')&&value.includes('contrast'))return 'compare-contrast';return value==='life cycle'||(value.includes('cycle')&&!value.includes('process'))?'cycle':'process';}
+    function rebuildPairLabels(kind){return { 'feature-function':['Features','Functions'], 'fact-explanation':['Facts / Features','Explanations'], 'cause-effect':['Causes','Effects'], 'compare-contrast':['Compare','Contrast'] }[kind]||['Left','Right'];}
+    function splitRebuildStatement(step){const text=String(step||'').trim();const explicit=text.split(/\s*(?:→|->|\||::)\s*/);if(explicit.length>1)return [explicit[0],explicit.slice(1).join(' ')];const match=text.match(/^(.*?\b(?:stem|skin|spines?|roots?|feathers?|shell|muscles?|bristles?|leaves?|surface|cap|threads?|plant|cactus|moss|desert))\s+(.+)$/i);if(match)return [match[1],match[2]];const verb=text.match(/^(.+?)\s+(is|are|has|have|stores?|keeps?|protects?|collects?|slows?|gives?|blocks?|pulls?|pushes?|takes?|traps?|spreads?|turns?|helps?|survives?|grows?|forms?|makes?)\s+(.+)$/i);return verb?[verb[1],`${verb[2]} ${verb[3]}`]:[text,''];}
+    function rebuildPairs(kind){const configured=state.card.rebuild?.pairs||state.card.rebuild?.rows||state.card.rebuild?.table;if(Array.isArray(configured)&&configured.length)return configured.map(row=>{if(Array.isArray(row))return [String(row[0]||''),String(row[1]||'')];if(typeof row==='string')return splitRebuildStatement(row);const left=row.left??row.feature??row.fact??row.cause??row.compare??row.itemA??row.first??'';const right=row.right??row.function??row.job??row.explanation??row.effect??row.contrast??row.itemB??row.second??'';return [String(left),String(right)];});const steps=rebuildSteps().map(String);const explicit=steps.map(splitRebuildStatement);if(explicit.every(pair=>pair[1]))return explicit;if(kind==='feature-function')return explicit.filter(pair=>pair[1]);if(kind==='cause-effect')return steps.slice(0,-1).map((step,index)=>[step,steps[index+1]]);const pairs=[];for(let i=0;i<steps.length;i+=2)pairs.push([steps[i]||'',steps[i+1]||'']);return pairs.filter(pair=>pair[0]&&pair[1]);}
+    function rebuildOrderFromState(steps){const valid=Array.isArray(state.rebuild)&&state.rebuild.length===steps.length&&state.rebuild.every(index=>index===null||(Number.isInteger(index)&&index>=0&&index<steps.length))&&new Set(state.rebuild.filter(index=>index!==null)).size===state.rebuild.filter(index=>index!==null).length;return valid?[...state.rebuild]:Array(steps.length).fill(null);}
+    function ensureRebuildBankOrder(steps){const expected=[...steps.keys()];const valid=state.rebuildBankOrder.length===expected.length&&state.rebuildBankOrder.every(index=>expected.includes(index))&&new Set(state.rebuildBankOrder).size===expected.length;if(valid)return;state.rebuildBankOrder=shuffled(expected);if(expected.length>1&&state.rebuildBankOrder.every((value,index)=>value===expected[index]))state.rebuildBankOrder.push(state.rebuildBankOrder.shift());}
+    function rebuildDiagramHtml(steps,order,kind){return `<div class="rebuild-diagram ${kind}">${order.map((stepIndex,pos)=>{const correct=state.rebuildChecked&&stepIndex===pos;const wrong=state.rebuildChecked&&stepIndex!==null&&stepIndex!==pos;const pop=state.rebuildFeedbackAnim&&state.rebuildChecked;return `<div class="rebuild-slot ${stepIndex===null?'empty':''} ${correct?'correct':''} ${wrong?'wrong':''} ${pop&&correct?'correct-pop':''} ${pop&&wrong?'wrong-pop':''}" data-rebuild-slot="${pos}" data-position="${pos}" draggable="${stepIndex!==null}" tabindex="0" role="button" aria-label="第 ${pos+1} 个位置，${stepIndex===null?'空白':escapeHtml(steps[stepIndex])}"><span class="rebuild-slot-number">${pos+1}</span><strong>${stepIndex===null?'选择备选句后点这里':escapeHtml(steps[stepIndex])}</strong><span class="move-buttons"><button type="button" data-move="${pos}" data-dir="-1" aria-label="向上移动" ${pos===0?'disabled':''}>↑</button><button type="button" data-move="${pos}" data-dir="1" aria-label="向下移动" ${pos===order.length-1?'disabled':''}>↓</button></span></div>${pos<order.length-1?`<div class="rebuild-connector" aria-hidden="true">${kind==='cycle'?'→':'↓'}</div>`:''}`;}).join('')}${kind==='cycle'&&order.length>1?'<div class="rebuild-connector" aria-hidden="true">↻</div>':''}</div>`;}
+    function rebuildTableState(kind,pairs){const signature=JSON.stringify(pairs);const valid=state.rebuild&&!Array.isArray(state.rebuild)&&state.rebuild.mode==='pair-bank'&&state.rebuild.kind===kind&&state.rebuild.signature===signature;if(!valid){const reveals=pairs.map((_,row)=>row%2===0?'left':'right');const optionOrder=shuffled(pairs.map((_,row)=>`${row}-${reveals[row]==='left'?'right':'left'}`));state.rebuild={mode:'pair-bank',kind,signature,reveals,optionOrder,cells:{},selected:null};}return state.rebuild;}
+    function rebuildTableOptionText(optionId,pairs){const [row,side]=String(optionId).split('-');return pairs[Number(row)]?.[side==='left'?0:1]||'';}
+    function rebuildTableDropHtml(row,side,label,pairs,tableState){const slotId=`${row}-${side}`,optionId=tableState.cells[slotId]||'',value=optionId?rebuildTableOptionText(optionId,pairs):'拖入备选内容';const result=state.rebuildChecked?(optionId===slotId?'correct':'wrong'):'';const pop=state.rebuildFeedbackAnim&&state.rebuildChecked?(optionId===slotId?'correct-pop':'wrong-pop'):'';return `<div class="rebuild-table-value drop ${optionId?'filled':''} ${result} ${pop} ${tableState.selected?'selected':''}" data-rebuild-table-slot="${slotId}" tabindex="0" role="button" aria-label="第 ${row+1} 行 ${label}，${optionId?escapeHtml(value):'空白'}" ${state.rebuildChecked&&optionId!==slotId?'aria-invalid="true"':''}>${escapeHtml(value)}</div>`;}
+    function placeRebuildTableOption(optionId,slotId,kind,pairs){const tableState=state.rebuild;const wasChecked=state.rebuildChecked;const previousSlot=Object.keys(tableState.cells).find(key=>tableState.cells[key]===optionId);const displaced=tableState.cells[slotId]||null;if(previousSlot&&previousSlot!==slotId)tableState.cells[previousSlot]=displaced;tableState.cells[slotId]=optionId;tableState.selected=null;if(wasChecked){state.rebuildChecked=true;const changed=[slotId];if(previousSlot)changed.push(previousSlot);changed.forEach(id=>updateTableCellDom(id,pairs,tableState));syncTableOptions(pairs,tableState);finalizeRebuildScore(tableScore(pairs,tableState));}else{state.rebuildChecked=false;renderRebuildTable(kind);saveProgress();scheduleRebuildCheck();}}
+    function tableScore(pairs,tableState){const correct=pairs.filter((_,row)=>{const hidden=tableState.reveals[row]==='left'?'right':'left',slotId=`${row}-${hidden}`;return tableState.cells[slotId]===slotId;}).length;return Math.round(correct/pairs.length*100);}
+    function finalizeRebuildScore(score){state.moduleStatus.rebuild={completed:true,score,completedAt:new Date().toISOString()};$$('.rebuild-canvas,.rebuild-bank,.rebuild-choice-bank,.rebuild-table-wrap').forEach(node=>{node.classList.toggle('correct',score===100);node.classList.toggle('wrong',score<100);});const alert=document.querySelector('#rebuildModule .alert');if(alert){alert.classList.toggle('success',score===100);alert.classList.toggle('error',score<100);alert.textContent=score===100?'结构正确！你已经抓住了文章关系。':'顺序还需要调整。看看信息是怎样一步步发生或相互作用的。';}const feedback=document.querySelector('#rebuildModule .rebuild-table-feedback');if(feedback){const correct=document.querySelectorAll('#rebuildModule .rebuild-table-value.drop.correct').length;const total=document.querySelectorAll('#rebuildModule .rebuild-table-value.drop').length;feedback.textContent=correct===total?'全部对应正确，你已经抓住了文章结构。':`已完成 ${correct} / ${total} 组正确配对；红色位置需要更换。`;}renderNav();const box=document.querySelector('[data-module-complete="rebuild"]');if(box)box.outerHTML=moduleCompleteBox('rebuild');bindNext();saveProgress();}
+    function updateTableCellDom(slotId,pairs,tableState){const cell=document.querySelector(`[data-rebuild-table-slot="${slotId}"]`);if(!cell)return;const optionId=tableState.cells[slotId]||'',value=optionId?rebuildTableOptionText(optionId,pairs):'拖入备选内容';const correct=state.rebuildChecked&&optionId===slotId;const wrong=state.rebuildChecked&&Boolean(optionId)&&optionId!==slotId;cell.classList.toggle('filled',Boolean(optionId));cell.classList.toggle('correct',correct);cell.classList.toggle('wrong',wrong);cell.classList.toggle('selected',tableState.selected===slotId);cell.classList.remove('correct-pop','wrong-pop');if(state.rebuildChecked&&(correct||wrong)){void cell.offsetWidth;cell.classList.add(correct?'correct-pop':'wrong-pop');}cell.textContent=value;const [row,side]=slotId.split('-');cell.setAttribute('aria-label',`第 ${Number(row)+1} 行 ${side==='left'?'左':'右'}，${optionId?value:'空白'}`);cell.toggleAttribute('aria-invalid',state.rebuildChecked&&wrong);}
+    function syncTableOptions(pairs,tableState){$$('[data-rebuild-table-option]').forEach(button=>{const optionId=button.dataset.rebuildTableOption;const used=Object.values(tableState.cells).includes(optionId);button.classList.toggle('used',used);const small=button.querySelector('small');if(small)small.textContent=used?'已放入':'拖入';});}
+    function renderRebuildTable(kind){const pairs=rebuildPairs(kind);if(!pairs.length){$('#rebuildModule').innerHTML='<div class="panel practice-shell"><div class="state-box"><strong>暂无表格答案</strong>这张卡片需要在 rebuild.pairs 中配置左右两列内容。</div></div>';return}const tableState=rebuildTableState(kind,pairs);const [leftLabel,rightLabel]=rebuildPairLabels(kind);const correct=()=>pairs.filter((_,row)=>{const hidden=tableState.reveals[row]==='left'?'right':'left',slotId=`${row}-${hidden}`;return tableState.cells[slotId]===slotId;}).length;const choices=tableState.optionOrder.map(optionId=>{const used=Object.values(tableState.cells).includes(optionId),selected=tableState.selected===optionId;return `<button type="button" class="rebuild-table-option ${used?'used':''} ${selected?'selected':''}" draggable="true" data-rebuild-table-option="${optionId}" aria-pressed="${selected}"><span>${escapeHtml(rebuildTableOptionText(optionId,pairs))}</span><small>${used?'已放入':'拖入'}</small></button>`;}).join('');const rows=pairs.map((pair,row)=>{const revealed=tableState.reveals[row];const left=revealed==='left'?`<div class="rebuild-table-value given">${escapeHtml(pair[0])}</div>`:rebuildTableDropHtml(row,'left',leftLabel,pairs,tableState);const right=revealed==='right'?`<div class="rebuild-table-value given">${escapeHtml(pair[1])}</div>`:rebuildTableDropHtml(row,'right',rightLabel,pairs,tableState);return `<tr><td>${left}</td><td class="connector" aria-hidden="true">→</td><td>${right}</td></tr>`;}).join('');const currentCorrect=correct();$('#rebuildModule').innerHTML=`<div class="panel practice-shell"><div class="practice-intro"><div><h2 class="section-title task-title"><span class="task-tag">Task 5</span><span class="task-divider" aria-hidden="true"></span><span class="task-name">Rebuild</span></h2><p class="muted">将备选内容填入对应位置，完成结构匹配。</p></div><div class="intro-actions"><span class="badge ${isDone('rebuild')?'success':''}">${isDone('rebuild')?'已提交':'等待检查'}</span><button class="link-btn" id="retryRebuild" type="button">再试一次</button></div></div><section class="rebuild-choice-bank ${rebuildResultClass()}" aria-labelledby="rebuildChoiceTitle"><h3 class="rebuild-choice-bank-title" id="rebuildChoiceTitle">备选内容</h3><div class="rebuild-choice-list">${choices}</div></section><div class="rebuild-table-wrap ${rebuildResultClass()}"><table class="rebuild-table"><thead><tr><th scope="col">${leftLabel}</th><th class="connector" aria-label="对应关系"></th><th scope="col">${rightLabel}</th></tr></thead><tbody>${rows}</tbody></table></div>${state.rebuildChecked?`<p class="rebuild-table-feedback" aria-live="polite">${currentCorrect===pairs.length?'全部对应正确，你已经抓住了文章结构。':`已完成 ${currentCorrect} / ${pairs.length} 组正确配对；红色位置需要更换。`}</p>`:''}</div>${moduleCompleteBox('rebuild')}`;$$('[data-rebuild-table-option]').forEach(button=>{button.onclick=()=>{tableState.selected=tableState.selected===button.dataset.rebuildTableOption?null:button.dataset.rebuildTableOption;$$('[data-rebuild-table-option]').forEach(item=>item.classList.toggle('selected',tableState.selected===item.dataset.rebuildTableOption));};button.addEventListener('dragstart',event=>event.dataTransfer?.setData('text/plain',button.dataset.rebuildTableOption));});$$('[data-rebuild-table-slot]').forEach(slot=>{const place=()=>{if(tableState.selected)placeRebuildTableOption(tableState.selected,slot.dataset.rebuildTableSlot,kind,pairs);};slot.onclick=place;slot.onkeydown=event=>{if(event.key==='Enter'||event.key===' '){event.preventDefault();place();}};slot.addEventListener('dragover',event=>{event.preventDefault();slot.classList.add('drag-over');});slot.addEventListener('dragleave',()=>slot.classList.remove('drag-over'));slot.addEventListener('drop',event=>{event.preventDefault();slot.classList.remove('drag-over');const optionId=event.dataTransfer?.getData('text/plain');if(optionId)placeRebuildTableOption(optionId,slot.dataset.rebuildTableSlot,kind,pairs);});});const retryBtn=$('#retryRebuild');if(retryBtn)retryBtn.onclick=resetRebuild;bindNext();}
+    function renderRebuild(){const steps=rebuildSteps();const kind=rebuildKind();if(['feature-function','fact-explanation','cause-effect','compare-contrast'].includes(kind)){renderRebuildTable(kind);return}if(!steps.length){$('#rebuildModule').innerHTML='<div class="panel practice-shell"><div class="state-box"><strong>暂无结构步骤</strong>这张卡片还没有配置重建题目。</div></div>';return}const order=rebuildOrderFromState(steps);state.rebuild=order;const label=kind==='cycle'?'循环结构':'流程结构';$('#rebuildModule').innerHTML=`<div class="panel practice-shell"><div class="practice-intro"><div><h2 class="section-title task-title"><span class="task-tag">Task 5</span><span class="task-divider" aria-hidden="true"></span><span class="task-name">Rebuild</span></h2><p class="muted">按文章顺序排列备选句，重建文章结构。</p></div><div class="intro-actions"><span class="badge ${isDone('rebuild')?'success':''}">${isDone('rebuild')?'已提交':'等待检查'}</span><button class="link-btn" id="retryRebuild" type="button">再试一次</button></div></div><div class="rebuild-workspace"><section class="rebuild-canvas ${rebuildResultClass()}" aria-labelledby="rebuildCanvasTitle"><h3 class="rebuild-panel-title" id="rebuildCanvasTitle">${kind==='cycle'?'循环图':'顺序图'}</h3>${rebuildDiagramHtml(steps,order,kind)}<p class="rebuild-drop-hint">可拖放、点选，或用每个方块上的上下箭头调整顺序。</p></section><aside class="rebuild-bank ${rebuildResultClass()}" aria-labelledby="rebuildBankTitle"><h3 class="rebuild-panel-title" id="rebuildBankTitle">备选句</h3><div class="rebuild-bank-list">${steps.map((text,index)=>`<button type="button" class="rebuild-option ${state.rebuildSelected===index?'selected':''}" draggable="true" data-rebuild-option="${index}" aria-pressed="${state.rebuildSelected===index}"><span aria-hidden="true">⋮⋮</span><span>${escapeHtml(text)}</span><small>${order.includes(index)?'已放入':'点选或拖入'}</small></button>`).join('')}</div></aside></div>${state.rebuildChecked?`<div class="alert ${scoreOf('rebuild')===100?'success':'error'}">${scoreOf('rebuild')===100?'结构正确！你已经抓住了文章关系。':'顺序还需要调整。看看信息是怎样一步步发生或相互作用的。'}</div>`:''}</div>${moduleCompleteBox('rebuild')}`;bindRebuildDrag();$$('[data-rebuild-option]').forEach(button=>button.onclick=()=>{state.rebuildSelected=state.rebuildSelected===Number(button.dataset.rebuildOption)?null:Number(button.dataset.rebuildOption);$$('[data-rebuild-option]').forEach(option=>option.classList.toggle('selected',state.rebuildSelected===Number(option.dataset.rebuildOption)));});$$('[data-rebuild-slot]').forEach(slot=>{const place=()=>{if(state.rebuildSelected===null)return;placeRebuildOption(state.rebuildSelected,Number(slot.dataset.position));};slot.addEventListener('click',event=>{if(!event.target.closest('button'))place();});slot.addEventListener('keydown',event=>{if((event.key==='Enter'||event.key===' ')&&!event.target.closest('button')){event.preventDefault();place();}});});$$('[data-move]').forEach(button=>button.onclick=()=>moveRebuildStep(Number(button.dataset.move),Number(button.dataset.move)+Number(button.dataset.dir)));const retryBtn=$('#retryRebuild');if(retryBtn)retryBtn.onclick=resetRebuild;bindNext();}
+    function placeRebuildOption(source,target){const steps=rebuildSteps();const wasChecked=state.rebuildChecked;const sourcePosition=state.rebuild.indexOf(source);if(sourcePosition>=0&&sourcePosition!==target)[state.rebuild[sourcePosition],state.rebuild[target]]=[state.rebuild[target],state.rebuild[sourcePosition]];else if(sourcePosition<0)state.rebuild[target]=source;state.rebuildSelected=null;if(wasChecked){state.rebuildChecked=true;$$('[data-rebuild-option]').forEach(option=>option.classList.remove('selected'));if(sourcePosition>=0&&sourcePosition!==target){updateProcessSlotDom(sourcePosition,steps);updateProcessSlotDom(target,steps);}else{updateProcessSlotDom(target,steps);}syncRebuildBank();finalizeRebuildScore(processScore(steps));}else{state.rebuildChecked=false;renderRebuild();saveProgress();scheduleRebuildCheck();}}
+    function processScore(steps){const correct=state.rebuild.filter((value,i)=>value===i).length;return Math.round(correct/steps.length*100);}
+    function updateProcessSlotDom(pos,steps){const slot=document.querySelector(`[data-rebuild-slot="${pos}"]`);if(!slot)return;const stepIndex=state.rebuild[pos];const correct=state.rebuildChecked&&stepIndex===pos;const wrong=state.rebuildChecked&&stepIndex!==null&&stepIndex!==pos;slot.classList.toggle('empty',stepIndex===null);slot.classList.toggle('correct',correct);slot.classList.toggle('wrong',wrong);slot.classList.remove('correct-pop','wrong-pop');if(state.rebuildChecked&&(correct||wrong)){void slot.offsetWidth;slot.classList.add(correct?'correct-pop':'wrong-pop');}const text=slot.querySelector('strong');if(text)text.textContent=stepIndex===null?'选择备选句后点这里':steps[stepIndex];slot.setAttribute('draggable',String(stepIndex!==null));slot.setAttribute('aria-label',`第 ${pos+1} 个位置，${stepIndex===null?'空白':steps[stepIndex]}`);}
+    function moveRebuildStep(from,to){const steps=rebuildSteps();if(to<0||to>=state.rebuild.length)return;const wasChecked=state.rebuildChecked;[state.rebuild[from],state.rebuild[to]]=[state.rebuild[to],state.rebuild[from]];if(wasChecked){state.rebuildChecked=true;updateProcessSlotDom(from,steps);updateProcessSlotDom(to,steps);finalizeRebuildScore(processScore(steps));}else{state.rebuildChecked=false;renderRebuild();saveProgress();scheduleRebuildCheck();}}
+    function swapRebuildSteps(a,b){const steps=rebuildSteps();if(a===b)return;const wasChecked=state.rebuildChecked;[state.rebuild[a],state.rebuild[b]]=[state.rebuild[b],state.rebuild[a]];if(wasChecked){state.rebuildChecked=true;updateProcessSlotDom(a,steps);updateProcessSlotDom(b,steps);finalizeRebuildScore(processScore(steps));}else{state.rebuildChecked=false;renderRebuild();saveProgress();scheduleRebuildCheck();}}
+    function scheduleRebuildCheck(){clearTimeout(state.rebuildCheckTimer);state.rebuildCheckTimer=setTimeout(checkRebuildAuto,400);}
+    function checkRebuildAuto(){if(state.rebuildChecked)return;const kind=rebuildKind();if(['feature-function','fact-explanation','cause-effect','compare-contrast'].includes(kind))checkRebuildTable(kind);else checkRebuildSteps();}
+    function checkRebuildSteps(){const steps=rebuildSteps();if(!steps.length||state.rebuild.includes(null))return;const expected=[...steps.keys()];const correct=state.rebuild.filter((value,i)=>value===expected[i]).length;state.rebuildChecked=true;state.rebuildFeedbackAnim=true;complete('rebuild',Math.round(correct/steps.length*100),correct===steps.length?'结构重建正确':'已保存本次结构答案');renderRebuild();state.rebuildFeedbackAnim=false;}
+    function checkRebuildTable(kind){const pairs=rebuildPairs(kind);const tableState=rebuildTableState(kind,pairs);const slots=pairs.map((_,row)=>`${row}-${tableState.reveals[row]==='left'?'right':'left'}`);if(slots.some(slotId=>!tableState.cells[slotId]))return;const correct=pairs.filter((_,row)=>{const hidden=tableState.reveals[row]==='left'?'right':'left',slotId=`${row}-${hidden}`;return tableState.cells[slotId]===slotId;}).length;const score=Math.round(correct/pairs.length*100);state.rebuildChecked=true;state.rebuildFeedbackAnim=true;complete('rebuild',score,score===100?'结构重建正确':'已保存本次表格答案');renderRebuildTable(kind);state.rebuildFeedbackAnim=false;}
+    function resetRebuild(){clearTimeout(state.rebuildCheckTimer);state.rebuildFeedbackAnim=false;const steps=rebuildSteps();state.rebuild=['feature-function','fact-explanation','cause-effect','compare-contrast'].includes(rebuildKind())?null:Array(steps.length).fill(null);state.rebuildSelected=null;state.rebuildChecked=false;state.moduleStatus.rebuild={completed:false,score:0};renderRebuild();renderNav();saveProgress();}
+    function rebuildResultClass(){return state.rebuildChecked?(scoreOf('rebuild')===100?'correct':'wrong'):'';}
+    function syncRebuildBank(){const bank=$('.rebuild-bank-list');if(!bank)return;const steps=rebuildSteps();const order=Array.isArray(state.rebuild)?state.rebuild:[];ensureRebuildBankOrder(steps);const options=new Map($$('[data-rebuild-option]').map(option=>[Number(option.dataset.rebuildOption),option]));const available=state.rebuildBankOrder.filter(index=>!order.includes(index));bank.innerHTML='';if(!available.length){bank.innerHTML='<p class="rebuild-option-empty" aria-live="polite">所有备选句都已放入图中。</p>';return}available.forEach(index=>{const option=options.get(index);if(option)bank.append(option);});}
+    function bindRebuildDrag(){syncRebuildBank();let dragged=null;$$('[data-rebuild-option],[data-rebuild-slot]').forEach(node=>{node.addEventListener('dragstart',event=>{dragged=node;node.classList.add('dragging');event.dataTransfer?.setData('text/plain',node.dataset.rebuildOption??node.dataset.position??'');});node.addEventListener('dragend',()=>{node.classList.remove('dragging');dragged=null;$$('[data-rebuild-slot]').forEach(slot=>slot.classList.remove('drag-over'));});});$$('[data-rebuild-slot]').forEach(slot=>{slot.addEventListener('dragover',event=>{event.preventDefault();slot.classList.add('drag-over');});slot.addEventListener('dragleave',()=>slot.classList.remove('drag-over'));slot.addEventListener('drop',event=>{event.preventDefault();slot.classList.remove('drag-over');const target=Number(slot.dataset.position);const source=Number(event.dataTransfer?.getData('text/plain'));if(!Number.isInteger(source)||!Number.isInteger(target))return;if(dragged?.dataset.rebuildOption!==undefined)placeRebuildOption(source,target);else if(source!==target)swapRebuildSteps(source,target);});});}
 
-    function renderResult(){if(['reading','listening','words','comprehension','rebuild'].every(isDone)&&!isDone('result')){state.moduleStatus.result={completed:true,score:100,completedAt:new Date().toISOString()};setTimeout(saveProgress,0);}const done=completedCount();const percent=Math.round(done/6*100);const items=[['reading','Reading','图文阅读'],['listening','Listen & Read','听读与录音'],['words','Words','匹配与语境'],['comprehension','3Q','阅读理解'],['rebuild','Rebuild','结构重建'],['result','Result','学习汇总']];$('#resultModule').innerHTML=`<div class="result-grid"><section class="panel score-card"><p class="eyebrow" style="color:#ffd6c9">Lesson result</p><h2>本课学习结果</h2><div class="score-ring" style="--score:${percent}%"><div><strong>${percent}%</strong><span>${done} / 6 完成</span></div></div><p>${percent===100?'所有模块都完成了，做得很棒！':percent>=50?'已经过半，完成剩余模块就能点亮整课。':'从任意模块开始，系统会为你保存进度。'}</p></section><section class="panel result-list"><div><p class="eyebrow">Module details</p><h2 class="section-title">模块明细</h2></div>${items.map(([id,en,zh])=>`<div class="result-row"><div><strong>${en} · ${zh}</strong><small>${isDone(id)?`已完成${['words','comprehension','rebuild'].includes(id)?` · 得分 ${scoreOf(id)}`:''}`:'尚未完成'}</small></div><button class="btn ${isDone(id)?'':'primary'}" type="button" data-result-open="${id}">${isDone(id)?'查看':'继续'}</button></div>`).join('')}<div class="btn-row"><a class="btn primary" href="/syllabus.html">返回课程</a><button class="btn" id="restart" type="button">再学一次</button></div></section></div>`;$$('[data-result-open]').forEach(button=>button.onclick=()=>openModule(button.dataset.resultOpen));$('#restart').onclick=()=>{if(!confirm('要清空本课页面中的答案并重新开始吗？'))return;state.context={};state.comprehension={};state.matched=[];state.rebuild=[];state.moduleStatus={};renderAll();openModule('reading');saveProgress();};renderNav();}
 
-    function bindNext(){$$('[data-next]').forEach(button=>button.onclick=()=>openModule(button.dataset.next));}
-    function complete(module,score,message){state.moduleStatus[module]={completed:true,score,completedAt:new Date().toISOString()};toast(message);renderNav();saveProgress();}
-    async function saveProgress(){if(!state.card)return;const completedPercent=Math.round(completedCount()/6*100);try{await api(`/api/progress/${encodeURIComponent(currentUserId())}`,{method:'PUT',headers:{'content-type':'application/json'},body:JSON.stringify({cardId:state.card.cardId,lastModule:state.active,answers:{context:state.context,comprehension:state.comprehension},matched:state.matched,rebuild:state.rebuild,moduleStatus:state.moduleStatus,completedPercent})});}catch{}}
-    async function loadProgress(){try{const data=await api(`/api/progress/${encodeURIComponent(currentUserId())}`);const saved=data.cards?.[state.card.cardId];if(!saved)return;state.context=saved.answers?.context||{};state.comprehension=saved.answers?.comprehension||saved.answers||{};state.matched=saved.matched||[];state.rebuild=saved.rebuild||saved.steps||[];state.moduleStatus=saved.moduleStatus||{};state.active=saved.lastModule||'reading';}catch{}}
-    function renderAll(){renderReading();renderListening();renderWords();renderComprehension();renderRebuild();renderResult();renderNav();}
+    function bindNext(){$$('[data-next]').forEach(button=>button.onclick=()=>openModule(button.dataset.next));$$('[data-prev]').forEach(button=>button.onclick=()=>openModule(button.dataset.prev));$$('[data-next-lesson]').forEach(button=>button.onclick=()=>location.href='/index.html?lesson='+encodeURIComponent(button.dataset.nextLesson));$$('[data-prev-lesson]').forEach(button=>button.onclick=()=>{const value=button.dataset.prevLesson;if(value)location.href='/index.html?lesson='+encodeURIComponent(value);});}
+    function moduleCompleteBox(id){const index=modules.findIndex(([moduleId])=>moduleId===id);const[,en,,members=[id]]=modules[index];const done=members.every(isDone);const next=modules[index+1];const previous=modules[index-1];const unit=id==='rebuild'?'课':'关';const title=done?`恭喜你完成本${unit}，让我们进入下一${unit}`:`完成本${unit}后将解锁下一${unit}`;const note=done?`「${en}」已全部完成，继续加油！`:`先完成「${en}」里的全部任务`;const previousLesson=state.previousLesson;const prevButton=previous&&['words','comprehension','rebuild'].includes(id)?`<button type="button" class="module-prev" data-prev="${previous[0]}" aria-label="回到上一关"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M15 18l-6-6 6-6" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"/></svg></button>`:(id==='reading'?`<button type="button" class="module-prev" ${previousLesson?'':'disabled'} data-prev-lesson="${previousLesson?escapeHtml(previousLesson.slug||previousLesson.id):''}" aria-label="${previousLesson?'回到上一课':'没有上一课'}"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M15 18l-6-6 6-6" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"/></svg></button>`:'');const nextLesson=state.nextLesson;const action=id==='rebuild'?(nextLesson?`<div class="module-actions"><button type="button" class="btn primary" data-next-lesson="${escapeHtml(nextLesson.slug||nextLesson.id)}" ${done?'':'disabled'}>${done?'前往下一课':'进入下一课'}</button></div>`:(done?`<a class="btn primary" href="/syllabus.html">返回课程</a>`:`<button type="button" class="btn primary" disabled>暂无下一课</button>`)):`<div class="module-actions"><button type="button" class="btn primary" data-next="${next[0]}" ${done?'':'disabled'}>进入下一关</button></div>`;return `<div class="module-complete ${done?'done':''}" data-module-complete="${id}">${prevButton}<div><strong>${title}</strong><small>${note}</small></div>${action}</div>`;}
+function complete(module,score,message){state.moduleStatus[module]={completed:true,score,completedAt:new Date().toISOString()};renderNav();saveProgress();const boxModule=module==='listening'?'reading':module;const box=document.querySelector(`[data-module-complete="${boxModule}"]`);if(box)box.outerHTML=moduleCompleteBox(boxModule);bindNext();}
+    async function saveProgress(){if(!state.card)return;const completedPercent=Math.round(completedCount()/modules.length*100);try{await api(`/api/progress/${encodeURIComponent(currentUserId())}`,{method:'PUT',headers:{'content-type':'application/json'},body:JSON.stringify({cardId:state.card.cardId,lastModule:state.active,wordBankReviewed:state.wordBankReviewed,answers:{context:state.context,comprehension:state.comprehension,contextChecked:state.contextChecked,comprehensionChecked:state.comprehensionChecked},matched:state.matched,wordTileMatched:state.wordTileMatched,rebuild:state.rebuild,rebuildChecked:state.rebuildChecked,submittedPractice:state.submittedPractice,moduleStatus:state.moduleStatus,completedPercent})});}catch(error){showError({title:'进度保存失败',message:'学习进度暂时无法保存，请检查网络后重试。',detail:error?.message||'',source:'进度',retry:()=>saveProgress()});}}
+    async function loadProgress(){try{const data=await api(`/api/progress/${encodeURIComponent(currentUserId())}`);const saved=data.cards?.[state.card.cardId];if(!saved)return;state.wordBankReviewed=Boolean(saved.wordBankReviewed);state.context=saved.answers?.context||{};state.contextChecked=Boolean(saved.answers?.contextChecked);contextQuestions().forEach((q,i)=>{const options=normalizeOptions(q);if(options[state.context[i]])state.context[i]=options[state.context[i]];});state.comprehension=saved.answers?.comprehension||saved.answers||{};state.comprehensionChecked=Boolean(saved.answers?.comprehensionChecked);state.matched=saved.matched||[];state.wordTileMatched=(saved.wordTileMatched||[]).map(String);state.wordTileSide=[...state.wordTileMatched];state.rebuild=saved.rebuild||saved.steps||[];state.rebuildChecked=Boolean(saved.rebuildChecked);state.submittedPractice=saved.submittedPractice||[];state.moduleStatus=saved.moduleStatus||{};state.active=modules.some(([id,,,members=[id]])=>id===saved.lastModule||members.includes(saved.lastModule))?saved.lastModule:'reading';}catch(error){showError({title:'学习进度加载失败',message:'已继续加载课程，但上次进度暂时无法恢复。',detail:error?.message||'',source:'进度',retry:()=>loadProgress()});}}
+    async function loadLessonNeighbors(){try{const data=await api('/api/cards');const course=state.card.courseId||state.card.seriesId;const cards=(data.cards||[]).filter(card=>card.status==='published'&&(!course||card.courseId===course||card.seriesId===course));const current=state.card.cardId||state.card.slug;const index=cards.findIndex(card=>card.id===current||card.slug===current||card.slug===state.card.slug||card.id===state.card.slug);state.previousLesson=index>0?cards[index-1]:null;state.nextLesson=index>=0&&index<cards.length-1?cards[index+1]:null;}catch(error){state.previousLesson=null;state.nextLesson=null;showError({title:'课程列表加载失败',message:'上一课/下一课暂时不可用，其余功能不受影响。',detail:error?.message||'',source:'课程列表',retry:()=>loadLessonNeighbors()});}}
+    function renderAll(){renderReading();renderWords();renderComprehension();renderRebuild();renderNav();}
 
-    async function boot(){try{state.card=await api(`/api/cards/${encodeURIComponent(slug)}`);await loadProgress();document.title=`${state.card.title} · Fluent Science Reading`;$('#meta').innerHTML=`<span class="badge">DAY ${String(state.card.day).padStart(3,'0')}</span><span class="badge">${escapeHtml(state.card.level||'L1')}</span><span class="badge">${escapeHtml(state.card.theme||'')}</span><span class="badge warning">${escapeHtml(state.card.articleStructure||state.card.structure||'Science Reading')}</span>`;$('#title').textContent=state.card.title;$('#bigQuestionLabel').textContent=state.card.bigQuestion||'';$('#loading').classList.add('hidden');$('#app').classList.remove('hidden');renderAll();openModule(state.active,false);}catch(error){$('#loading').classList.add('hidden');$('#fatal').classList.remove('hidden');$('#fatalMessage').textContent=error.message;}}
+    async function boot(){try{state.card=await api(`/api/cards/${encodeURIComponent(slug)}`);await loadProgress();await loadLessonNeighbors();await loadAudioManifest();loadRecordingState();document.title=`${state.card.title} · Fluent Science Reading`;$('#meta').innerHTML=`<span class="badge">DAY ${String(state.card.day).padStart(3,'0')}</span><span class="badge">${escapeHtml(state.card.level||'L1')}</span><span class="badge">${escapeHtml(state.card.theme||'')}</span><span class="badge warning">${escapeHtml(state.card.articleStructure||state.card.structure||'Science Reading')}</span>`;$('#title').textContent=state.card.title;$('#bigQuestionLabel').textContent=state.card.bigQuestion||'';$('#loading').classList.add('hidden');$('#app').classList.remove('hidden');renderAll();openModule(state.active,false);}catch(error){$('#loading').classList.add('hidden');showError({title:'课程加载失败',message:error?.message||'这张学习卡片暂时打不开，请稍后再试。',detail:`页面地址：${location.href}`,source:'课程',retry:()=>location.reload()});}}
     boot();
   </script>
 </body>

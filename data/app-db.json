@@ -28,8 +28,8 @@
           },
           "steps": [],
           "active": -1,
-          "updatedAt": "2026-08-23T14:07:29.151Z",
-          "lastModule": "result",
+          "updatedAt": "2026-08-24T12:46:49.833Z",
+          "lastModule": "reading",
           "matched": [
             "bud",
             "roots",
@@ -137,7 +137,7 @@
       "image": "day001-flower.png",
       "status": "published",
       "contentFile": "day001-flower.json",
-      "updatedAt": "2026-08-24T11:12:59.661Z"
+      "updatedAt": "2026-08-24T16:04:42.975Z"
     },
     "science-reader-100-how-a-cactus-saves-water": {
       "id": "science-reader-100-how-a-cactus-saves-water",
@@ -153,7 +153,7 @@
       "image": "day001-flower.png",
       "status": "published",
       "contentFile": "science-reader-100-how-a-cactus-saves-water.json",
-      "updatedAt": "2026-08-24T11:12:59.661Z"
+      "updatedAt": "2026-08-24T16:04:42.975Z"
     }
   },
   "series": [

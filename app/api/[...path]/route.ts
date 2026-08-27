@@ -48,7 +48,11 @@ function requestUser(request: Request) {
 }
 function canPreviewVocabulary(request:Request){const token=String(env.CONTENT_EDITOR_PREVIEW_TOKEN||'');return Boolean(token&&request.headers.get('authorization')===`Bearer ${token}`);}
 function scopedUser(request:Request,requested:string){const user=requestUser(request);if(user)return requested==='demo'||requested===user.id?user.id:null;return requested==='demo'?'demo':null;}
-const cardRecord=(row:any)=>({id:row.id,slug:row.slug,seriesId:row.series_id,courseId:row.course_id,topic:row.topic,theme:row.theme,day:row.day,level:row.level,title:row.title,articleStructure:row.article_structure,image:row.image,status:row.status,updatedAt:row.updated_at});
+const cardRecord=(row:any)=>{
+  let content:any={};
+  try{content=JSON.parse(String(row.content_json||'{}'));}catch{}
+  return {id:row.id,slug:row.slug,seriesId:row.series_id,courseId:row.course_id,topic:row.topic,theme:row.theme,day:row.day,level:row.level,title:row.title,articleStructure:row.article_structure,image:row.image,thumbnail:content.thumbnail_file||content.thumbnail||'',status:row.status,updatedAt:row.updated_at};
+};
 
 async function handle(request:Request,context:RouteContext){
   const segments=(await context.params).path||[];const path='/'+segments.join('/');const method=request.method;const url=new URL(request.url);

@@ -52,7 +52,7 @@ img { max-width: 100%; }
 .eyebrow { margin: 0 0 6px; color: var(--brand-dark); font-size: 12px; font-weight: 900; letter-spacing: .12em; text-transform: uppercase; }
 .muted { color: var(--muted); }
 .page-title { margin: 0; font-size: clamp(28px, 4vw, 46px); line-height: 1.08; letter-spacing: -.04em; }
-.section-title { margin: 0; font-size: 22px; letter-spacing: -.02em; }
+.section-title { margin: 0; font-size: 24px; letter-spacing: -.02em; font-weight: 850; }
 .status-dot { width: 8px; height: 8px; border-radius: 50%; background: currentColor; display: inline-block; }
 .badge { display: inline-flex; align-items: center; gap: 6px; padding: 6px 10px; border-radius: 999px; background: var(--blue-soft); color: var(--blue); font-size: 12px; font-weight: 900; }
 .badge.success { background: var(--green-soft); color: var(--green); }

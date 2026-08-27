@@ -108,8 +108,10 @@
       $('#cards').innerHTML = visible.map(card => {
         const value = percent(card);
         const label = value >= 100 ? '再次学习' : value > 0 ? '继续学习' : '开始学习';
+        const image = card.thumbnail || card.image || 'day001-flower.png';
+        const imageSrc = /^(?:https?:|data:|\/)/i.test(image) ? image : `/${image}`;
         return `<article class="lesson-card">
-          <img src="/${escapeHtml(card.image || 'day001-flower.png')}" alt="${escapeHtml(card.title)} 阅读卡片" loading="lazy">
+          <img src="${escapeHtml(imageSrc)}" alt="${escapeHtml(card.title)} 阅读卡片" loading="lazy" width="110" height="148">
           <div>
             <div class="lesson-meta"><span>DAY ${String(card.day).padStart(3,'0')}</span><span>·</span><span>${escapeHtml(card.level || 'L1')}</span><span>·</span><span>${escapeHtml(card.theme || '')}</span></div>
             <h3>${escapeHtml(card.title || 'Untitled lesson')}</h3>

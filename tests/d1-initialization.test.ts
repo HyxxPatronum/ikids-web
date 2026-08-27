@@ -29,7 +29,12 @@ test('the real D1 initializer uses shared orchestration and all published databa
   assert.deepEqual(first, { status: 'ready', ecdictEntries: 2, catalogEntries: 2, mediaAssets: 0 });
   assert.deepEqual(second, first);
   const catalogSql = await fs.readFile(path.join(root, '.cache', 'catalog-production-seed.sql'), 'utf8');
+  const contentSql = await fs.readFile(path.join(root, '.cache', 'content-production-seed.sql'), 'utf8');
   assert.match(catalogSql, /database-course/);
+  assert.match(catalogSql, /INSERT INTO published_vocabulary_terms \(card_id,lexeme/);
+  assert.doesNotMatch(catalogSql, /published_vocabulary_terms SELECT \*/);
+  assert.match(contentSql, /ON CONFLICT\(id\) DO UPDATE SET/);
+  assert.match(contentSql, /content_json=excluded\.content_json/);
   assert.equal(calls.filter(args => args.includes('migrations')).length, 2);
 });
 
