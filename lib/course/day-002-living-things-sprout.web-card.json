@@ -1,0 +1,258 @@
+{
+  "version": "1.0",
+  "cardId": "day002-sprout",
+  "courseId": "science-reading",
+  "seriesId": "science-reading",
+  "topic": "Living Things",
+  "theme": "sprout",
+  "day": 2,
+  "level": "L1",
+  "title": "SPROUT",
+  "bigQuestion": "What helps a sprout grow?",
+  "image_file": "day-002-living-things-sprout.png",
+  "articleStructure": "Cause-Effect",
+  "structure": "Cause-Effect",
+  "status": "draft",
+  "paragraphs": [
+    "A sprout needs water and air. Its root takes water from soil. Its stem lifts the young leaves. The leaves open toward the sun. They make food for growth. The sprout becomes a stronger plant."
+  ],
+  "word_bank": [
+    {
+      "english": "sprout",
+      "chinese": "幼苗",
+      "paragraph_form": "sprout",
+      "image_semantics": "whole two-leaf seedling emerging beside its split seed coat; full plant silhouette",
+      "word_bank_rationale": "“sprout” appears in the paragraph and supports the sprout reasoning chain."
+    },
+    {
+      "english": "stem",
+      "chinese": "茎",
+      "paragraph_form": "stem",
+      "image_semantics": "isolated close-up of one green stem segment from soil line to leaf junction; emphasize the vertical stem, not a whole sprout",
+      "word_bank_rationale": "“stem” appears in the paragraph and supports the sprout reasoning chain."
+    },
+    {
+      "english": "lift",
+      "chinese": "托起",
+      "paragraph_form": "lifts",
+      "image_semantics": "paired physical comparison with a bent low stem beside an upright stem visibly supporting raised leaves; no arrows or symbols",
+      "word_bank_rationale": "“lifts” appears in the paragraph and supports the sprout reasoning chain."
+    },
+    {
+      "english": "open",
+      "chinese": "展开",
+      "paragraph_form": "open",
+      "image_semantics": "top view of two folded leaves beside two broadly opened leaves receiving a soft sun glow; no arrows or symbols",
+      "word_bank_rationale": "“open” appears in the paragraph and supports the sprout reasoning chain."
+    },
+    {
+      "english": "growth",
+      "chinese": "生长",
+      "paragraph_form": "growth",
+      "image_semantics": "small newly emerged sprout beside a clearly taller multi-leaf sprout as a before-and-after size comparison; no arrow between them",
+      "word_bank_rationale": "“growth” appears in the paragraph and supports the sprout reasoning chain."
+    },
+    {
+      "english": "strong",
+      "chinese": "强壮的",
+      "paragraph_form": "stronger",
+      "image_semantics": "close-up of a thick sturdy stem, broad firm leaves, and anchoring roots resisting a gentle breeze; robust structure, not a generic seedling",
+      "word_bank_rationale": "“stronger” appears in the paragraph and supports the sprout reasoning chain."
+    }
+  ],
+  "comprehension": {
+    "questions": [
+      {
+        "type": "Whole",
+        "prompt": "What helps a sprout become stronger?",
+        "options": {
+          "A": "Its roots take water and its leaves make food.",
+          "B": "It keeps all its leaves closed.",
+          "C": "It grows without air."
+        },
+        "answer": "A"
+      },
+      {
+        "type": "Connection",
+        "prompt": "How do leaves help a sprout grow?",
+        "options": {
+          "A": "They make food for growth.",
+          "B": "They pull the root from soil.",
+          "C": "They turn into a shell."
+        },
+        "answer": "A"
+      },
+      {
+        "type": "Transfer",
+        "prompt": "A sprout has water but no air. What does it still need?",
+        "options": {
+          "A": "Air to help it grow.",
+          "B": "A hard shell to cover it.",
+          "C": "A long tail to swim."
+        },
+        "answer": "A"
+      }
+    ]
+  },
+  "wordModule": {
+    "matchPairs": [
+      {
+        "word": "sprout",
+        "meaning": "a young plant"
+      },
+      {
+        "word": "stem",
+        "meaning": "the part that lifts leaves"
+      },
+      {
+        "word": "lift",
+        "meaning": "to raise up"
+      },
+      {
+        "word": "open",
+        "meaning": "to spread leaves"
+      },
+      {
+        "word": "growth",
+        "meaning": "becoming bigger"
+      }
+    ],
+    "contextQuestions": [
+      {
+        "prompt": "The __ lifts the young leaves.",
+        "options": [
+          "stem",
+          "sprout",
+          "water"
+        ],
+        "answer": "stem"
+      },
+      {
+        "prompt": "Leaves __ toward the sun.",
+        "options": [
+          "open",
+          "lift",
+          "growth"
+        ],
+        "answer": "open"
+      }
+    ]
+  },
+  "rebuild": {
+    "type": "Cause-Effect",
+    "steps": [
+      "Water and air reach the sprout",
+      "The root takes water from soil",
+      "Leaves open toward the sun",
+      "Leaves make food for growth"
+    ]
+  },
+  "listenRead": {
+    "fullAudio": null,
+    "coreSentenceAudio": null,
+    "sentences": [
+      {
+        "sentence": "A sprout needs water and air.",
+        "role": "Science Core"
+      },
+      {
+        "sentence": "They make food for growth.",
+        "role": "Structure"
+      }
+    ]
+  },
+  "callouts": [
+    "A sprout needs water and air",
+    "The root takes in water",
+    "The stem lifts young leaves",
+    "Leaves open toward the sun",
+    "Leaves make food for growth",
+    "The sprout becomes stronger"
+  ],
+  "reasoning_chain": [
+    {
+      "step": 1,
+      "role": "input",
+      "claim": "A sprout receives water and air"
+    },
+    {
+      "step": 2,
+      "role": "mechanism",
+      "claim": "The root takes water from soil"
+    },
+    {
+      "step": 3,
+      "role": "mechanism",
+      "claim": "The stem lifts young leaves"
+    },
+    {
+      "step": 4,
+      "role": "mechanism",
+      "claim": "Leaves open toward sunlight and make food"
+    },
+    {
+      "step": 5,
+      "role": "result",
+      "claim": "The sprout grows into a stronger plant"
+    }
+  ],
+  "difficulty_metrics": {
+    "total_words": 35,
+    "science_core": [
+      "sprout",
+      "root",
+      "stem",
+      "leaf"
+    ],
+    "science_core_count": 4,
+    "sentence_lengths": [
+      6,
+      6,
+      6,
+      6,
+      5,
+      6
+    ],
+    "average_sentence_length_words": 5.83,
+    "longest_sentence_words": 6,
+    "familiar_language_estimate_percent": 83,
+    "cognition_check": "Every answer is stated directly in one sentence.",
+    "level_outcome_check": "Passes the Level 1 reading outcome."
+  },
+  "vocabulary_audit": {
+    "tier_505": [
+      "water",
+      "air",
+      "take",
+      "young",
+      "open",
+      "sun",
+      "make",
+      "food",
+      "strong",
+      "plant"
+    ],
+    "tier_1095": [
+      "need",
+      "soil",
+      "lift"
+    ],
+    "science_core": [
+      "sprout",
+      "root",
+      "stem",
+      "leaf"
+    ],
+    "necessity_notes": {
+      "need": "“need” is necessary here to preserve the lesson's exact object, structure, action, or mechanism.",
+      "soil": "“soil” is necessary here to preserve the lesson's exact object, structure, action, or mechanism.",
+      "lift": "“lift” is necessary here to preserve the lesson's exact object, structure, action, or mechanism.",
+      "sprout": "“sprout” is necessary here to preserve the lesson's exact object, structure, action, or mechanism.",
+      "root": "“root” is necessary here to preserve the lesson's exact object, structure, action, or mechanism.",
+      "stem": "“stem” is necessary here to preserve the lesson's exact object, structure, action, or mechanism.",
+      "leaf": "“leaf” is necessary here to preserve the lesson's exact object, structure, action, or mechanism.",
+      "toward": "“toward” is necessary here to preserve the lesson's exact object, structure, action, or mechanism.",
+      "growth": "“growth” is necessary here to preserve the lesson's exact object, structure, action, or mechanism."
+    }
+  }
+}

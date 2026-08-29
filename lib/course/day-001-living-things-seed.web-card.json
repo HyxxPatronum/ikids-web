@@ -1,0 +1,270 @@
+{
+  "version": "1.0",
+  "cardId": "day001-seed",
+  "courseId": "science-reading",
+  "seriesId": "science-reading",
+  "topic": "Living Things",
+  "theme": "seed",
+  "day": 1,
+  "level": "L1",
+  "title": "SEED",
+  "bigQuestion": "How does a seed grow?",
+  "image_file": "day-001-living-things-seed.png",
+  "articleStructure": "Process/Life cycle",
+  "structure": "Process/Life cycle",
+  "status": "draft",
+  "paragraphs": [
+    "Water enters a dry seed. The seed coat grows soft. A tiny root pushes down. A small shoot grows up. Roots take in more water. The shoot opens its first leaves. The young plant now makes new food."
+  ],
+  "word_bank": [
+    {
+      "english": "seed coat",
+      "chinese": "种皮",
+      "paragraph_form": "seed coat",
+      "image_semantics": "cutaway seed showing the protective outer coat",
+      "word_bank_rationale": "“seed coat” appears in the paragraph and supports the seed reasoning chain."
+    },
+    {
+      "english": "dry",
+      "chinese": "干燥的",
+      "paragraph_form": "dry",
+      "image_semantics": "dry seed surface beside a water droplet",
+      "word_bank_rationale": "“dry” appears in the paragraph and supports the seed reasoning chain."
+    },
+    {
+      "english": "soft",
+      "chinese": "柔软的",
+      "paragraph_form": "soft",
+      "image_semantics": "softened seed coat flexing open",
+      "word_bank_rationale": "“soft” appears in the paragraph and supports the seed reasoning chain."
+    },
+    {
+      "english": "shoot",
+      "chinese": "幼芽",
+      "paragraph_form": "shoot",
+      "image_semantics": "small green shoot growing upward",
+      "word_bank_rationale": "“shoot” appears in the paragraph and supports the seed reasoning chain."
+    },
+    {
+      "english": "push",
+      "chinese": "推",
+      "paragraph_form": "pushes",
+      "image_semantics": "root tip pushing downward through soil",
+      "word_bank_rationale": "“pushes” appears in the paragraph and supports the seed reasoning chain."
+    },
+    {
+      "english": "open",
+      "chinese": "展开",
+      "paragraph_form": "opens",
+      "image_semantics": "first leaves opening from the shoot",
+      "word_bank_rationale": "“opens” appears in the paragraph and supports the seed reasoning chain."
+    }
+  ],
+  "comprehension": {
+    "questions": [
+      {
+        "type": "Whole",
+        "prompt": "Which story tells how a seed becomes a young plant?",
+        "options": {
+          "A": "Water softens the seed, then roots and a shoot grow.",
+          "B": "A seed stays dry under the ground.",
+          "C": "Leaves close and stop growing."
+        },
+        "answer": "A"
+      },
+      {
+        "type": "Connection",
+        "prompt": "What happens after a seed coat grows soft?",
+        "options": {
+          "A": "A tiny root pushes down.",
+          "B": "The seed becomes dry.",
+          "C": "The leaves make less food."
+        },
+        "answer": "A"
+      },
+      {
+        "type": "Transfer",
+        "prompt": "A seed gets water in a cup. What can happen next?",
+        "options": {
+          "A": "Its seed coat can grow soft.",
+          "B": "Its shoot must close.",
+          "C": "Its roots stop taking water."
+        },
+        "answer": "A"
+      }
+    ]
+  },
+  "wordModule": {
+    "matchPairs": [
+      {
+        "word": "seed coat",
+        "meaning": "the outside part of a seed"
+      },
+      {
+        "word": "dry",
+        "meaning": "without water"
+      },
+      {
+        "word": "soft",
+        "meaning": "not hard"
+      },
+      {
+        "word": "shoot",
+        "meaning": "a young part that grows up"
+      },
+      {
+        "word": "open",
+        "meaning": "to spread leaves"
+      }
+    ],
+    "contextQuestions": [
+      {
+        "prompt": "A seed coat grows __ after water enters.",
+        "options": [
+          "soft",
+          "dry",
+          "open"
+        ],
+        "answer": "soft"
+      },
+      {
+        "prompt": "A small __ grows up from the seed.",
+        "options": [
+          "shoot",
+          "seed coat",
+          "water"
+        ],
+        "answer": "shoot"
+      }
+    ]
+  },
+  "rebuild": {
+    "type": "Process/Life cycle",
+    "steps": [
+      "Water enters the seed",
+      "A root grows down",
+      "A shoot grows up",
+      "Leaves open and make food"
+    ]
+  },
+  "listenRead": {
+    "fullAudio": null,
+    "coreSentenceAudio": null,
+    "sentences": [
+      {
+        "sentence": "Water enters a dry seed.",
+        "role": "Science Core"
+      },
+      {
+        "sentence": "The shoot opens its first leaves.",
+        "role": "Structure"
+      }
+    ]
+  },
+  "callouts": [
+    "Water enters the seed",
+    "The seed coat grows soft",
+    "A tiny root pushes down",
+    "A small shoot grows up",
+    "Roots take in more water",
+    "The shoot opens first leaves",
+    "The young plant makes food"
+  ],
+  "reasoning_chain": [
+    {
+      "step": 1,
+      "role": "input",
+      "claim": "Water enters a dry seed"
+    },
+    {
+      "step": 2,
+      "role": "mechanism",
+      "claim": "The seed coat becomes soft"
+    },
+    {
+      "step": 3,
+      "role": "mechanism",
+      "claim": "A root grows down"
+    },
+    {
+      "step": 4,
+      "role": "mechanism",
+      "claim": "A shoot grows up"
+    },
+    {
+      "step": 5,
+      "role": "mechanism",
+      "claim": "Roots take in more water"
+    },
+    {
+      "step": 6,
+      "role": "result",
+      "claim": "The shoot opens leaves and the young plant makes food"
+    }
+  ],
+  "difficulty_metrics": {
+    "total_words": 38,
+    "science_core": [
+      "seed",
+      "seed coat",
+      "root",
+      "shoot"
+    ],
+    "science_core_count": 4,
+    "sentence_lengths": [
+      5,
+      5,
+      5,
+      5,
+      5,
+      6,
+      7
+    ],
+    "average_sentence_length_words": 5.43,
+    "longest_sentence_words": 7,
+    "familiar_language_estimate_percent": 83,
+    "cognition_check": "Every answer is stated directly in one sentence.",
+    "level_outcome_check": "Passes the Level 1 reading outcome."
+  },
+  "vocabulary_audit": {
+    "tier_505": [
+      "water",
+      "small",
+      "take",
+      "open",
+      "young",
+      "plant",
+      "make",
+      "food"
+    ],
+    "tier_1095": [
+      "enter",
+      "dry",
+      "soft",
+      "tiny",
+      "push",
+      "shoot",
+      "grow"
+    ],
+    "science_core": [
+      "seed",
+      "seed coat",
+      "root",
+      "shoot"
+    ],
+    "necessity_notes": {
+      "enter": "“enter” is necessary here to preserve the lesson's exact object, structure, action, or mechanism.",
+      "dry": "“dry” is necessary here to preserve the lesson's exact object, structure, action, or mechanism.",
+      "soft": "“soft” is necessary here to preserve the lesson's exact object, structure, action, or mechanism.",
+      "tiny": "“tiny” is necessary here to preserve the lesson's exact object, structure, action, or mechanism.",
+      "push": "“push” is necessary here to preserve the lesson's exact object, structure, action, or mechanism.",
+      "shoot": "“shoot” is necessary here to preserve the lesson's exact object, structure, action, or mechanism.",
+      "grow": "“grow” is necessary here to preserve the lesson's exact object, structure, action, or mechanism.",
+      "seed": "“seed” is necessary here to preserve the lesson's exact object, structure, action, or mechanism.",
+      "seed coat": "“seed coat” is necessary here to preserve the lesson's exact object, structure, action, or mechanism.",
+      "root": "“root” is necessary here to preserve the lesson's exact object, structure, action, or mechanism.",
+      "first": "“first” is necessary here to preserve the lesson's exact object, structure, action, or mechanism.",
+      "leaf": "“leaf” is necessary here to preserve the lesson's exact object, structure, action, or mechanism."
+    }
+  }
+}

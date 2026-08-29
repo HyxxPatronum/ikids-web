@@ -1,0 +1,264 @@
+{
+  "version": "1.0",
+  "cardId": "day005-worm",
+  "courseId": "science-reading",
+  "seriesId": "science-reading",
+  "topic": "Living Things",
+  "theme": "worm",
+  "day": 5,
+  "level": "L1",
+  "title": "WORM",
+  "bigQuestion": "How does a worm move?",
+  "image_file": "day-005-living-things-worm.png",
+  "articleStructure": "Process/Life cycle",
+  "structure": "Process/Life cycle",
+  "status": "draft",
+  "paragraphs": [
+    "An earthworm has a long body. Strong muscles make its body shorter. Other muscles make its body longer. Tiny bristles grip the wet soil. The worm pushes against the ground. This pattern helps the earthworm crawl."
+  ],
+  "word_bank": [
+    {
+      "english": "earthworm",
+      "chinese": "蚯蚓",
+      "paragraph_form": "earthworm",
+      "image_semantics": "whole earthworm moving through soil",
+      "word_bank_rationale": "“earthworm” appears in the paragraph and supports the worm reasoning chain."
+    },
+    {
+      "english": "muscle",
+      "chinese": "肌肉",
+      "paragraph_form": "muscles",
+      "image_semantics": "body wall muscle bands contracting",
+      "word_bank_rationale": "“muscles” appears in the paragraph and supports the worm reasoning chain."
+    },
+    {
+      "english": "short",
+      "chinese": "变短",
+      "paragraph_form": "shorter",
+      "image_semantics": "short thick body segment during contraction",
+      "word_bank_rationale": "“shorter” appears in the paragraph and supports the worm reasoning chain."
+    },
+    {
+      "english": "long",
+      "chinese": "变长",
+      "paragraph_form": "longer",
+      "image_semantics": "long thin body segment extending forward",
+      "word_bank_rationale": "“longer” appears in the paragraph and supports the worm reasoning chain."
+    },
+    {
+      "english": "bristle",
+      "chinese": "刚毛",
+      "paragraph_form": "bristles",
+      "image_semantics": "magnified tiny bristles gripping soil",
+      "word_bank_rationale": "“bristles” appears in the paragraph and supports the worm reasoning chain."
+    },
+    {
+      "english": "crawl",
+      "chinese": "爬行",
+      "paragraph_form": "crawl",
+      "image_semantics": "earthworm moving forward in a wave",
+      "word_bank_rationale": "“crawl” appears in the paragraph and supports the worm reasoning chain."
+    }
+  ],
+  "comprehension": {
+    "questions": [
+      {
+        "type": "Whole",
+        "prompt": "How does an earthworm crawl?",
+        "options": {
+          "A": "Its muscles change length and bristles grip soil.",
+          "B": "Its shell pulls it through water.",
+          "C": "Its wings lift it from the ground."
+        },
+        "answer": "A"
+      },
+      {
+        "type": "Connection",
+        "prompt": "What grips the wet soil?",
+        "options": {
+          "A": "Tiny bristles.",
+          "B": "Long leaves.",
+          "C": "Sharp teeth."
+        },
+        "answer": "A"
+      },
+      {
+        "type": "Transfer",
+        "prompt": "A worm has no grip on the soil. What will be harder?",
+        "options": {
+          "A": "Crawling forward.",
+          "B": "Growing a cap.",
+          "C": "Making seeds."
+        },
+        "answer": "A"
+      }
+    ]
+  },
+  "wordModule": {
+    "matchPairs": [
+      {
+        "word": "earthworm",
+        "meaning": "a long animal in soil"
+      },
+      {
+        "word": "muscle",
+        "meaning": "a body part that moves"
+      },
+      {
+        "word": "short",
+        "meaning": "not long"
+      },
+      {
+        "word": "long",
+        "meaning": "not short"
+      },
+      {
+        "word": "bristle",
+        "meaning": "a tiny stiff hair"
+      }
+    ],
+    "contextQuestions": [
+      {
+        "prompt": "Strong muscles can make a worm body __.",
+        "options": [
+          "shorter",
+          "wetter",
+          "softer"
+        ],
+        "answer": "shorter"
+      },
+      {
+        "prompt": "Tiny __ grip the wet soil.",
+        "options": [
+          "bristles",
+          "shells",
+          "leaves"
+        ],
+        "answer": "bristles"
+      }
+    ]
+  },
+  "rebuild": {
+    "type": "Process/Life cycle",
+    "steps": [
+      "Muscles make the body shorter",
+      "Other muscles make the body longer",
+      "Bristles grip wet soil",
+      "The worm pushes against ground",
+      "The earthworm crawls forward"
+    ]
+  },
+  "listenRead": {
+    "fullAudio": null,
+    "coreSentenceAudio": null,
+    "sentences": [
+      {
+        "sentence": "Strong muscles make its body shorter.",
+        "role": "Science Core"
+      },
+      {
+        "sentence": "This pattern helps the earthworm crawl.",
+        "role": "Structure"
+      }
+    ]
+  },
+  "callouts": [
+    "An earthworm has a long body",
+    "Muscles make its body shorter",
+    "Other muscles make it longer",
+    "Bristles grip the wet soil",
+    "The worm pushes against ground",
+    "The earthworm crawls forward"
+  ],
+  "reasoning_chain": [
+    {
+      "step": 1,
+      "role": "input",
+      "claim": "An earthworm begins with a long flexible body"
+    },
+    {
+      "step": 2,
+      "role": "mechanism",
+      "claim": "One muscle group shortens the body"
+    },
+    {
+      "step": 3,
+      "role": "mechanism",
+      "claim": "Another muscle group lengthens the body"
+    },
+    {
+      "step": 4,
+      "role": "mechanism",
+      "claim": "Bristles grip soil while the worm pushes"
+    },
+    {
+      "step": 5,
+      "role": "result",
+      "claim": "The repeated pattern moves the earthworm forward"
+    }
+  ],
+  "difficulty_metrics": {
+    "total_words": 36,
+    "science_core": [
+      "earthworm",
+      "muscle",
+      "bristle",
+      "crawl"
+    ],
+    "science_core_count": 4,
+    "sentence_lengths": [
+      6,
+      6,
+      6,
+      6,
+      6,
+      6
+    ],
+    "average_sentence_length_words": 6,
+    "longest_sentence_words": 6,
+    "familiar_language_estimate_percent": 83,
+    "cognition_check": "Every answer is stated directly in one sentence.",
+    "level_outcome_check": "Passes the Level 1 reading outcome."
+  },
+  "vocabulary_audit": {
+    "tier_505": [
+      "long",
+      "body",
+      "strong",
+      "make",
+      "short",
+      "help"
+    ],
+    "tier_1095": [
+      "other",
+      "tiny",
+      "wet",
+      "soil",
+      "push",
+      "against",
+      "ground"
+    ],
+    "science_core": [
+      "earthworm",
+      "muscle",
+      "bristle",
+      "crawl"
+    ],
+    "necessity_notes": {
+      "other": "“other” is necessary here to preserve the lesson's exact object, structure, action, or mechanism.",
+      "tiny": "“tiny” is necessary here to preserve the lesson's exact object, structure, action, or mechanism.",
+      "wet": "“wet” is necessary here to preserve the lesson's exact object, structure, action, or mechanism.",
+      "soil": "“soil” is necessary here to preserve the lesson's exact object, structure, action, or mechanism.",
+      "push": "“push” is necessary here to preserve the lesson's exact object, structure, action, or mechanism.",
+      "against": "“against” is necessary here to preserve the lesson's exact object, structure, action, or mechanism.",
+      "ground": "“ground” is necessary here to preserve the lesson's exact object, structure, action, or mechanism.",
+      "earthworm": "“earthworm” is necessary here to preserve the lesson's exact object, structure, action, or mechanism.",
+      "muscle": "“muscle” is necessary here to preserve the lesson's exact object, structure, action, or mechanism.",
+      "bristle": "“bristle” is necessary here to preserve the lesson's exact object, structure, action, or mechanism.",
+      "grip": "“grip” is necessary here to preserve the lesson's exact object, structure, action, or mechanism.",
+      "worm": "“worm” is necessary here to preserve the lesson's exact object, structure, action, or mechanism.",
+      "pattern": "“pattern” is necessary here to preserve the lesson's exact object, structure, action, or mechanism.",
+      "crawl": "“crawl” is necessary here to preserve the lesson's exact object, structure, action, or mechanism."
+    }
+  }
+}

@@ -1,0 +1,269 @@
+{
+  "version": "1.0",
+  "cardId": "day008-bird",
+  "courseId": "science-reading",
+  "seriesId": "science-reading",
+  "topic": "Living Things",
+  "theme": "bird",
+  "day": 8,
+  "level": "L2",
+  "title": "BIRD",
+  "bigQuestion": "How do feathers help a bird?",
+  "image_file": "day-008-living-things-bird.png",
+  "articleStructure": "Feature-Function",
+  "structure": "Feature-Function",
+  "status": "draft",
+  "paragraphs": [
+    "Bird feathers have different shapes because they do different jobs. Soft down feathers trap air, so a bird stays warm. Long wing feathers push air down and help make lift. Tail feathers spread and turn, so the bird can steer."
+  ],
+  "word_bank": [
+    {
+      "english": "feather",
+      "chinese": "羽毛",
+      "paragraph_form": "feathers",
+      "image_semantics": "three feather types side by side",
+      "word_bank_rationale": "“feathers” appears in the paragraph and supports the bird reasoning chain."
+    },
+    {
+      "english": "shape",
+      "chinese": "形状",
+      "paragraph_form": "shapes",
+      "image_semantics": "rounded down, long wing, and broad tail shapes",
+      "word_bank_rationale": "“shapes” appears in the paragraph and supports the bird reasoning chain."
+    },
+    {
+      "english": "down feather",
+      "chinese": "绒羽",
+      "paragraph_form": "down feathers",
+      "image_semantics": "fluffy down feather trapping air",
+      "word_bank_rationale": "“down feathers” appears in the paragraph and supports the bird reasoning chain."
+    },
+    {
+      "english": "wing",
+      "chinese": "翅膀",
+      "paragraph_form": "wing",
+      "image_semantics": "bird wing with aligned flight feathers",
+      "word_bank_rationale": "“wing” appears in the paragraph and supports the bird reasoning chain."
+    },
+    {
+      "english": "lift",
+      "chinese": "升力",
+      "paragraph_form": "lift",
+      "image_semantics": "upward lift arrow over a wing",
+      "word_bank_rationale": "“lift” appears in the paragraph and supports the bird reasoning chain."
+    },
+    {
+      "english": "steer",
+      "chinese": "转向",
+      "paragraph_form": "steer",
+      "image_semantics": "tail feathers turning a flying bird",
+      "word_bank_rationale": "“steer” appears in the paragraph and supports the bird reasoning chain."
+    }
+  ],
+  "comprehension": {
+    "questions": [
+      {
+        "type": "Whole",
+        "prompt": "What do different bird feathers do?",
+        "options": {
+          "A": "They help a bird stay warm, fly, and steer.",
+          "B": "They help a bird grow roots and drink water.",
+          "C": "They turn a bird into a fish."
+        },
+        "answer": "A"
+      },
+      {
+        "type": "Connection",
+        "prompt": "How do wing feathers help a bird?",
+        "options": {
+          "A": "They push air down and help make lift.",
+          "B": "They trap water inside a shell.",
+          "C": "They make the bird’s tail shorter."
+        },
+        "answer": "A"
+      },
+      {
+        "type": "Transfer",
+        "prompt": "A bird needs to turn in the air. Which feathers help most?",
+        "options": {
+          "A": "Tail feathers.",
+          "B": "Down feathers.",
+          "C": "Root feathers."
+        },
+        "answer": "A"
+      }
+    ]
+  },
+  "wordModule": {
+    "matchPairs": [
+      {
+        "word": "feather",
+        "meaning": "a light covering on a bird"
+      },
+      {
+        "word": "down feather",
+        "meaning": "a soft feather"
+      },
+      {
+        "word": "wing",
+        "meaning": "a bird part for flying"
+      },
+      {
+        "word": "lift",
+        "meaning": "an upward push"
+      },
+      {
+        "word": "steer",
+        "meaning": "to turn in a direction"
+      },
+      {
+        "word": "shape",
+        "meaning": "the form of something"
+      }
+    ],
+    "contextQuestions": [
+      {
+        "prompt": "Soft __ trap air and keep a bird warm.",
+        "options": [
+          "down feathers",
+          "wings",
+          "tails"
+        ],
+        "answer": "down feathers"
+      },
+      {
+        "prompt": "Tail feathers help a bird __.",
+        "options": [
+          "steer",
+          "store",
+          "crawl"
+        ],
+        "answer": "steer"
+      }
+    ]
+  },
+  "rebuild": {
+    "type": "Feature-Function",
+    "steps": [
+      "Soft down feathers trap air → warmth",
+      "Long wing feathers push air down → lift",
+      "Tail feathers spread and turn → steering"
+    ]
+  },
+  "listenRead": {
+    "fullAudio": null,
+    "coreSentenceAudio": null,
+    "sentences": [
+      {
+        "sentence": "Soft down feathers trap air, so a bird stays warm.",
+        "role": "Science Core"
+      },
+      {
+        "sentence": "Tail feathers spread and turn, so the bird can steer.",
+        "role": "Structure"
+      }
+    ]
+  },
+  "callouts": [
+    "Feathers have different shapes",
+    "Soft down feathers trap air",
+    "Trapped air keeps a bird warm",
+    "Wing feathers push air down",
+    "Wing feathers help make lift",
+    "Tail feathers help the bird steer"
+  ],
+  "reasoning_chain": [
+    {
+      "step": 1,
+      "role": "input",
+      "claim": "A bird has feathers with different shapes"
+    },
+    {
+      "step": 2,
+      "role": "mechanism",
+      "claim": "Soft down feathers trap insulating air"
+    },
+    {
+      "step": 3,
+      "role": "mechanism",
+      "claim": "Long wing feathers push air downward to help make lift"
+    },
+    {
+      "step": 4,
+      "role": "mechanism",
+      "claim": "Tail feathers spread and turn"
+    },
+    {
+      "step": 5,
+      "role": "result",
+      "claim": "The bird stays warm, rises, and steers"
+    }
+  ],
+  "difficulty_metrics": {
+    "total_words": 40,
+    "science_core": [
+      "feather",
+      "down feather",
+      "wing",
+      "lift",
+      "steer"
+    ],
+    "science_core_count": 5,
+    "sentence_lengths": [
+      10,
+      10,
+      10,
+      10
+    ],
+    "average_sentence_length_words": 10,
+    "longest_sentence_words": 10,
+    "familiar_language_estimate_percent": 86,
+    "cognition_check": "The paragraph states one explicit how relationship.",
+    "level_outcome_check": "Passes the Level 2 reading outcome."
+  },
+  "vocabulary_audit": {
+    "tier_505": [
+      "bird",
+      "job",
+      "air",
+      "warm",
+      "long",
+      "down",
+      "help",
+      "make",
+      "tail",
+      "turn"
+    ],
+    "tier_1095": [
+      "different",
+      "shape",
+      "soft",
+      "stay",
+      "wing",
+      "push",
+      "lift",
+      "spread"
+    ],
+    "science_core": [
+      "feather",
+      "down feather",
+      "wing",
+      "lift",
+      "steer"
+    ],
+    "necessity_notes": {
+      "different": "“different” is necessary here to preserve the lesson's exact object, structure, action, or mechanism.",
+      "shape": "“shape” is necessary here to preserve the lesson's exact object, structure, action, or mechanism.",
+      "soft": "“soft” is necessary here to preserve the lesson's exact object, structure, action, or mechanism.",
+      "stay": "“stay” is necessary here to preserve the lesson's exact object, structure, action, or mechanism.",
+      "wing": "“wing” is necessary here to preserve the lesson's exact object, structure, action, or mechanism.",
+      "push": "“push” is necessary here to preserve the lesson's exact object, structure, action, or mechanism.",
+      "lift": "“lift” is necessary here to preserve the lesson's exact object, structure, action, or mechanism.",
+      "spread": "“spread” is necessary here to preserve the lesson's exact object, structure, action, or mechanism.",
+      "feather": "“feather” is necessary here to preserve the lesson's exact object, structure, action, or mechanism.",
+      "down feather": "“down feather” is necessary here to preserve the lesson's exact object, structure, action, or mechanism.",
+      "trap": "“trap” is necessary here to preserve the lesson's exact object, structure, action, or mechanism.",
+      "steer": "“steer” is necessary here to preserve the lesson's exact object, structure, action, or mechanism."
+    }
+  }
+}

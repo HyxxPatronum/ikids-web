@@ -1,11 +1,13 @@
 import type { Metadata } from 'next';
+import '../styles.css';
 import './globals.css';
 
 export const metadata: Metadata = {
-  title: 'Fluent Science Reading',
-  description: 'Read · Think · Explain — 儿童英语科普阅读学习平台。',
-  openGraph: { title: 'Fluent Science Reading', description: 'Read · Think · Explain — 儿童英语科普阅读学习平台。', images: ['/og.png'] },
-  twitter: { card: 'summary_large_image', title: 'Fluent Science Reading', description: 'Read · Think · Explain — 儿童英语科普阅读学习平台。', images: ['/og.png'] },
+  title: 'IKIDs',
+  description: '儿童英语科普阅读学习平台。',
+  icons: { icon: '/logo-icon.png', apple: '/logo-icon.png' },
+  openGraph: { title: 'IKIDs', description: '儿童英语科普阅读学习平台。', images: ['/og.png'] },
+  twitter: { card: 'summary_large_image', title: 'IKIDs', description: '儿童英语科普阅读学习平台。', images: ['/og.png'] },
 };
 
 export default function RootLayout({ children }: Readonly<{ children: React.ReactNode }>) {

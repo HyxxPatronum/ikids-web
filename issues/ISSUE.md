@@ -118,6 +118,79 @@
 
 ---
 
+
+---
+
+## 5. JSON 数据 Schema 优化——冗余字段清理、元数据归档、别名统一
+
+- **状态**：待确认（审查完成，待用户决策后执行）
+- **日期**：2026-08-28
+- **标签**：数据 / schema / 内容管线
+
+### 背景
+
+`lib/course/*.web-card.json` 是课程卡片的唯一数据源，前端（课程目录、学习页、词汇中心、内容工作台）直接消费其中的字段。逐一扫描 10 个 JSON 文件的全部字段，对照前端代码（`app/`、`lib/`）确认实际消费情况，发现三类问题：**前端零引用的冗余字段、重复字段、别名并存**。
+
+### 审查结论
+
+#### A. 建议删除（零引用 + 无保留价值，零风险）
+
+| 字段 | 位置 | 现状 |
+|---|---|---|
+| `structure` | 顶层 | 与 `articleStructure` 完全重复（10/10 文件值相同），前端仅作 fallback |
+| `listenRead.fullAudio` | 听读 | 恒为 `null`，零引用；音频由独立字段 `audioDirectory` 驱动 |
+| `listenRead.coreSentenceAudio` | 听读 | 恒为 `null`，零引用 |
+
+#### B. 零引用但可能有未来价值（建议归档，需决策）
+
+这些字段是内容生成过程的工作底稿（AI 生成时的推理与审核记录），前端全部不消费：
+
+| 字段 | 内容 | 潜在价值 |
+|---|---|---|
+| `callouts` | 文章要点提取（6-7 条/文件） | 无明确用途 |
+| `reasoning_chain` | 科学推理链（input→mechanism→result） | 未来“推理可视化” |
+| `difficulty_metrics` | 字数、句长、熟悉度百分比、认知检查 | 未来难度分级/复习排序 |
+| `vocabulary_audit` | 词汇分级 tier_505/tier_1095 + necessity_notes 词典 | 未来词汇复习、选词审核 |
+| `word_bank[].word_bank_rationale` | 收录理由 | 审核用 |
+| `word_bank[].image_semantics` | 配图语义描述 | AI 生成配图时的提示词 |
+| `word_bank[].paragraph_form` | 词在段落中的实际形式（push→pushes） | 段落内核心词高亮 |
+
+归档方案：移至独立文件（如 `lib/course-meta/*.json`），运行时 JSON 不再包含。
+
+#### C. 需规范统一的字段别名
+
+| 现状 | 问题 | 建议 |
+|---|---|---|
+| `translations` vs `paragraphTranslations` | 两种写法并存，学习页做 fallback；当前 10 个 JSON 均缺失，中文翻译走前端硬编码 fallback | 统一为一个字段 |
+| `word_bank[].image_file / image / illustration` | 三种字段名（当前均无数据） | 统一为 `image_file` |
+| `contextQuestions[].image_file / image` | 两种字段名（当前均无数据） | 统一为 `image_file` |
+| `version` | 前端不读 | 保留作 schema 版本标识，校验时检查 |
+
+#### D. 确认保留（被前端实际消费）
+
+- 顶层：`cardId, courseId, seriesId, topic, theme, day, level, title, bigQuestion, image_file, articleStructure, status, paragraphs, audioDirectory`
+- `word_bank[].english / chinese`
+- `comprehension.questions[]`（type/prompt/options/answer）
+- `wordModule.matchPairs[]`（word/meaning）、`wordModule.contextQuestions[]`（prompt/options/answer）
+- `rebuild.type / steps`
+- `listenRead.sentences[]`（sentence/role）
+
+### 待决策 / 待实现
+
+1. **B 组**（`callouts` / `reasoning_chain` / `difficulty_metrics` / `vocabulary_audit` / `word_bank_rationale` / `image_semantics` / `paragraph_form`）——删除还是归档到独立文件？
+2. **C 组统一后**：`translations` 缺失的中文翻译是否补录到 JSON，还是保持前端 fallback？
+3. 确认判决后：
+   - 从全部 10 个 `*.web-card.json` 中移除 A 组字段
+   - 若选归档，将 B 组移至 `lib/course-meta/*.json`
+   - 统一 C 组字段名（先不复写到现有 JSON，仅收拢 admin 表单和 API 写入规范）
+
+### 备注
+
+- 完整审查过程见 `.scratch/json-schema-optimization/issues/01-json-schema-review.md`
+- 相关：`lib/course/*.web-card.json`、`app/admin/import/AdminImport.tsx`（admin 上传表单）
+- 实施时需同步更新 `lib/course-data.ts` 的类型定义
+
+
 ## 追加模板（复制到文件末尾填写）
 
 ```

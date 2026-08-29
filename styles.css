@@ -1,13 +1,13 @@
 :root {
-  --bg: #f4f7fb;
+  --bg: #f6f4ee;
   --surface: #ffffff;
-  --surface-warm: #fffaf2;
+  --surface-warm: #f2f8ff;
   --surface-subtle: #f8fafc;
   --ink: #18304f;
   --muted: #687b92;
   --line: #d7e1ed;
-  --brand: #ef7259;
-  --brand-dark: #c94f39;
+  --brand: #3979d8;
+  --brand-dark: #2563eb;
   --blue: #3979d8;
   --blue-soft: #edf5ff;
   --green: #2f8b68;
@@ -24,18 +24,20 @@ html { scroll-behavior: smooth; }
 html { scrollbar-color: #b9c7d7 var(--bg); scrollbar-width: thin; }
 body {
   margin: 0;
-  background: radial-gradient(circle at 92% 0, #fff1e7 0, transparent 26rem), var(--bg);
+  background: radial-gradient(circle at 92% 0, #fdf6e8 0, transparent 26rem), var(--bg);
   color: var(--ink);
-  font-family: "Avenir Next", Avenir, "Microsoft YaHei", "PingFang SC", sans-serif;
+  font-family: system-ui, -apple-system, "Segoe UI", Roboto, "Helvetica Neue", "Noto Sans SC", "Microsoft YaHei", "PingFang SC", sans-serif;
   line-height: 1.5;
 }
-::selection { background: #f7c8bb; color: var(--ink); }
+::selection { background: #cfe3ff; color: var(--ink); }
 ::-webkit-scrollbar { width: 10px; height: 10px; }
 ::-webkit-scrollbar-track { background: var(--bg); }
 ::-webkit-scrollbar-thumb { border: 3px solid var(--bg); border-radius: 999px; background: #b9c7d7; }
 button, input, textarea, select { font: inherit; }
 button, a { -webkit-tap-highlight-color: transparent; }
 a { color: inherit; }
+a, button { text-decoration: none; }
+a:focus, a:focus-visible, button:focus, button:focus-visible { text-decoration: none; }
 img { max-width: 100%; }
 :focus-visible { outline: 3px solid rgba(57, 121, 216, .35); outline-offset: 3px; }
 

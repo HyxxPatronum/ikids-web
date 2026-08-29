@@ -4,7 +4,7 @@
 > 产品阶段：可用型 MVP / 模块闭环建设  
 > 更新日期：2026-08-23  
 > 适用对象：产品、设计、前端、后端、内容教研、测试与运营  
-> 需求基线：当前 `syllabus.html`、`index.html`、Next 产品 API（`app/api/[...path]/route.ts`）、卡片 JSON 与数据库设计
+> 历史需求基线：静态页面与 Cloudflare 产品 API 已在 React 前端重构中移除。当前运行范围与待接入能力以 `PRODUCT.md` 和 `.scratch/react-frontend-rebuild/issues/` 为准。
 
 ## 1. 文档目的
 

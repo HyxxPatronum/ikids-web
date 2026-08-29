@@ -1,1 +1,0 @@
-ALTER TABLE `published_vocabulary_terms` ADD `media_json` text DEFAULT '{}' NOT NULL;

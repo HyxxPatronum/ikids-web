@@ -1,0 +1,261 @@
+{
+  "version": "1.0",
+  "cardId": "day007-frog",
+  "courseId": "science-reading",
+  "seriesId": "science-reading",
+  "topic": "Living Things",
+  "theme": "frog",
+  "day": 7,
+  "level": "L2",
+  "title": "FROG",
+  "bigQuestion": "How does a frog change?",
+  "image_file": "day-007-living-things-frog.png",
+  "articleStructure": "Process/Life cycle",
+  "structure": "Process/Life cycle",
+  "status": "draft",
+  "paragraphs": [
+    "A frog begins its life as a small egg in water. The egg opens, and a tadpole swims with a long tail. As legs grow, the tadpole slowly loses its tail. Lungs develop, so the young frog can live on land."
+  ],
+  "word_bank": [
+    {
+      "english": "frog",
+      "chinese": "青蛙",
+      "paragraph_form": "frog",
+      "image_semantics": "young frog with four legs",
+      "word_bank_rationale": "“frog” appears in the paragraph and supports the frog reasoning chain."
+    },
+    {
+      "english": "egg",
+      "chinese": "卵",
+      "paragraph_form": "egg",
+      "image_semantics": "clear jelly egg with dark embryo",
+      "word_bank_rationale": "“egg” appears in the paragraph and supports the frog reasoning chain."
+    },
+    {
+      "english": "tadpole",
+      "chinese": "蝌蚪",
+      "paragraph_form": "tadpole",
+      "image_semantics": "swimming tadpole with long tail",
+      "word_bank_rationale": "“tadpole” appears in the paragraph and supports the frog reasoning chain."
+    },
+    {
+      "english": "tail",
+      "chinese": "尾巴",
+      "paragraph_form": "tail",
+      "image_semantics": "tail becoming shorter across stages",
+      "word_bank_rationale": "“tail” appears in the paragraph and supports the frog reasoning chain."
+    },
+    {
+      "english": "leg",
+      "chinese": "腿",
+      "paragraph_form": "legs",
+      "image_semantics": "hind and front legs growing",
+      "word_bank_rationale": "“legs” appears in the paragraph and supports the frog reasoning chain."
+    },
+    {
+      "english": "lung",
+      "chinese": "肺",
+      "paragraph_form": "Lungs",
+      "image_semantics": "simple paired lungs inside young frog",
+      "word_bank_rationale": "“Lungs” appears in the paragraph and supports the frog reasoning chain."
+    }
+  ],
+  "comprehension": {
+    "questions": [
+      {
+        "type": "Whole",
+        "prompt": "Which order shows a frog changing?",
+        "options": {
+          "A": "Egg, tadpole, legs grow, young frog on land.",
+          "B": "Young frog, egg, long tail, water.",
+          "C": "Legs grow, egg, shell, fruit."
+        },
+        "answer": "A"
+      },
+      {
+        "type": "Connection",
+        "prompt": "What helps the young frog live on land?",
+        "options": {
+          "A": "Lungs develop.",
+          "B": "Its tail grows longer.",
+          "C": "Its egg closes."
+        },
+        "answer": "A"
+      },
+      {
+        "type": "Transfer",
+        "prompt": "A tadpole has grown legs but still has a tail. What can happen next?",
+        "options": {
+          "A": "Its tail can slowly get smaller.",
+          "B": "It can grow a hard shell.",
+          "C": "It can make fruit."
+        },
+        "answer": "A"
+      }
+    ]
+  },
+  "wordModule": {
+    "matchPairs": [
+      {
+        "word": "egg",
+        "meaning": "the first stage of a frog"
+      },
+      {
+        "word": "tadpole",
+        "meaning": "a young frog in water"
+      },
+      {
+        "word": "tail",
+        "meaning": "a long back part"
+      },
+      {
+        "word": "leg",
+        "meaning": "a body part for moving"
+      },
+      {
+        "word": "lung",
+        "meaning": "a body part for breathing"
+      }
+    ],
+    "contextQuestions": [
+      {
+        "prompt": "A young frog in water is a __.",
+        "options": [
+          "tadpole",
+          "egg",
+          "lung"
+        ],
+        "answer": "tadpole"
+      },
+      {
+        "prompt": "As legs grow, the tadpole loses its __.",
+        "options": [
+          "tail",
+          "egg",
+          "water"
+        ],
+        "answer": "tail"
+      }
+    ]
+  },
+  "rebuild": {
+    "type": "Process/Life cycle",
+    "steps": [
+      "Egg in water",
+      "Tadpole swims with a tail",
+      "Legs grow",
+      "Tail becomes smaller",
+      "Lungs develop and the frog lives on land"
+    ]
+  },
+  "listenRead": {
+    "fullAudio": null,
+    "coreSentenceAudio": null,
+    "sentences": [
+      {
+        "sentence": "The egg opens, and a tadpole swims with a long tail.",
+        "role": "Science Core"
+      },
+      {
+        "sentence": "Lungs develop, so the young frog can live on land.",
+        "role": "Structure"
+      }
+    ]
+  },
+  "callouts": [
+    "A frog begins as an egg",
+    "A tadpole comes from the egg",
+    "The tadpole swims with a tail",
+    "Legs grow on the tadpole",
+    "The tadpole loses its tail",
+    "Lungs help the frog live on land"
+  ],
+  "reasoning_chain": [
+    {
+      "step": 1,
+      "role": "input",
+      "claim": "A frog begins as an egg in water"
+    },
+    {
+      "step": 2,
+      "role": "mechanism",
+      "claim": "A tadpole hatches and swims with a tail"
+    },
+    {
+      "step": 3,
+      "role": "mechanism",
+      "claim": "Legs grow while the tail becomes smaller"
+    },
+    {
+      "step": 4,
+      "role": "mechanism",
+      "claim": "Lungs develop"
+    },
+    {
+      "step": 5,
+      "role": "result",
+      "claim": "The young frog can live on land"
+    }
+  ],
+  "difficulty_metrics": {
+    "total_words": 41,
+    "science_core": [
+      "frog",
+      "egg",
+      "tadpole",
+      "tail",
+      "lung"
+    ],
+    "science_core_count": 5,
+    "sentence_lengths": [
+      11,
+      11,
+      9,
+      10
+    ],
+    "average_sentence_length_words": 10.25,
+    "longest_sentence_words": 11,
+    "familiar_language_estimate_percent": 86,
+    "cognition_check": "The paragraph states one explicit how relationship.",
+    "level_outcome_check": "Passes the Level 2 reading outcome."
+  },
+  "vocabulary_audit": {
+    "tier_505": [
+      "begin",
+      "small",
+      "egg",
+      "water",
+      "open",
+      "swim",
+      "long",
+      "tail",
+      "leg",
+      "slow",
+      "young",
+      "live"
+    ],
+    "tier_1095": [
+      "grow",
+      "lose",
+      "develop",
+      "land"
+    ],
+    "science_core": [
+      "frog",
+      "egg",
+      "tadpole",
+      "tail",
+      "lung"
+    ],
+    "necessity_notes": {
+      "grow": "“grow” is necessary here to preserve the lesson's exact object, structure, action, or mechanism.",
+      "lose": "“lose” is necessary here to preserve the lesson's exact object, structure, action, or mechanism.",
+      "develop": "“develop” is necessary here to preserve the lesson's exact object, structure, action, or mechanism.",
+      "land": "“land” is necessary here to preserve the lesson's exact object, structure, action, or mechanism.",
+      "frog": "“frog” is necessary here to preserve the lesson's exact object, structure, action, or mechanism.",
+      "life": "“life” is necessary here to preserve the lesson's exact object, structure, action, or mechanism.",
+      "tadpole": "“tadpole” is necessary here to preserve the lesson's exact object, structure, action, or mechanism.",
+      "lung": "“lung” is necessary here to preserve the lesson's exact object, structure, action, or mechanism."
+    }
+  }
+}

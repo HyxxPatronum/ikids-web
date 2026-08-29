@@ -1,0 +1,267 @@
+{
+  "version": "1.0",
+  "cardId": "day009-bee",
+  "courseId": "science-reading",
+  "seriesId": "science-reading",
+  "topic": "Living Things",
+  "theme": "bee",
+  "day": 9,
+  "level": "L2",
+  "title": "BEE",
+  "bigQuestion": "How does a bee help flowers?",
+  "image_file": "day-009-living-things-bee.png",
+  "articleStructure": "Cause-Effect",
+  "structure": "Cause-Effect",
+  "status": "draft",
+  "paragraphs": [
+    "A bee visits flowers to collect sweet nectar and pollen. Pollen sticks to the bee while it drinks nectar. When the bee visits another bright flower, some pollen rubs off. This transfer helps the flower make seeds and new fruit."
+  ],
+  "word_bank": [
+    {
+      "english": "bee",
+      "chinese": "蜜蜂",
+      "paragraph_form": "bee",
+      "image_semantics": "bee with pollen grains on its fuzzy body",
+      "word_bank_rationale": "“bee” appears in the paragraph and supports the bee reasoning chain."
+    },
+    {
+      "english": "visit",
+      "chinese": "拜访",
+      "paragraph_form": "visits",
+      "image_semantics": "bee moving between two flowers",
+      "word_bank_rationale": "“visits” appears in the paragraph and supports the bee reasoning chain."
+    },
+    {
+      "english": "collect",
+      "chinese": "采集",
+      "paragraph_form": "collect",
+      "image_semantics": "bee gathering nectar with its mouthparts",
+      "word_bank_rationale": "“collect” appears in the paragraph and supports the bee reasoning chain."
+    },
+    {
+      "english": "nectar",
+      "chinese": "花蜜",
+      "paragraph_form": "nectar",
+      "image_semantics": "nectar drop deep inside a flower",
+      "word_bank_rationale": "“nectar” appears in the paragraph and supports the bee reasoning chain."
+    },
+    {
+      "english": "pollen",
+      "chinese": "花粉",
+      "paragraph_form": "Pollen",
+      "image_semantics": "yellow pollen grains sticking to bee hairs",
+      "word_bank_rationale": "“Pollen” appears in the paragraph and supports the bee reasoning chain."
+    },
+    {
+      "english": "transfer",
+      "chinese": "传递",
+      "paragraph_form": "transfer",
+      "image_semantics": "pollen moving from bee to the next flower",
+      "word_bank_rationale": "“transfer” appears in the paragraph and supports the bee reasoning chain."
+    }
+  ],
+  "comprehension": {
+    "questions": [
+      {
+        "type": "Whole",
+        "prompt": "How does a bee help flowers?",
+        "options": {
+          "A": "It moves pollen from one flower to another.",
+          "B": "It covers flowers with a hard shell.",
+          "C": "It stops flowers from making seeds."
+        },
+        "answer": "A"
+      },
+      {
+        "type": "Connection",
+        "prompt": "Why does pollen reach another flower?",
+        "options": {
+          "A": "Some pollen rubs off when the bee visits it.",
+          "B": "The flower grows a long tail.",
+          "C": "The bee turns into a seed."
+        },
+        "answer": "A"
+      },
+      {
+        "type": "Transfer",
+        "prompt": "A bee visits a second flower after pollen sticks to it. What may happen?",
+        "options": {
+          "A": "Some pollen can rub onto the second flower.",
+          "B": "The second flower becomes dry at once.",
+          "C": "The bee grows roots."
+        },
+        "answer": "A"
+      }
+    ]
+  },
+  "wordModule": {
+    "matchPairs": [
+      {
+        "word": "bee",
+        "meaning": "an insect that visits flowers"
+      },
+      {
+        "word": "visit",
+        "meaning": "to go to a place"
+      },
+      {
+        "word": "collect",
+        "meaning": "to gather"
+      },
+      {
+        "word": "nectar",
+        "meaning": "sweet liquid in a flower"
+      },
+      {
+        "word": "pollen",
+        "meaning": "yellow powder from a flower"
+      },
+      {
+        "word": "transfer",
+        "meaning": "to move from one place to another"
+      }
+    ],
+    "contextQuestions": [
+      {
+        "prompt": "A bee drinks sweet __ from a flower.",
+        "options": [
+          "nectar",
+          "pollen",
+          "fruit"
+        ],
+        "answer": "nectar"
+      },
+      {
+        "prompt": "__ can stick to a bee.",
+        "options": [
+          "Pollen",
+          "Water",
+          "Soil"
+        ],
+        "answer": "Pollen"
+      }
+    ]
+  },
+  "rebuild": {
+    "type": "Cause-Effect",
+    "steps": [
+      "A bee visits a flower",
+      "Pollen sticks to the bee",
+      "The bee visits another flower",
+      "Some pollen rubs off",
+      "The flower can make seeds and fruit"
+    ]
+  },
+  "listenRead": {
+    "fullAudio": null,
+    "coreSentenceAudio": null,
+    "sentences": [
+      {
+        "sentence": "Pollen sticks to the bee while it drinks nectar.",
+        "role": "Science Core"
+      },
+      {
+        "sentence": "This transfer helps the flower make seeds and new fruit.",
+        "role": "Structure"
+      }
+    ]
+  },
+  "callouts": [
+    "A bee visits a flower",
+    "The bee collects nectar and pollen",
+    "Pollen sticks to the bee",
+    "The bee visits another flower",
+    "Some pollen rubs off",
+    "The transfer helps seeds form"
+  ],
+  "reasoning_chain": [
+    {
+      "step": 1,
+      "role": "input",
+      "claim": "A bee visits a flower for nectar and pollen"
+    },
+    {
+      "step": 2,
+      "role": "mechanism",
+      "claim": "Pollen sticks to the bee"
+    },
+    {
+      "step": 3,
+      "role": "mechanism",
+      "claim": "The bee visits another flower"
+    },
+    {
+      "step": 4,
+      "role": "mechanism",
+      "claim": "Some pollen rubs onto the next flower"
+    },
+    {
+      "step": 5,
+      "role": "result",
+      "claim": "The pollen transfer helps seeds and fruit form"
+    }
+  ],
+  "difficulty_metrics": {
+    "total_words": 40,
+    "science_core": [
+      "bee",
+      "nectar",
+      "pollen",
+      "transfer",
+      "flower"
+    ],
+    "science_core_count": 5,
+    "sentence_lengths": [
+      10,
+      9,
+      11,
+      10
+    ],
+    "average_sentence_length_words": 10,
+    "longest_sentence_words": 11,
+    "familiar_language_estimate_percent": 86,
+    "cognition_check": "The paragraph states one explicit how relationship.",
+    "level_outcome_check": "Passes the Level 2 reading outcome."
+  },
+  "vocabulary_audit": {
+    "tier_505": [
+      "bee",
+      "visit",
+      "flower",
+      "drink",
+      "off",
+      "help",
+      "make",
+      "new",
+      "fruit"
+    ],
+    "tier_1095": [
+      "collect",
+      "sweet",
+      "stick",
+      "while",
+      "another",
+      "bright"
+    ],
+    "science_core": [
+      "bee",
+      "nectar",
+      "pollen",
+      "transfer",
+      "flower"
+    ],
+    "necessity_notes": {
+      "collect": "“collect” is necessary here to preserve the lesson's exact object, structure, action, or mechanism.",
+      "sweet": "“sweet” is necessary here to preserve the lesson's exact object, structure, action, or mechanism.",
+      "stick": "“stick” is necessary here to preserve the lesson's exact object, structure, action, or mechanism.",
+      "while": "“while” is necessary here to preserve the lesson's exact object, structure, action, or mechanism.",
+      "another": "“another” is necessary here to preserve the lesson's exact object, structure, action, or mechanism.",
+      "bright": "“bright” is necessary here to preserve the lesson's exact object, structure, action, or mechanism.",
+      "nectar": "“nectar” is necessary here to preserve the lesson's exact object, structure, action, or mechanism.",
+      "pollen": "“pollen” is necessary here to preserve the lesson's exact object, structure, action, or mechanism.",
+      "rub": "“rub” is necessary here to preserve the lesson's exact object, structure, action, or mechanism.",
+      "transfer": "“transfer” is necessary here to preserve the lesson's exact object, structure, action, or mechanism.",
+      "seed": "“seed” is necessary here to preserve the lesson's exact object, structure, action, or mechanism."
+    }
+  }
+}

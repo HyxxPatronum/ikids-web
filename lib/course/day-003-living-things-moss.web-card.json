@@ -1,0 +1,262 @@
+{
+  "version": "1.0",
+  "cardId": "day003-moss",
+  "courseId": "science-reading",
+  "seriesId": "science-reading",
+  "topic": "Living Things",
+  "theme": "moss",
+  "day": 3,
+  "level": "L1",
+  "title": "MOSS",
+  "bigQuestion": "Where does moss grow best?",
+  "image_file": "day-003-living-things-moss.png",
+  "articleStructure": "Fact/Explanation",
+  "structure": "Fact/Explanation",
+  "status": "draft",
+  "paragraphs": [
+    "Moss is a small green plant. It grows in cool, wet places. Moss has no deep roots. It takes water across its surface. Shade keeps the moss from drying. Many tiny moss plants form a soft mat."
+  ],
+  "word_bank": [
+    {
+      "english": "moss",
+      "chinese": "苔藓",
+      "paragraph_form": "Moss",
+      "image_semantics": "close cluster of tiny moss shoots",
+      "word_bank_rationale": "“Moss” appears in the paragraph and supports the moss reasoning chain."
+    },
+    {
+      "english": "green",
+      "chinese": "绿色的",
+      "paragraph_form": "green",
+      "image_semantics": "rich green moss color swatch",
+      "word_bank_rationale": "“green” appears in the paragraph and supports the moss reasoning chain."
+    },
+    {
+      "english": "wet",
+      "chinese": "湿润的",
+      "paragraph_form": "wet",
+      "image_semantics": "moss surface holding clear droplets",
+      "word_bank_rationale": "“wet” appears in the paragraph and supports the moss reasoning chain."
+    },
+    {
+      "english": "surface",
+      "chinese": "表面",
+      "paragraph_form": "surface",
+      "image_semantics": "magnified moss surface absorbing droplets",
+      "word_bank_rationale": "“surface” appears in the paragraph and supports the moss reasoning chain."
+    },
+    {
+      "english": "shade",
+      "chinese": "阴凉处",
+      "paragraph_form": "Shade",
+      "image_semantics": "rock shade protecting moss from sun",
+      "word_bank_rationale": "“Shade” appears in the paragraph and supports the moss reasoning chain."
+    },
+    {
+      "english": "mat",
+      "chinese": "垫状层",
+      "paragraph_form": "mat",
+      "image_semantics": "thick soft carpet of many moss plants",
+      "word_bank_rationale": "“mat” appears in the paragraph and supports the moss reasoning chain."
+    }
+  ],
+  "comprehension": {
+    "questions": [
+      {
+        "type": "Whole",
+        "prompt": "Which place is best for moss?",
+        "options": {
+          "A": "A cool, wet place with shade.",
+          "B": "A hot, dry rock in the sun.",
+          "C": "A high, windy roof."
+        },
+        "answer": "A"
+      },
+      {
+        "type": "Connection",
+        "prompt": "What helps moss take in water?",
+        "options": {
+          "A": "Its surface takes in water.",
+          "B": "Its deep roots take in water.",
+          "C": "Its long stem takes in water."
+        },
+        "answer": "A"
+      },
+      {
+        "type": "Transfer",
+        "prompt": "A small moss plant is in deep shade. What does the shade help stop?",
+        "options": {
+          "A": "It helps stop the moss from drying.",
+          "B": "It helps the moss grow a shell.",
+          "C": "It helps the moss fly away."
+        },
+        "answer": "A"
+      }
+    ]
+  },
+  "wordModule": {
+    "matchPairs": [
+      {
+        "word": "moss",
+        "meaning": "a small green plant"
+      },
+      {
+        "word": "wet",
+        "meaning": "with water"
+      },
+      {
+        "word": "surface",
+        "meaning": "the outside part"
+      },
+      {
+        "word": "shade",
+        "meaning": "a place away from strong sun"
+      },
+      {
+        "word": "mat",
+        "meaning": "a soft layer of many plants"
+      }
+    ],
+    "contextQuestions": [
+      {
+        "prompt": "Moss grows best in __ places.",
+        "options": [
+          "wet",
+          "dry",
+          "long"
+        ],
+        "answer": "wet"
+      },
+      {
+        "prompt": "Moss takes water across its __.",
+        "options": [
+          "surface",
+          "shade",
+          "mat"
+        ],
+        "answer": "surface"
+      }
+    ]
+  },
+  "rebuild": {
+    "type": "Fact/Explanation",
+    "steps": [
+      "Moss is a small green plant",
+      "It grows in cool, wet places",
+      "Its surface takes in water",
+      "Many moss plants form a soft mat"
+    ]
+  },
+  "listenRead": {
+    "fullAudio": null,
+    "coreSentenceAudio": null,
+    "sentences": [
+      {
+        "sentence": "Moss is a small green plant.",
+        "role": "Science Core"
+      },
+      {
+        "sentence": "It takes water across its surface.",
+        "role": "Structure"
+      }
+    ]
+  },
+  "callouts": [
+    "Moss is a small green plant",
+    "Moss grows in wet places",
+    "Moss has no deep roots",
+    "Its surface takes in water",
+    "Shade stops moss from drying",
+    "Many moss plants form a mat"
+  ],
+  "reasoning_chain": [
+    {
+      "step": 1,
+      "role": "input",
+      "claim": "Moss lives in cool wet shade"
+    },
+    {
+      "step": 2,
+      "role": "mechanism",
+      "claim": "Moss has no deep roots"
+    },
+    {
+      "step": 3,
+      "role": "mechanism",
+      "claim": "Its surface takes in water"
+    },
+    {
+      "step": 4,
+      "role": "mechanism",
+      "claim": "Shade slows drying"
+    },
+    {
+      "step": 5,
+      "role": "result",
+      "claim": "Many moss plants form a soft mat"
+    }
+  ],
+  "difficulty_metrics": {
+    "total_words": 37,
+    "science_core": [
+      "moss",
+      "root",
+      "surface",
+      "shade"
+    ],
+    "science_core_count": 4,
+    "sentence_lengths": [
+      6,
+      6,
+      5,
+      6,
+      6,
+      8
+    ],
+    "average_sentence_length_words": 6.17,
+    "longest_sentence_words": 8,
+    "familiar_language_estimate_percent": 83,
+    "cognition_check": "Every answer is stated directly in one sentence.",
+    "level_outcome_check": "Passes the Level 1 reading outcome."
+  },
+  "vocabulary_audit": {
+    "tier_505": [
+      "small",
+      "green",
+      "plant",
+      "cool",
+      "place",
+      "take",
+      "water",
+      "keep"
+    ],
+    "tier_1095": [
+      "grow",
+      "wet",
+      "deep",
+      "surface",
+      "dry",
+      "tiny",
+      "soft"
+    ],
+    "science_core": [
+      "moss",
+      "root",
+      "surface",
+      "shade"
+    ],
+    "necessity_notes": {
+      "grow": "“grow” is necessary here to preserve the lesson's exact object, structure, action, or mechanism.",
+      "wet": "“wet” is necessary here to preserve the lesson's exact object, structure, action, or mechanism.",
+      "deep": "“deep” is necessary here to preserve the lesson's exact object, structure, action, or mechanism.",
+      "surface": "“surface” is necessary here to preserve the lesson's exact object, structure, action, or mechanism.",
+      "dry": "“dry” is necessary here to preserve the lesson's exact object, structure, action, or mechanism.",
+      "tiny": "“tiny” is necessary here to preserve the lesson's exact object, structure, action, or mechanism.",
+      "soft": "“soft” is necessary here to preserve the lesson's exact object, structure, action, or mechanism.",
+      "moss": "“moss” is necessary here to preserve the lesson's exact object, structure, action, or mechanism.",
+      "root": "“root” is necessary here to preserve the lesson's exact object, structure, action, or mechanism.",
+      "shade": "“shade” is necessary here to preserve the lesson's exact object, structure, action, or mechanism.",
+      "mat": "“mat” is necessary here to preserve the lesson's exact object, structure, action, or mechanism."
+    }
+  }
+}

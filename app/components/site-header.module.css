@@ -1,0 +1,275 @@
+/* ── 全宽吸顶毛玻璃导航 ── */
+.header {
+  position: sticky;
+  top: 0;
+  z-index: 100;
+  width: 100%;
+  background: rgba(221, 236, 252, 0.85); 
+  backdrop-filter: blur(20px) saturate(150%);
+  -webkit-backdrop-filter: blur(20px) saturate(150%);
+  box-shadow: inset 0 -1px 0 rgba(255, 255, 255, 0.7), 0 8px 28px rgba(57, 121, 216, 0.12); 
+}
+
+/* 非吸顶变体（lesson 内：不固定，让流程条吸顶） */
+.headerStatic {
+  position: relative;
+  top: auto;
+}
+
+/* ── 磨砂颗粒（弱化为柔和质感，不发灰） ── */
+.header::before {
+  content: '';
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+  opacity: 0.12;
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='240' height='240'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='1.1' numOctaves='5' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)'/%3E%3C/svg%3E");
+  background-repeat: repeat;
+  background-size: 130px 130px;
+  mix-blend-mode: soft-light;
+}
+
+/* ── 顶部高光（柔和提亮） ── */
+.header::after {
+  content: '';
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+  opacity: 0.6;
+  background: linear-gradient(to bottom, rgba(255, 255, 255, 0.7), rgba(255, 255, 255, 0.12) 45%, transparent); 
+}
+
+.inner {
+  position: relative;
+  display: flex;
+  align-items: center;
+  width: 100%;
+  max-width: 1140px;
+  margin: 0 auto;
+  height: 64px;
+  padding: 0 20px;
+}
+
+/* ── Logo（absolute 居中） ── */
+.logo {
+  position: absolute;
+  left: 50%;
+  top: 50%;
+  transform: translate(-50%, -50%);
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  text-decoration: none;
+  z-index: 1;
+}
+
+.logoIcon {
+  width: 34px;
+  height: 34px;
+  border-radius: 9px;
+  object-fit: contain;
+  background: transparent;
+}
+
+.logoText {
+  font-family: "Times New Roman", Times, serif;
+  font-size: 30px;
+  font-weight: 400;
+  line-height: 36px;
+  color: var(--ink);
+  letter-spacing: 0.05em;
+}
+
+/* ── 主导航（左） ── */
+.nav {
+  display: flex;
+  align-items: center;
+  gap: 4px;
+}
+
+.navLink {
+  display: inline-flex;
+  align-items: center;
+  padding: 9px 14px;
+  border-radius: 8px;
+  font-size: 15px;
+  font-weight: 600;
+  color: #55708f;
+  text-decoration: none;
+  white-space: nowrap;
+  transition: color 0.18s ease, background 0.18s ease;
+}
+
+.navLink:hover {
+  background: rgba(57, 121, 216, 0.08);
+  color: var(--ink);
+}
+
+.navLinkActive {
+  color: var(--blue);
+  font-weight: 800;
+  background: rgba(57, 121, 216, 0.1);
+}
+
+/* ── 右侧操作区 ── */
+.actions {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  margin-left: auto;
+  flex-shrink: 0;
+  z-index: 1;
+}
+
+/* 工作台 */
+.toolBtn {
+  display: grid;
+  place-items: center;
+  width: 38px;
+  height: 38px;
+  border-radius: 10px;
+  color: #55708f;
+  text-decoration: none;
+  transition: background 0.15s ease, color 0.15s ease;
+  flex-shrink: 0;
+}
+
+.toolBtn:hover {
+  background: rgba(57, 121, 216, 0.08);
+  color: var(--ink);
+}
+
+.toolBtnActive {
+  background: rgba(57, 121, 216, 0.1);
+  color: var(--blue);
+}
+
+/* Log in / Sign up */
+.loginBtn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  padding: 9px 14px;
+  font-size: 14px;
+  font-weight: 600;
+  color: #55708f;
+  text-decoration: none;
+  white-space: nowrap;
+  transition: color 0.18s ease, background 0.18s ease;
+  border-radius: 8px;
+}
+
+.loginBtn:hover {
+  color: var(--ink);
+  background: rgba(57, 121, 216, 0.08);
+}
+
+.signupBtn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  padding: 9px 18px;
+  border-radius: 10px;
+  font-size: 14px;
+  font-weight: 800;
+  color: #fff;
+  text-decoration: none;
+  white-space: nowrap;
+  background: linear-gradient(135deg, #4f8ff2, #2563eb);
+  box-shadow: 0 4px 16px rgba(37, 99, 235, 0.35);
+  transition: transform 0.16s ease, box-shadow 0.16s ease;
+}
+
+.signupBtn:hover {
+  transform: translateY(-1px);
+  box-shadow: 0 6px 20px rgba(37, 99, 235, 0.45);
+}
+
+/* ── 汉堡菜单 ── */
+.hamburger {
+  display: none;
+  place-items: center;
+  width: 38px;
+  height: 38px;
+  border: none;
+  border-radius: 10px;
+  background: transparent;
+  color: #55708f;
+  cursor: pointer;
+  flex-shrink: 0;
+  z-index: 1;
+}
+
+.hamburger:hover {
+  background: rgba(57, 121, 216, 0.08);
+}
+
+/* ── 响应式 ── */
+@media (max-width: 1080px) {
+  .logoText {
+    display: none;
+  }
+}
+
+@media (max-width: 900px) {
+  .inner {
+    height: 56px;
+    padding: 0 16px;
+  }
+
+  .logoIcon {
+    width: 28px;
+    height: 28px;
+  }
+
+  .logoText {
+    font-size: 16px;
+    line-height: 28px;
+  }
+
+  .navLink {
+    padding: 8px 10px;
+    font-size: 14px;
+  }
+}
+
+@media (max-width: 720px) {
+  .nav {
+    display: none;
+  }
+
+  .hamburger {
+    display: grid;
+  }
+}
+
+@media (max-width: 520px) {
+  .inner {
+    height: 50px;
+    padding: 0 12px;
+  }
+
+  .logoIcon {
+    width: 24px;
+    height: 24px;
+  }
+
+  .logoText {
+    font-size: 15px;
+    line-height: 24px;
+  }
+
+  .loginBtn {
+    padding: 7px 10px;
+    font-size: 13px;
+  }
+
+  .signupBtn {
+    padding: 7px 14px;
+    font-size: 13px;
+  }
+
+  .toolBtn {
+    display: none;
+  }
+}

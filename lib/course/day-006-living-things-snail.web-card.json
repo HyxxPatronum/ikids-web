@@ -1,0 +1,271 @@
+{
+  "version": "1.0",
+  "cardId": "day006-snail",
+  "courseId": "science-reading",
+  "seriesId": "science-reading",
+  "topic": "Living Things",
+  "theme": "snail",
+  "day": 6,
+  "level": "L2",
+  "title": "SNAIL",
+  "bigQuestion": "How does a snail stay safe?",
+  "image_file": "day-006-living-things-snail.png",
+  "articleStructure": "Feature-Function",
+  "structure": "Feature-Function",
+  "status": "draft",
+  "paragraphs": [
+    "A snail carries a hard shell that covers its soft body. When danger comes, strong muscles pull the snail inside the shell. The shell blocks sharp teeth and helps keep the snail wet. This protection lets the snail rest until the danger passes."
+  ],
+  "word_bank": [
+    {
+      "english": "snail",
+      "chinese": "蜗牛",
+      "paragraph_form": "snail",
+      "image_semantics": "snail with extended head and foot",
+      "word_bank_rationale": "“snail” appears in the paragraph and supports the snail reasoning chain."
+    },
+    {
+      "english": "shell",
+      "chinese": "壳",
+      "paragraph_form": "shell",
+      "image_semantics": "hard spiral shell cross-section",
+      "word_bank_rationale": "“shell” appears in the paragraph and supports the snail reasoning chain."
+    },
+    {
+      "english": "danger",
+      "chinese": "危险",
+      "paragraph_form": "danger",
+      "image_semantics": "approaching bird shadow without contact",
+      "word_bank_rationale": "“danger” appears in the paragraph and supports the snail reasoning chain."
+    },
+    {
+      "english": "muscle",
+      "chinese": "肌肉",
+      "paragraph_form": "muscles",
+      "image_semantics": "retractor muscles pulling the snail inward",
+      "word_bank_rationale": "“muscles” appears in the paragraph and supports the snail reasoning chain."
+    },
+    {
+      "english": "wet",
+      "chinese": "湿润的",
+      "paragraph_form": "wet",
+      "image_semantics": "moist snail skin protected inside shell",
+      "word_bank_rationale": "“wet” appears in the paragraph and supports the snail reasoning chain."
+    },
+    {
+      "english": "protection",
+      "chinese": "保护",
+      "paragraph_form": "protection",
+      "image_semantics": "snail safely enclosed in shell",
+      "word_bank_rationale": "“protection” appears in the paragraph and supports the snail reasoning chain."
+    }
+  ],
+  "comprehension": {
+    "questions": [
+      {
+        "type": "Whole",
+        "prompt": "How does a snail stay safe in danger?",
+        "options": {
+          "A": "It pulls inside its hard shell, which protects it.",
+          "B": "It grows wings and flies away.",
+          "C": "It changes into a tadpole."
+        },
+        "answer": "A"
+      },
+      {
+        "type": "Connection",
+        "prompt": "How does the hard shell help a snail?",
+        "options": {
+          "A": "It blocks sharp teeth and keeps the snail wet.",
+          "B": "It makes food from sunlight.",
+          "C": "It helps the snail grow roots."
+        },
+        "answer": "A"
+      },
+      {
+        "type": "Transfer",
+        "prompt": "A snail sees a bird nearby. What should it do?",
+        "options": {
+          "A": "Pull inside its shell.",
+          "B": "Open its leaves.",
+          "C": "Swim with a tail."
+        },
+        "answer": "A"
+      }
+    ]
+  },
+  "wordModule": {
+    "matchPairs": [
+      {
+        "word": "snail",
+        "meaning": "an animal with a shell"
+      },
+      {
+        "word": "shell",
+        "meaning": "a hard cover"
+      },
+      {
+        "word": "danger",
+        "meaning": "something that may hurt"
+      },
+      {
+        "word": "muscle",
+        "meaning": "a body part that pulls"
+      },
+      {
+        "word": "protection",
+        "meaning": "being kept safe"
+      }
+    ],
+    "contextQuestions": [
+      {
+        "prompt": "A snail goes inside its __ when danger comes.",
+        "options": [
+          "shell",
+          "tail",
+          "root"
+        ],
+        "answer": "shell"
+      },
+      {
+        "prompt": "Strong __ pull the snail inside.",
+        "options": [
+          "muscles",
+          "spores",
+          "bristles"
+        ],
+        "answer": "muscles"
+      }
+    ]
+  },
+  "rebuild": {
+    "type": "Feature-Function",
+    "steps": [
+      "Danger comes near",
+      "Strong muscles pull the snail inside",
+      "The hard shell blocks sharp teeth",
+      "The shell helps keep the snail wet",
+      "The snail can rest safely"
+    ]
+  },
+  "listenRead": {
+    "fullAudio": null,
+    "coreSentenceAudio": null,
+    "sentences": [
+      {
+        "sentence": "When danger comes, strong muscles pull the snail inside the shell.",
+        "role": "Science Core"
+      },
+      {
+        "sentence": "The shell blocks sharp teeth and helps keep the snail wet.",
+        "role": "Structure"
+      }
+    ]
+  },
+  "callouts": [
+    "A snail carries a hard shell",
+    "The shell covers its soft body",
+    "Muscles pull the snail inside",
+    "The shell blocks sharp teeth",
+    "The shell keeps the snail wet",
+    "Protection lets the snail rest"
+  ],
+  "reasoning_chain": [
+    {
+      "step": 1,
+      "role": "input",
+      "claim": "Danger approaches a snail"
+    },
+    {
+      "step": 2,
+      "role": "mechanism",
+      "claim": "Strong muscles pull the snail into its shell"
+    },
+    {
+      "step": 3,
+      "role": "mechanism",
+      "claim": "The hard shell blocks teeth"
+    },
+    {
+      "step": 4,
+      "role": "mechanism",
+      "claim": "The shell also slows water loss"
+    },
+    {
+      "step": 5,
+      "role": "result",
+      "claim": "The protected snail can wait until danger passes"
+    }
+  ],
+  "difficulty_metrics": {
+    "total_words": 43,
+    "science_core": [
+      "snail",
+      "shell",
+      "muscle",
+      "protection",
+      "tooth"
+    ],
+    "science_core_count": 5,
+    "sentence_lengths": [
+      11,
+      11,
+      11,
+      10
+    ],
+    "average_sentence_length_words": 10.75,
+    "longest_sentence_words": 11,
+    "familiar_language_estimate_percent": 86,
+    "cognition_check": "The paragraph states one explicit how relationship.",
+    "level_outcome_check": "Passes the Level 2 reading outcome."
+  },
+  "vocabulary_audit": {
+    "tier_505": [
+      "hard",
+      "body",
+      "come",
+      "strong",
+      "help",
+      "keep",
+      "let"
+    ],
+    "tier_1095": [
+      "carry",
+      "cover",
+      "soft",
+      "danger",
+      "pull",
+      "inside",
+      "block",
+      "wet",
+      "rest",
+      "pass"
+    ],
+    "science_core": [
+      "snail",
+      "shell",
+      "muscle",
+      "protection",
+      "tooth"
+    ],
+    "necessity_notes": {
+      "carry": "“carry” is necessary here to preserve the lesson's exact object, structure, action, or mechanism.",
+      "cover": "“cover” is necessary here to preserve the lesson's exact object, structure, action, or mechanism.",
+      "soft": "“soft” is necessary here to preserve the lesson's exact object, structure, action, or mechanism.",
+      "danger": "“danger” is necessary here to preserve the lesson's exact object, structure, action, or mechanism.",
+      "pull": "“pull” is necessary here to preserve the lesson's exact object, structure, action, or mechanism.",
+      "inside": "“inside” is necessary here to preserve the lesson's exact object, structure, action, or mechanism.",
+      "block": "“block” is necessary here to preserve the lesson's exact object, structure, action, or mechanism.",
+      "wet": "“wet” is necessary here to preserve the lesson's exact object, structure, action, or mechanism.",
+      "rest": "“rest” is necessary here to preserve the lesson's exact object, structure, action, or mechanism.",
+      "pass": "“pass” is necessary here to preserve the lesson's exact object, structure, action, or mechanism.",
+      "snail": "“snail” is necessary here to preserve the lesson's exact object, structure, action, or mechanism.",
+      "shell": "“shell” is necessary here to preserve the lesson's exact object, structure, action, or mechanism.",
+      "muscle": "“muscle” is necessary here to preserve the lesson's exact object, structure, action, or mechanism.",
+      "sharp": "“sharp” is necessary here to preserve the lesson's exact object, structure, action, or mechanism.",
+      "tooth": "“tooth” is necessary here to preserve the lesson's exact object, structure, action, or mechanism.",
+      "protection": "“protection” is necessary here to preserve the lesson's exact object, structure, action, or mechanism.",
+      "until": "“until” is necessary here to preserve the lesson's exact object, structure, action, or mechanism."
+    }
+  }
+}

@@ -1,0 +1,38 @@
+{
+  "voice": "en-US-AvaMultilingualNeural",
+  "rate": "+0%",
+  "pitch": "+0Hz",
+  "sentences": [
+    {
+      "index": 1,
+      "text": "A cactus lives where rain is rare.",
+      "file": "01.mp3"
+    },
+    {
+      "index": 2,
+      "text": "Wide roots quickly collect water near the surface.",
+      "file": "02.mp3"
+    },
+    {
+      "index": 3,
+      "text": "Its thick stem stores water after storms.",
+      "file": "03.mp3"
+    },
+    {
+      "index": 4,
+      "text": "A waxy skin slows water loss.",
+      "file": "04.mp3"
+    },
+    {
+      "index": 5,
+      "text": "Spines give shade and protect the stem.",
+      "file": "05.mp3"
+    },
+    {
+      "index": 6,
+      "text": "Together, these features help the cactus survive long dry times.",
+      "file": "06.mp3"
+    }
+  ],
+  "full": "full.mp3"
+}

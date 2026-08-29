@@ -1,0 +1,270 @@
+{
+  "version": "1.0",
+  "cardId": "day004-mushroom",
+  "courseId": "science-reading",
+  "seriesId": "science-reading",
+  "topic": "Living Things",
+  "theme": "mushroom",
+  "day": 4,
+  "level": "L1",
+  "title": "MUSHROOM",
+  "bigQuestion": "How does a mushroom spread?",
+  "image_file": "day-004-living-things-mushroom.png",
+  "articleStructure": "Process/Life cycle",
+  "structure": "Process/Life cycle",
+  "status": "draft",
+  "paragraphs": [
+    "A mushroom grows from hidden threads. The threads spread through damp soil. They take food from dead things. A cap rises above the ground. Tiny spores form under the cap. Wind carries the spores to new places."
+  ],
+  "word_bank": [
+    {
+      "english": "mushroom",
+      "chinese": "蘑菇",
+      "paragraph_form": "mushroom",
+      "image_semantics": "whole mushroom with cap and stalk",
+      "word_bank_rationale": "“mushroom” appears in the paragraph and supports the mushroom reasoning chain."
+    },
+    {
+      "english": "hidden",
+      "chinese": "隐藏的",
+      "paragraph_form": "hidden",
+      "image_semantics": "pale fungal threads hidden below soil",
+      "word_bank_rationale": "“hidden” appears in the paragraph and supports the mushroom reasoning chain."
+    },
+    {
+      "english": "thread",
+      "chinese": "菌丝",
+      "paragraph_form": "threads",
+      "image_semantics": "branching fungal threads through soil",
+      "word_bank_rationale": "“threads” appears in the paragraph and supports the mushroom reasoning chain."
+    },
+    {
+      "english": "damp",
+      "chinese": "潮湿的",
+      "paragraph_form": "damp",
+      "image_semantics": "dark moist soil with droplets",
+      "word_bank_rationale": "“damp” appears in the paragraph and supports the mushroom reasoning chain."
+    },
+    {
+      "english": "cap",
+      "chinese": "菌盖",
+      "paragraph_form": "cap",
+      "image_semantics": "mushroom cap shown from above and below",
+      "word_bank_rationale": "“cap” appears in the paragraph and supports the mushroom reasoning chain."
+    },
+    {
+      "english": "spore",
+      "chinese": "孢子",
+      "paragraph_form": "spores",
+      "image_semantics": "tiny spores falling from gills",
+      "word_bank_rationale": "“spores” appears in the paragraph and supports the mushroom reasoning chain."
+    }
+  ],
+  "comprehension": {
+    "questions": [
+      {
+        "type": "Whole",
+        "prompt": "How can a mushroom spread to new places?",
+        "options": {
+          "A": "Wind carries its spores away.",
+          "B": "Its cap grows under the ground.",
+          "C": "Its threads turn into water."
+        },
+        "answer": "A"
+      },
+      {
+        "type": "Connection",
+        "prompt": "What grows through damp soil first?",
+        "options": {
+          "A": "Hidden threads.",
+          "B": "A cap.",
+          "C": "A new fruit."
+        },
+        "answer": "A"
+      },
+      {
+        "type": "Transfer",
+        "prompt": "Wind blows under a mushroom cap. What may it carry?",
+        "options": {
+          "A": "Tiny spores.",
+          "B": "Wet soil.",
+          "C": "A hard shell."
+        },
+        "answer": "A"
+      }
+    ]
+  },
+  "wordModule": {
+    "matchPairs": [
+      {
+        "word": "mushroom",
+        "meaning": "a fungus with a cap"
+      },
+      {
+        "word": "hidden",
+        "meaning": "not easy to see"
+      },
+      {
+        "word": "thread",
+        "meaning": "a thin line under soil"
+      },
+      {
+        "word": "damp",
+        "meaning": "a little wet"
+      },
+      {
+        "word": "spore",
+        "meaning": "a tiny part that can grow"
+      }
+    ],
+    "contextQuestions": [
+      {
+        "prompt": "Mushroom __ spread through damp soil.",
+        "options": [
+          "threads",
+          "caps",
+          "spores"
+        ],
+        "answer": "threads"
+      },
+      {
+        "prompt": "Tiny __ form under the cap.",
+        "options": [
+          "spores",
+          "threads",
+          "soil"
+        ],
+        "answer": "spores"
+      }
+    ]
+  },
+  "rebuild": {
+    "type": "Process/Life cycle",
+    "steps": [
+      "Hidden threads spread through damp soil",
+      "Threads take food from dead things",
+      "A cap rises above ground",
+      "Spores form under the cap",
+      "Wind carries spores away"
+    ]
+  },
+  "listenRead": {
+    "fullAudio": null,
+    "coreSentenceAudio": null,
+    "sentences": [
+      {
+        "sentence": "A mushroom grows from hidden threads.",
+        "role": "Science Core"
+      },
+      {
+        "sentence": "Wind carries the spores to new places.",
+        "role": "Structure"
+      }
+    ]
+  },
+  "callouts": [
+    "A mushroom grows from threads",
+    "Threads spread through damp soil",
+    "Threads take food from dead things",
+    "A cap rises above ground",
+    "Spores form under the cap",
+    "Wind carries spores away"
+  ],
+  "reasoning_chain": [
+    {
+      "step": 1,
+      "role": "input",
+      "claim": "Hidden threads grow through damp soil"
+    },
+    {
+      "step": 2,
+      "role": "mechanism",
+      "claim": "The threads take nutrients from dead matter"
+    },
+    {
+      "step": 3,
+      "role": "mechanism",
+      "claim": "A mushroom cap rises above ground"
+    },
+    {
+      "step": 4,
+      "role": "mechanism",
+      "claim": "Spores form under the cap"
+    },
+    {
+      "step": 5,
+      "role": "result",
+      "claim": "Wind carries spores to new places"
+    }
+  ],
+  "difficulty_metrics": {
+    "total_words": 37,
+    "science_core": [
+      "mushroom",
+      "thread",
+      "cap",
+      "spore"
+    ],
+    "science_core_count": 4,
+    "sentence_lengths": [
+      6,
+      6,
+      6,
+      6,
+      6,
+      7
+    ],
+    "average_sentence_length_words": 6.17,
+    "longest_sentence_words": 7,
+    "familiar_language_estimate_percent": 83,
+    "cognition_check": "Every answer is stated directly in one sentence.",
+    "level_outcome_check": "Passes the Level 1 reading outcome."
+  },
+  "vocabulary_audit": {
+    "tier_505": [
+      "take",
+      "food",
+      "cap",
+      "under",
+      "new",
+      "place"
+    ],
+    "tier_1095": [
+      "grow",
+      "spread",
+      "soil",
+      "dead",
+      "thing",
+      "rise",
+      "ground",
+      "tiny",
+      "form",
+      "wind",
+      "carry"
+    ],
+    "science_core": [
+      "mushroom",
+      "thread",
+      "cap",
+      "spore"
+    ],
+    "necessity_notes": {
+      "grow": "“grow” is necessary here to preserve the lesson's exact object, structure, action, or mechanism.",
+      "spread": "“spread” is necessary here to preserve the lesson's exact object, structure, action, or mechanism.",
+      "soil": "“soil” is necessary here to preserve the lesson's exact object, structure, action, or mechanism.",
+      "dead": "“dead” is necessary here to preserve the lesson's exact object, structure, action, or mechanism.",
+      "thing": "“thing” is necessary here to preserve the lesson's exact object, structure, action, or mechanism.",
+      "rise": "“rise” is necessary here to preserve the lesson's exact object, structure, action, or mechanism.",
+      "ground": "“ground” is necessary here to preserve the lesson's exact object, structure, action, or mechanism.",
+      "tiny": "“tiny” is necessary here to preserve the lesson's exact object, structure, action, or mechanism.",
+      "form": "“form” is necessary here to preserve the lesson's exact object, structure, action, or mechanism.",
+      "wind": "“wind” is necessary here to preserve the lesson's exact object, structure, action, or mechanism.",
+      "carry": "“carry” is necessary here to preserve the lesson's exact object, structure, action, or mechanism.",
+      "mushroom": "“mushroom” is necessary here to preserve the lesson's exact object, structure, action, or mechanism.",
+      "hidden": "“hidden” is necessary here to preserve the lesson's exact object, structure, action, or mechanism.",
+      "thread": "“thread” is necessary here to preserve the lesson's exact object, structure, action, or mechanism.",
+      "damp": "“damp” is necessary here to preserve the lesson's exact object, structure, action, or mechanism.",
+      "spore": "“spore” is necessary here to preserve the lesson's exact object, structure, action, or mechanism."
+    }
+  }
+}

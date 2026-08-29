@@ -1,0 +1,302 @@
+{
+  "version": "1.0",
+  "cardId": "day010-cactus",
+  "courseId": "science-reading",
+  "seriesId": "science-reading",
+  "topic": "Living Things",
+  "theme": "cactus",
+  "day": 10,
+  "level": "L3",
+  "title": "CACTUS",
+  "bigQuestion": "How does a cactus save water?",
+  "image_file": "day-010-living-things-cactus.png",
+  "articleStructure": "Feature-Function",
+  "structure": "Feature-Function",
+  "status": "draft",
+  "paragraphs": [
+    "A cactus lives where rain is rare. Wide roots quickly collect water near the surface. Its thick stem stores water after storms. A waxy skin slows water loss. Spines give shade and protect the stem. Together, these features help the cactus survive long dry times."
+  ],
+  "word_bank": [
+    {
+      "english": "cactus",
+      "chinese": "仙人掌",
+      "paragraph_form": "cactus",
+      "image_semantics": "whole desert cactus with thick green stem",
+      "word_bank_rationale": "“cactus” appears in the paragraph and supports the cactus reasoning chain."
+    },
+    {
+      "english": "stem",
+      "chinese": "茎",
+      "paragraph_form": "stem",
+      "image_semantics": "cutaway thick stem holding stored water",
+      "word_bank_rationale": "“stem” appears in the paragraph and supports the cactus reasoning chain."
+    },
+    {
+      "english": "store",
+      "chinese": "储存",
+      "paragraph_form": "stores",
+      "image_semantics": "water held inside stem tissue",
+      "word_bank_rationale": "“stores” appears in the paragraph and supports the cactus reasoning chain."
+    },
+    {
+      "english": "waxy",
+      "chinese": "蜡质的",
+      "paragraph_form": "waxy",
+      "image_semantics": "shiny waxy skin layer on stem",
+      "word_bank_rationale": "“waxy” appears in the paragraph and supports the cactus reasoning chain."
+    },
+    {
+      "english": "spine",
+      "chinese": "刺",
+      "paragraph_form": "Spines",
+      "image_semantics": "cluster of sharp cactus spines casting shade",
+      "word_bank_rationale": "“Spines” appears in the paragraph and supports the cactus reasoning chain."
+    },
+    {
+      "english": "survive",
+      "chinese": "生存",
+      "paragraph_form": "survive",
+      "image_semantics": "healthy cactus through a long dry period",
+      "word_bank_rationale": "“survive” appears in the paragraph and supports the cactus reasoning chain."
+    }
+  ],
+  "comprehension": {
+    "questions": [
+      {
+        "type": "Whole",
+        "prompt": "How does a cactus survive long dry times?",
+        "options": {
+          "A": "Its roots collect water, and its stem and skin help save it.",
+          "B": "It makes rain every day with its leaves.",
+          "C": "It lives only in deep water."
+        },
+        "answer": "A"
+      },
+      {
+        "type": "Connection",
+        "prompt": "How does a thick cactus stem help?",
+        "options": {
+          "A": "It stores water after storms.",
+          "B": "It turns into a flower.",
+          "C": "It makes the roots shorter."
+        },
+        "answer": "A"
+      },
+      {
+        "type": "Transfer",
+        "prompt": "After a short storm, what feature helps a cactus keep the water it gets?",
+        "options": {
+          "A": "Its thick stem stores the water.",
+          "B": "Its long tail moves the water.",
+          "C": "Its soft down feathers trap it."
+        },
+        "answer": "A"
+      }
+    ]
+  },
+  "wordModule": {
+    "matchPairs": [
+      {
+        "word": "cactus",
+        "meaning": "a plant that lives in dry places"
+      },
+      {
+        "word": "stem",
+        "meaning": "the thick main part of a cactus"
+      },
+      {
+        "word": "store",
+        "meaning": "to keep for later"
+      },
+      {
+        "word": "waxy",
+        "meaning": "covered with a wax-like layer"
+      },
+      {
+        "word": "spine",
+        "meaning": "a sharp cactus part"
+      },
+      {
+        "word": "survive",
+        "meaning": "to stay alive"
+      }
+    ],
+    "contextQuestions": [
+      {
+        "prompt": "A cactus uses its thick __ to store water.",
+        "options": [
+          "stem",
+          "spine",
+          "root"
+        ],
+        "answer": "stem"
+      },
+      {
+        "prompt": "A __ skin slows water loss.",
+        "options": [
+          "waxy",
+          "wet",
+          "long"
+        ],
+        "answer": "waxy"
+      },
+      {
+        "prompt": "Cactus __ help give shade and protect the stem.",
+        "options": [
+          "spines",
+          "flowers",
+          "tails"
+        ],
+        "answer": "spines"
+      }
+    ]
+  },
+  "rebuild": {
+    "type": "Feature-Function",
+    "steps": [
+      "Wide roots collect water near the surface",
+      "A thick stem stores water",
+      "Waxy skin slows water loss",
+      "Spines give shade and protect the stem",
+      "The cactus survives long dry times"
+    ]
+  },
+  "listenRead": {
+    "fullAudio": null,
+    "coreSentenceAudio": null,
+    "sentences": [
+      {
+        "sentence": "Its thick stem stores water after storms.",
+        "role": "Science Core"
+      },
+      {
+        "sentence": "Together, these features help the cactus survive long dry times.",
+        "role": "Structure"
+      }
+    ]
+  },
+  "callouts": [
+    "A cactus lives with little rain",
+    "Wide roots collect water quickly",
+    "The thick stem stores water",
+    "Waxy skin slows water loss",
+    "Spines shade and protect the stem",
+    "These features help the cactus survive"
+  ],
+  "reasoning_chain": [
+    {
+      "step": 1,
+      "role": "input",
+      "claim": "Rain is rare in the cactus habitat"
+    },
+    {
+      "step": 2,
+      "role": "mechanism",
+      "claim": "Wide shallow roots quickly collect surface water"
+    },
+    {
+      "step": 3,
+      "role": "mechanism",
+      "claim": "A thick stem stores the collected water"
+    },
+    {
+      "step": 4,
+      "role": "mechanism",
+      "claim": "Waxy skin slows water loss"
+    },
+    {
+      "step": 5,
+      "role": "mechanism",
+      "claim": "Spines shade and protect the stem"
+    },
+    {
+      "step": 6,
+      "role": "result",
+      "claim": "The cactus survives long dry times"
+    }
+  ],
+  "difficulty_metrics": {
+    "total_words": 45,
+    "science_core": [
+      "cactus",
+      "root",
+      "stem",
+      "store",
+      "waxy skin",
+      "spine"
+    ],
+    "science_core_count": 6,
+    "sentence_lengths": [
+      7,
+      8,
+      7,
+      6,
+      7,
+      10
+    ],
+    "average_sentence_length_words": 7.5,
+    "longest_sentence_words": 10,
+    "familiar_language_estimate_percent": 84,
+    "cognition_check": "The paragraph integrates several traceable features into one survival explanation.",
+    "level_outcome_check": "Passes the Level 3 reading outcome."
+  },
+  "vocabulary_audit": {
+    "tier_505": [
+      "live",
+      "rain",
+      "water",
+      "near",
+      "after",
+      "slow",
+      "give",
+      "help",
+      "long",
+      "time"
+    ],
+    "tier_1095": [
+      "wide",
+      "quick",
+      "collect",
+      "surface",
+      "thick",
+      "store",
+      "storm",
+      "loss",
+      "protect",
+      "together",
+      "survive",
+      "dry"
+    ],
+    "science_core": [
+      "cactus",
+      "root",
+      "stem",
+      "store",
+      "waxy skin",
+      "spine"
+    ],
+    "necessity_notes": {
+      "wide": "“wide” is necessary here to preserve the lesson's exact object, structure, action, or mechanism.",
+      "quick": "“quick” is necessary here to preserve the lesson's exact object, structure, action, or mechanism.",
+      "collect": "“collect” is necessary here to preserve the lesson's exact object, structure, action, or mechanism.",
+      "surface": "“surface” is necessary here to preserve the lesson's exact object, structure, action, or mechanism.",
+      "thick": "“thick” is necessary here to preserve the lesson's exact object, structure, action, or mechanism.",
+      "store": "“store” is necessary here to preserve the lesson's exact object, structure, action, or mechanism.",
+      "storm": "“storm” is necessary here to preserve the lesson's exact object, structure, action, or mechanism.",
+      "loss": "“loss” is necessary here to preserve the lesson's exact object, structure, action, or mechanism.",
+      "protect": "“protect” is necessary here to preserve the lesson's exact object, structure, action, or mechanism.",
+      "together": "“together” is necessary here to preserve the lesson's exact object, structure, action, or mechanism.",
+      "survive": "“survive” is necessary here to preserve the lesson's exact object, structure, action, or mechanism.",
+      "dry": "“dry” is necessary here to preserve the lesson's exact object, structure, action, or mechanism.",
+      "cactus": "“cactus” is necessary here to preserve the lesson's exact object, structure, action, or mechanism.",
+      "rare": "“rare” is necessary here to preserve the lesson's exact object, structure, action, or mechanism.",
+      "root": "“root” is necessary here to preserve the lesson's exact object, structure, action, or mechanism.",
+      "stem": "“stem” is necessary here to preserve the lesson's exact object, structure, action, or mechanism.",
+      "waxy skin": "“waxy skin” is necessary here to preserve the lesson's exact object, structure, action, or mechanism.",
+      "spine": "“spine” is necessary here to preserve the lesson's exact object, structure, action, or mechanism.",
+      "shade": "“shade” is necessary here to preserve the lesson's exact object, structure, action, or mechanism.",
+      "feature": "“feature” is necessary here to preserve the lesson's exact object, structure, action, or mechanism."
+    }
+  },
+  "audioDirectory": "day010-cactus"
+}

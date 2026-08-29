@@ -1,2 +1,0 @@
-CREATE INDEX `idx_published_vocabulary_lexeme` ON `published_vocabulary_terms` (`lexeme`);--> statement-breakpoint
-CREATE INDEX `idx_published_vocabulary_membership` ON `published_vocabulary_terms` (`membership`,`lexeme`);
